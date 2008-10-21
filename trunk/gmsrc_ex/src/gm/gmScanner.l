@@ -66,6 +66,7 @@ FL		    (f|F)
 "this"                            { return(KEYWORD_THIS);       }
 "true"                            { return(KEYWORD_TRUE);       }
 "false"                           { return(KEYWORD_FALSE);      }
+"fork"                            { return(KEYWORD_FORK);      }
 
 {LETTER}({LETTER}|{DIGIT})*       { return(IDENTIFIER);         }
                                                                 

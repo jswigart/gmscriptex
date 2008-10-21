@@ -147,6 +147,7 @@ void gmByteCodeGen::AdjustStack(gmByteCode a_instruction)
     case BC_OP_GTE : --m_tos; break;
     case BC_OP_EQ : --m_tos; break;
     case BC_OP_NEQ : --m_tos; break;
+	case BC_FORK : m_tos += 2; break; // two variables are popped as a result of BC_FORK (one in each thread)
   }
 
   if(m_tos > m_maxTos) m_maxTos = m_tos;

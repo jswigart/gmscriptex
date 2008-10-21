@@ -128,6 +128,7 @@ enum gmCodeTreeNodeStatementType
   CTNST_DOWHILE,
   CTNST_IF,
   CTNST_COMPOUND,
+  CTNST_FORK,
 };
 
 

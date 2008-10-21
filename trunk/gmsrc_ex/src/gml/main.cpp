@@ -143,6 +143,7 @@ static void PrintByteCode(FILE * a_fp, const void * a_byteCode, int a_byteCodeLe
       case BC_OP_GTE : cp = "gte"; break;
       case BC_OP_EQ : cp = "eq"; break;
       case BC_OP_NEQ : cp = "neq"; break;
+      case BC_FORK: cp = "fork"; opiptr = true; break;
 
       default : cp = "ERROR"; break;
     }
