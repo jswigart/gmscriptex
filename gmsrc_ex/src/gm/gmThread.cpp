@@ -672,6 +672,36 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
         if(res == SYS_EXCEPTION) goto LabelException;
         break;
       }
+	  // duplicates the current thread and just the local stack frame
+	  // and branches around the forked section of code
+	  case BC_FORK :
+	  {
+		  int id = GM_INVALID_THREAD;
+		  gmThread* newthr = GetMachine()->CreateThread(&id);
+		  GM_ASSERT( newthr );
+
+		  // make sure there is enough room
+		  newthr->Touch( m_size - m_base + 2 );
+		  // copy stack and vars
+		  memcpy( newthr->m_stack, &m_stack[ m_base - 2 ], sizeof( gmVariable ) * (m_top - m_base + 2 ) );
+
+		  newthr->m_frame = m_machine->Sys_AllocStackFrame();
+		  newthr->m_frame->m_prev = 0;
+		  newthr->m_frame->m_returnAddress = 0;
+		  newthr->m_frame->m_returnBase = 0;
+
+		  newthr->m_base = 2;
+		  newthr->m_top = m_top - m_base + 2;
+		  newthr->m_instruction = instruction + sizeof(gmptr); // skip branch on other thread
+		  newthr->PushInt( GetId() );
+
+		  instruction = code + OPCODE_PTR_NI( instruction );   // branch
+
+		  top->m_type = GM_INT;
+		  top->m_value.m_int = newthr->GetId();
+		  ++top;
+		  break;
+	  }
       case BC_FOREACH :
       {
         gmuint32 localvalue = OPCODE_PTR(instruction);

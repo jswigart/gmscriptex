@@ -103,6 +103,7 @@ public:
   bool GenExprIdentifier(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
   bool GenExprCall(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
   bool GenExprThis(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
+  bool GenStmtFork(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
 
   bool m_locked;
   int m_errors;
@@ -384,6 +385,7 @@ bool gmCodeGenPrivate::Generate(const gmCodeTreeNode * a_node, gmByteCodeGen * a
           case CTNST_DOWHILE : res = GenStmtDoWhile(a_node, a_byteCode); break;
           case CTNST_IF : res = GenStmtIf(a_node, a_byteCode); break;
           case CTNST_COMPOUND : res = GenStmtCompound(a_node, a_byteCode); break;
+		  case CTNST_FORK : res = GenStmtFork(a_node, a_byteCode); break;
           default: 
           {
             GM_ASSERT(false);
@@ -916,7 +918,37 @@ bool gmCodeGenPrivate::GenStmtCompound(const gmCodeTreeNode * a_node, gmByteCode
   return Generate(a_node->m_children[0], a_byteCode);
 }
 
+bool gmCodeGenPrivate::GenStmtFork(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode)
+{
+	GM_ASSERT(a_node->m_type == CTNT_STATEMENT && a_node->m_subType == CTNST_FORK );
 
+	gmuint32 loc1,loc2;
+
+	// create the var for the thread id
+	const char * valname = 0;
+	gmuint32 valref = 0;
+	if ( a_node->m_children[1])
+	{
+		valname = a_node->m_children[1]->m_data.m_string;
+		valref = m_currentFunction->SetVariableType( valname, CTVT_LOCAL );
+	}
+
+	loc1 = a_byteCode->Skip( SIZEOF_BC_BRA );
+
+	if (!valname) a_byteCode->Emit( BC_POP );   // if not specified then just pop
+	else a_byteCode->Emit( BC_SETLOCAL, valref );   // store the thread id
+	if (!Generate(a_node->m_children[0], a_byteCode )) return false;
+	a_byteCode->Emit( BC_RET );
+
+	loc2 = a_byteCode->Seek( loc1 );
+	a_byteCode->Emit( BC_FORK, loc2 );
+	a_byteCode->Seek( loc2 );
+
+	if (!valname) a_byteCode->Emit( BC_POP );   // if not specified then just pop
+	else a_byteCode->Emit( BC_SETLOCAL, valref );   // store the thread id
+
+	return true;
+}
 
 bool gmCodeGenPrivate::GenExprOpDot(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode)
 {

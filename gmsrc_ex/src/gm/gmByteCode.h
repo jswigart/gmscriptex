@@ -91,6 +91,8 @@ enum gmByteCode
   BC_SETGLOBAL,       // set global opptr (symbol id) --tos
   BC_GETTHIS,         // get this opptr (symbol id) ++tos
   BC_SETTHIS,         // set this opptr (symbol id) --tos
+
+  BC_FORK,
 };
 
 #if GM_COMPILE_DEBUG
