@@ -1,11 +1,11 @@
 /*
-    _____               __  ___          __            ____        _      __
-   / ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
-  / (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
-  \___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
-                                               /___/             /_/
-                                             
-  See Copyright Notice in gmMachine.h
+_____               __  ___          __            ____        _      __
+/ ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
+/ (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
+\___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
+/___/             /_/
+
+See Copyright Notice in gmMachine.h
 
 */
 
@@ -24,11 +24,13 @@
 #include <math.h> // floorf, fmodf
 
 
+typedef void (GM_CDECL *gmChildInfoCallback)(const char * a_symbol, const char * a_value, int a_valuetype, int a_VarId);
+
 /// \enum gmEndian Endian byte order
 enum gmEndian
 {
-  GM_ENDIAN_BIG = 0,      //!< MOTOROLA (MAC), NINTENDO GC
-  GM_ENDIAN_LITTLE = 1    //!< x86, XBOX, PS2
+	GM_ENDIAN_BIG = 0,      //!< MOTOROLA (MAC), NINTENDO GC
+	GM_ENDIAN_LITTLE = 1    //!< x86, XBOX, PS2
 };
 
 //
@@ -76,8 +78,8 @@ enum gmEndian
 #define GMMACHINE_GCEVERYALLOC      0         // define this to check garbage collection every allocate.
 #define GMMACHINE_SUPERPARANOIDGC   0         // validate references (only for debugging purposes)
 #define GMMACHINE_THREEPASSGC       0         // 1 for safe gc of persisting objects that reference other objects, 
-                                              // ie, persisting tables.  if you only have persisting simple objects, ie
-                                              // strings, set to 0 for faster garbage collection.
+											  // ie, persisting tables.  if you only have persisting simple objects, ie
+											  // strings, set to 0 for faster garbage collection.
 
 // Auto GC Calibration values
 #define GMMACHINE_GC_HARD_MEM_INC_FRAC_OF_USED      1.5f   // what to set hard limit to above used mem when growing hard limit
@@ -91,6 +93,8 @@ enum gmEndian
 #define GM_GC_DEFAULT_DESTRUCT_INCREMENT            200    // Desired number of old objects to free per frame
 
 #define GMMACHINE_CPPOWNEDGMOBJHASHSIZE 1024  // default hash table size for objects owned by cpp code, necessary for GC.
+
+#define GM_USE_VECTOR3_STACK		1
 
 // DEBUGGING
 

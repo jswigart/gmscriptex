@@ -1,11 +1,11 @@
 /*
-    _____               __  ___          __            ____        _      __
-   / ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
-  / (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
-  \___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
-                                               /___/             /_/
-                                             
-  See Copyright Notice in gmMachine.h
+_____               __  ___          __            ____        _      __
+/ ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
+/ (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
+\___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
+/___/             /_/
+
+See Copyright Notice in gmMachine.h
 
 */
 
@@ -21,93 +21,174 @@ gmVariable gmVariable::s_null = gmVariable(GM_NULL, 0);
 
 const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_len) const
 {
-  switch(m_type)
-  {
-    case GM_NULL : 
-      _gmsnprintf(a_buffer, a_len, "null");
-      break;
-    case GM_INT :
-      _gmsnprintf(a_buffer, a_len, "%d", m_value.m_int);
-      break;
-    case GM_FLOAT :
-      _gmsnprintf(a_buffer, a_len, "%g", m_value.m_float);
-      break;
-    case GM_STRING :
-      return ((gmStringObject *) GM_MOBJECT(a_machine, m_value.m_ref))->GetString();
-    default:
-      gmAsStringCallback asStringCallback = a_machine->GetUserAsStringCallback(m_type);
-      if(asStringCallback)
-      {
-        asStringCallback((gmUserObject *) GM_MOBJECT(a_machine, m_value.m_ref), a_buffer, a_len );
-      }
-      else
-      {
-        _gmsnprintf(a_buffer, a_len, "%s:0x%x", a_machine->GetTypeName(m_type), m_value.m_ref);
-      }
-      break;
-  }
-  return a_buffer;
+	switch(m_type)
+	{
+	case GM_NULL : 
+		_gmsnprintf(a_buffer, a_len, "null");
+		break;
+	case GM_INT :
+		_gmsnprintf(a_buffer, a_len, "%d", m_value.m_int);
+		break;
+	case GM_FLOAT :
+		_gmsnprintf(a_buffer, a_len, "%g", m_value.m_float);
+		break;
+	case GM_STRING :
+		return ((gmStringObject *) GM_MOBJECT(a_machine, m_value.m_ref))->GetString();
+#if(GM_USE_VECTOR3_STACK)
+	case GM_VEC3:
+		{
+			_gmsnprintf(a_buffer, a_len, "(%.3f, %.3f, %.3f)",
+				m_value.m_vec3.x,
+				m_value.m_vec3.y,
+				m_value.m_vec3.z);
+			break;
+		}
+#endif
+	default:
+		gmAsStringCallback asStringCallback = a_machine->GetUserAsStringCallback(m_type);
+		if(asStringCallback)
+		{
+			asStringCallback((gmUserObject *) GM_MOBJECT(a_machine, m_value.m_ref), a_buffer, a_len );
+		}
+		else
+		{
+			_gmsnprintf(a_buffer, a_len, "%s:0x%x", a_machine->GetTypeName(m_type), m_value.m_ref);
+		}
+		break;
+	}
+	return a_buffer;
 }
 
+void gmVariable::DebugInfo(gmMachine * a_machine, gmChildInfoCallback a_cb) const
+{
+	const int buffSize = 256;
+	char buffVar[buffSize];
+	char buffVal[buffSize];
+
+	switch(m_type)
+	{
+#if(GM_USE_VECTOR3_STACK)
+	case GM_VEC3:
+		{
+			_gmsnprintf(buffVal, buffSize, "(%.3f, %.3f, %.3f)",
+				m_value.m_vec3.x,
+				m_value.m_vec3.y,
+				m_value.m_vec3.z);
+			a_cb("Vector3", buffVal, GM_INT, 0);
+			break;
+		}
+#endif
+	case GM_STRING:
+		{
+			break;
+		}
+	case GM_TABLE:
+		{
+			gmTableObject *pTable = GetTableObjectSafe();
+			gmTableIterator tIt;
+			gmTableNode *pNode = pTable->GetFirst(tIt);
+			while(pNode)
+			{
+				const char *pVar = pNode->m_key.AsString(a_machine, buffVar, buffSize);
+				const char *pVal = pNode->m_value.AsString(a_machine, buffVal, buffSize);
+				a_cb(
+					pVar,
+					pVal, pNode->m_value.m_type, 
+					pNode->m_value.IsReference() ? pNode->m_value.m_value.m_ref : 0);
+
+				pNode = pTable->GetNext(tIt);
+			}
+			break;
+		}
+	case GM_FUNCTION:
+		{
+			gmFunctionObject *pFunc = GetFunctionObjectSafe();
+			const char *pDbName = pFunc->GetDebugName();
+			_gmsnprintf(buffVal, buffSize, pDbName ? pDbName : "<Unknown>");
+			a_cb("Function Name", buffVal, GM_STRING, pFunc->GetRef());
+			break;
+		}
+	default:
+		gmDebugChildInfoCallback dbg_cb = a_machine->GetUserDebugChildInfoCallback(m_type);		
+		if(dbg_cb)
+		{
+			dbg_cb((gmUserObject*)GM_MOBJECT(a_machine, m_value.m_ref), a_machine, a_cb);
+		}
+		else
+		{
+			//_gmsnprintf(a_buffer, a_len, "%s:0x%x", a_machine->GetTypeName(m_type), m_value.m_ref);
+		}
+	}
+}
 
 const char * gmVariable::AsStringWithType(gmMachine * a_machine, char * a_buffer, int a_len) const
 {
-  // Copy the type first
-  _gmsnprintf(a_buffer, a_len, "%s: ", a_machine->GetTypeName(m_type));
+	// Copy the type first
+	_gmsnprintf(a_buffer, a_len, "%s: ", a_machine->GetTypeName(m_type));
 
-  // Update for used portion
-  int usedLen = strlen(a_buffer);
-  char* newBufferPos = a_buffer + usedLen;
-  int newLen = a_len - usedLen;
+	// Update for used portion
+	int usedLen = strlen(a_buffer);
+	char* newBufferPos = a_buffer + usedLen;
+	int newLen = a_len - usedLen;
 
-  if(newLen > 0) //Paranoid check some string buffer remaining
-  {
-    const char * str = AsString(a_machine, newBufferPos, newLen);
-    if(str != newBufferPos)
-    {
-      // copy what we can... this is used for debug purposes so it doesnt matter if we chop some off
-      strncpy(newBufferPos, str, newLen);
-    }
-  }
+	if(newLen > 0) //Paranoid check some string buffer remaining
+	{
+		const char * str = AsString(a_machine, newBufferPos, newLen);
+		if(str != newBufferPos)
+		{
+			// copy what we can... this is used for debug purposes so it doesnt matter if we chop some off
+			strncpy(newBufferPos, str, newLen);
+		}
+	}
 
-  return a_buffer;
+	return a_buffer;
 }
 
 
 void gmVariable::SetUser(gmUserObject * a_object)
 {
-  m_type = (gmType) a_object->m_userType;
-  m_value.m_ref = ((gmObject *) a_object)->GetRef();
+	m_type = (gmType) a_object->m_userType;
+	m_value.m_ref = ((gmObject *) a_object)->GetRef();
 }
 
 
 void gmVariable::SetUser(gmMachine * a_machine, void * a_userPtr, int a_userType)
 {
-  SetUser( a_machine->AllocUserObject(a_userPtr, a_userType) );
+	SetUser( a_machine->AllocUserObject(a_userPtr, a_userType) );
 }
 
 
 void gmVariable::SetString(gmMachine * a_machine, const char * a_cString)
 {
-  SetString( a_machine->AllocStringObject(a_cString) );
+	SetString( a_machine->AllocStringObject(a_cString) );
 }
 
 
-const char * gmVariable::GetCStringSafe() const
+const char * gmVariable::GetCStringSafe(const char *_def) const
 {
-  if( m_type == GM_STRING )
-  {
-    return ((gmStringObject *)m_value.m_ref)->GetString();
-  }
-  return "";
+	if( m_type == GM_STRING )
+	{
+		return ((gmStringObject *)m_value.m_ref)->GetString();
+	}
+	return _def;
 }
 
 
 void * gmVariable::GetUserSafe(int a_userType) const
 {
-  if( m_type == a_userType )
-  {
-    return ((gmUserObject *)m_value.m_ref)->m_user;
-  }
-  return NULL;
+	if( m_type == a_userType )
+	{
+		return ((gmUserObject *)m_value.m_ref)->m_user;
+	}
+	return NULL;
 }
+
+gmUserObject *gmVariable::GetUserObjectSafe(int a_userType) const
+{
+	if( m_type == a_userType )
+	{
+		return ((gmUserObject *)m_value.m_ref);
+	}
+	return NULL;
+}
+

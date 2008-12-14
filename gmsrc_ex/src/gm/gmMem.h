@@ -1,11 +1,11 @@
 /*
-    _____               __  ___          __            ____        _      __
-   / ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
-  / (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
-  \___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
-                                               /___/             /_/
-                                             
-  See Copyright Notice in gmMachine.h
+_____               __  ___          __            ____        _      __
+/ ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
+/ (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
+\___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
+/___/             /_/
+
+See Copyright Notice in gmMachine.h
 
 */
 
@@ -30,7 +30,7 @@
 template<class TYPE>
 inline TYPE* gmConstructElement(TYPE* a_element)
 {
-  return (TYPE*) GM_PLACEMENT_NEW( TYPE, (void*)a_element );
+	return (TYPE*) GM_PLACEMENT_NEW( TYPE, (void*)a_element );
 }
 
 
@@ -39,7 +39,7 @@ inline TYPE* gmConstructElement(TYPE* a_element)
 template<class TYPE>
 inline void gmDestructElement(TYPE* a_element)
 {
-  a_element->~TYPE();
+	a_element->~TYPE();
 }
 
 
@@ -48,11 +48,11 @@ inline void gmDestructElement(TYPE* a_element)
 template<class TYPE>
 inline void gmConstructElements(TYPE* a_elements, int a_count)
 {
-  // Call the constructor(s)
-  for (; a_count--; a_elements++)
-  {
-    GM_PLACEMENT_NEW( TYPE, (void*)a_elements );
-  }
+	// Call the constructor(s)
+	for (; a_count--; a_elements++)
+	{
+		GM_PLACEMENT_NEW( TYPE, (void*)a_elements );
+	}
 }
 
 
@@ -61,11 +61,11 @@ inline void gmConstructElements(TYPE* a_elements, int a_count)
 template<class TYPE>
 inline void gmDestructElements(TYPE* a_elements, int a_count)
 {
-  // Call the destructor(s)
-  for (; a_count--; a_elements++)
-  {
-    a_elements->~TYPE();
-  }
+	// Call the destructor(s)
+	for (; a_count--; a_elements++)
+	{
+		a_elements->~TYPE();
+	}
 }
 
 #endif // _GMMEM_H_
