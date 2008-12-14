@@ -1,11 +1,11 @@
 /*
-    _____               __  ___          __            ____        _      __
-   / ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
-  / (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
-  \___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
-                                               /___/             /_/
-                                             
-  See Copyright Notice in gmMachine.h
+_____               __  ___          __            ____        _      __
+/ ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
+/ (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
+\___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
+/___/             /_/
+
+See Copyright Notice in gmMachine.h
 
 */
 
@@ -27,22 +27,22 @@ class gmCodeGen
 {
 public:
 
-  /// \brief Get() will return the singleton code generator.
-  static gmCodeGen& Get();
+	/// \brief Get() will return the singleton code generator.
+	static gmCodeGen& Get();
 
-  /// \brief FreeMemory() will free all memory allocated by the code tree.  must be unlocked
-  virtual void FreeMemory() = 0;
+	/// \brief FreeMemory() will free all memory allocated by the code tree.  must be unlocked
+	virtual void FreeMemory() = 0;
 
-  /// \brief Lock() will create the byte code for the given gode tree.
-  /// \param a_codeTree is the code tree.
-  /// \param a_hooks is the byte code authoring object.
-  /// \param a_debug is true if debug info is required.
-  /// \param a_log is the compile log.
-  /// \return the number of errors encounted
-  virtual int Lock(const gmCodeTreeNode * a_codeTree, gmCodeGenHooks * a_hooks, bool a_debug, gmLog * a_log) = 0;
- 
-  /// \brief Unlock() will reset the code generator.
-  virtual int Unlock() = 0;
+	/// \brief Lock() will create the byte code for the given gode tree.
+	/// \param a_codeTree is the code tree.
+	/// \param a_hooks is the byte code authoring object.
+	/// \param a_debug is true if debug info is required.
+	/// \param a_log is the compile log.
+	/// \return the number of errors encounted
+	virtual int Lock(const gmCodeTreeNode * a_codeTree, gmCodeGenHooks * a_hooks, bool a_debug, gmLog * a_log) = 0;
+
+	/// \brief Unlock() will reset the code generator.
+	virtual int Unlock() = 0;
 };
 
 

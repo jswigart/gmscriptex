@@ -17,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)/bin/"
+			OutputDirectory="build/$(ConfigurationName)"
 			IntermediateDirectory="build/$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -40,11 +40,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\platform\win32msvc"
+				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;..\binds;..\gm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\$(ProjectName)_d.lib"
+				OutputFile="$(OutDir)\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -80,7 +80,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)/bin/"
+			OutputDirectory="build/$(ConfigurationName)"
 			IntermediateDirectory="build/$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -103,9 +103,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\platform\win32msvc"
+				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;..\binds;..\gm"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -241,6 +241,10 @@
 			</File>
 			<File
 				RelativePath=".\gmVariable.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmVec3Stack.cpp"
 				>
 			</File>
 		</Filter>
@@ -381,12 +385,64 @@
 				RelativePath=".\gmVariable.h"
 				>
 			</File>
+			<File
+				RelativePath="..\binds\gmVec3Stack.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="3rdParty"
+			>
+			<Filter
+				Name="mathlib"
+				>
+				<File
+					RelativePath="..\3rdParty\mathlib\matrix.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\mathlib\matrix.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\mathlib\quat.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\mathlib\quat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\mathlib\vector.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\mathlib\vector.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="gmbinder2"
+				>
+				<File
+					RelativePath="..\3rdParty\gmbinder2\gmbinder2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\gmbinder2\gmbinder2_class.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\gmbinder2\gmbinder2_functraits.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

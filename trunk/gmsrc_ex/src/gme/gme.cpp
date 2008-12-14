@@ -17,6 +17,11 @@
 #include "NetClient.h"
 #include <math.h>
 
+#undef GetObject
+
+#include "gmbinder2.h"
+#include "gmbinder2_class.h"
+
 #define GM_DEBUGGER_PORT  49001
 
 //
@@ -71,6 +76,9 @@ static void gmeInit(gmMachine * a_machine)
 
   gmTableObject * table = a_machine->AllocTableObject();
   a_machine->GetGlobals()->Set(a_machine, "CA", gmVariable(GM_TABLE, table->GetRef()));
+
+  gmBind2::Global(a_machine)
+	  .var(FOREGROUND_BLUE,"F_BLUE");
 
   table->Set(a_machine, "F_BLUE", gmVariable(GM_INT, FOREGROUND_BLUE));
   table->Set(a_machine, "F_GREEN", gmVariable(GM_INT, FOREGROUND_GREEN));

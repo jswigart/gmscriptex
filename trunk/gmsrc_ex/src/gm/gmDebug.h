@@ -1,11 +1,11 @@
 /*
-    _____               __  ___          __            ____        _      __
-   / ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
-  / (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
-  \___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
-                                               /___/             /_/
-                                             
-  See Copyright Notice in gmMachine.h
+_____               __  ___          __            ____        _      __
+/ ___/__ ___ _  ___ /  |/  /__  ___  / /_____ __ __/ __/_______(_)__  / /_
+/ (_ / _ `/  ' \/ -_) /|_/ / _ \/ _ \/  '_/ -_) // /\ \/ __/ __/ / _ \/ __/
+\___/\_,_/_/_/_/\__/_/  /_/\___/_//_/_/\_\\__/\_, /___/\__/_/ /_/ .__/\__/
+/___/             /_/
+
+See Copyright Notice in gmMachine.h
 
 */
 
@@ -33,54 +33,54 @@ class gmDebugSession
 {
 public:
 
-  gmDebugSession();
-  ~gmDebugSession();
+	gmDebugSession();
+	~gmDebugSession();
 
-  /// \brief Update() must be called to pump messages
-  void Update();
+	/// \brief Update() must be called to pump messages
+	void Update();
 
-  /// \brief Open() will start debugging on a_machine
-  bool Open(gmMachine * a_machine);
-  
-  /// \brief Close() will stop debugging
-  bool Close();
+	/// \brief Open() will start debugging on a_machine
+	bool Open(gmMachine * a_machine);
 
-  /// \brief GetMachine()
-  inline gmMachine * GetMachine() const { return m_machine; }
+	/// \brief Close() will stop debugging
+	bool Close();
 
-  gmSendDebuggerMessage m_sendMessage;
-  gmPumpDebuggerMessage m_pumpMessage;
-  void * m_user;
+	/// \brief GetMachine()
+	inline gmMachine * GetMachine() const { return m_machine; }
 
-  // send message helpers
-  gmDebugSession &Pack(int a_val);
-  gmDebugSession &Pack(const char * a_val);
-  void Send();
+	gmSendDebuggerMessage m_sendMessage;
+	gmPumpDebuggerMessage m_pumpMessage;
+	void * m_user;
 
-  // rcv message helpers
-  gmDebugSession &Unpack(int &a_val);
-  gmDebugSession &Unpack(const char * &a_val);
+	// send message helpers
+	gmDebugSession &Pack(int a_val);
+	gmDebugSession &Pack(const char * a_val);
+	void Send();
 
-  // helpers
-  bool AddBreakPoint(const void * a_bp, int a_threadId);
-  int * FindBreakPoint(const void * a_bp); // return thread id
-  bool RemoveBreakPoint(const void * a_bp);
+	// rcv message helpers
+	gmDebugSession &Unpack(int &a_val);
+	gmDebugSession &Unpack(const char * &a_val);
+
+	// helpers
+	bool AddBreakPoint(const void * a_bp, int a_threadId);
+	int * FindBreakPoint(const void * a_bp); // return thread id
+	bool RemoveBreakPoint(const void * a_bp);
 
 private:
 
-  class BreakPoint : public gmHashNode<void *, BreakPoint>
-  {
-  public:
-    inline const void * GetKey() const { return m_bp; }
-    const void * m_bp;
-    int m_threadId;
-  };
+	class BreakPoint : public gmHashNode<void *, BreakPoint>
+	{
+	public:
+		inline const void * GetKey() const { return m_bp; }
+		const void * m_bp;
+		int m_threadId;
+	};
 
-  gmMachine * m_machine;
-  
-  gmHash<void *, BreakPoint> m_breaks;
-  gmStreamBufferDynamic m_out;
-  gmStreamBufferStatic m_in;
+	gmMachine * m_machine;
+
+	gmHash<void *, BreakPoint> m_breaks;
+	gmStreamBufferDynamic m_out;
+	gmStreamBufferStatic m_in;
 };
 
 #endif
