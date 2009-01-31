@@ -33,3 +33,16 @@ print("TestVector :", bc.TestVector);
 bc.TestVector = Vector3(2,4,6);
 print("TestVector :", bc.TestVector);
 assert(bc.TestVector==Vector3(2,4,6),"Bad Set Vector");
+print("FuncRaw :", bc.FuncRaw());
+
+global TestFunc = function(arg1,arg2,arg3,arg4,arg5)
+{
+	print("TestFunc",arg1,arg2,arg3,arg4,arg5);
+	return "Test";
+};
+global InTable = {};
+InTable.TestFunc = function(arg1,arg2,arg3,arg4,arg5)
+{
+	print("InTable.TestFunc",arg1,arg2,arg3,arg4,arg5);
+	return "Test2";
+};
