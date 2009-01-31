@@ -132,7 +132,7 @@ namespace gmBind2
 	{
 	public:
 		template <typename Fn>
-		Class &func(Fn a_fn, const char *a_funcname, const char *a_asTable = NULL)
+		Class &func(Fn a_fn, const char *a_funcname)
 		{
 			typedef typename FunctionTraits<Fn>::Class_Type cls_type;
 			GM_ASSERT(ClassBase<cls_type>::GetClassType() != GM_NULL);
@@ -144,7 +144,7 @@ namespace gmBind2
 			ClassBase<ClassT>::m_Machine->RegisterTypeLibrary(ClassBase<ClassT>::GetClassType(), &fn, 1);
 			return *this;
 		}
-		Class &func(RawFunctionType a_fn, const char *a_funcname, const char *a_asTable = NULL)
+		Class &func(RawFunctionType a_fn, const char *a_funcname)
 		{
 			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = a_funcname;

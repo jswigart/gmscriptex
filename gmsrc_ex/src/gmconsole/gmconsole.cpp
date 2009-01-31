@@ -74,6 +74,11 @@ public:
 		std::cout << __FUNCTION__ << std::endl;
 		return str;
 	}
+	static int FuncRaw(gmThread *a_thread)
+	{
+		a_thread->PushNewString("RawFunc!");
+		return GM_OK;
+	}
 
 	static void Bind(gmMachine *a_machine)
 	{
@@ -84,6 +89,7 @@ public:
 			.func(&BindClass::FuncBoolNoArg,"FuncBoolNoArg")
 			.func(&BindClass::FuncStringNoArg,"FuncStringNoArg")
 			.func(&BindClass::FuncStringArg,"FuncStringArg")
+			.func(&BindClass::FuncRaw,"FuncRaw")
 			.var(&BindClass::TestInt,"TestInt")
 			.var(&BindClass::TestFloat,"TestFloat")
 			.var(&BindClass::TestVector,"TestVector")
@@ -93,9 +99,6 @@ public:
 			.var(&BindClass::TestGCFunction,"TestGCFunction")
 			;
 	}
-	/*improved error handling on returns of unknown types
-		print message on attempts to set read only variables
-		misc fixes*/
 	BindClass() : TestInt(1), TestFloat(2.f), TestStdString("foo"), TestFloatReadOnly(50.f)
 	{
 		TestVector[0] = 1;
@@ -183,6 +186,25 @@ void main(int argc, char * argv[], char * envp[])
 				Script[size] = 0;
 				fclose(fp);
 			}
+		}
+		if(strstr(buffer,"testfunc"))
+		{
+			{
+				gmBind2::Function callFn(g_machine,"TestFunc");
+				gmVariable returnVal = callFn << 10 << 20 << 30 << gmBind2::Null() << 40 << gmBind2::Call();
+
+				char buffer[256];
+				std::cout << returnVal.AsString(g_machine,buffer,256) << std::endl;
+			}
+			
+			{
+				gmBind2::Function callFn(g_machine,"InTable.TestFunc");
+				gmVariable returnVal = callFn << 1 << 2 << 3 << gmBind2::Null() << 4 << gmBind2::Call();
+
+				char buffer[256];
+				std::cout << returnVal.AsString(g_machine,buffer,256) << std::endl;
+			}
+			continue;
 		}
 		//////////////////////////////////////////////////////////////////////////
 		int errors = g_machine->ExecuteString(Script?Script:buffer, NULL, false);
