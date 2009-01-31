@@ -23,6 +23,9 @@
 #ifndef _GMBINDER2_CLASS_H_
 #define _GMBINDER2_CLASS_H_
 
+#include <string>
+#include <map>
+
 namespace gmBind2
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -134,7 +137,7 @@ namespace gmBind2
 			typedef typename FunctionTraits<Fn>::Class_Type cls_type;
 			GM_ASSERT(ClassBase<cls_type>::GetClassType() != GM_NULL);
 
-			gmFunctionEntry fn = {0,0,0,0};
+			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = a_funcname;
 			fn.m_function = 0;
 			fn.m_functor = new GMExportFunctor<Fn>(a_fn);
@@ -143,7 +146,7 @@ namespace gmBind2
 		}
 		Class &func(RawFunctionType a_fn, const char *a_funcname, const char *a_asTable = NULL)
 		{
-			gmFunctionEntry fn = {0,0,0,0};
+			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = a_funcname;
 			fn.m_function = a_fn;
 			fn.m_functor = 0;
@@ -153,7 +156,7 @@ namespace gmBind2
 		template <typename Fn>
 		Class &func_operator(gmOperator a_op, Fn a_fn)
 		{
-			gmFunctionEntry fn = {0,0,0,0};
+			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = 0;
 			fn.m_function = 0;
 			fn.m_functor = new GMExportOpFunctor<Fn>(a_fn);
@@ -162,7 +165,7 @@ namespace gmBind2
 		}
 		Class &rawfunc_operator(gmOperator a_op, RawFunctionType a_fn)
 		{
-			gmFunctionEntry fn = {0,0,0,0};
+			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = 0;
 			fn.m_function = a_fn;
 			fn.m_functor = 0;
@@ -205,12 +208,13 @@ namespace gmBind2
 			pr.m_Getter = GMProperty::Get<VarType>;
 			//pr.m_Setter = GMProperty::Get<VarType>;
 			pr.m_PropertyOffset = (size_t)(*(VarType**)&cv);
+			pr.m_Static = false;
 			m_Properties.insert(std::make_pair(_name, pr));
 			return *this;
 		}
 		Class &constructor(RawFunctionType f, const char *_name = 0, const char *_undertable = 0)
 		{
-			gmFunctionEntry fn = {0,0,0,0};
+			gmFunctionEntry fn = {0,0,0};
 			fn.m_name =  _name ? _name : ClassBase<ClassT>::GetClassName();
 			fn.m_function = f;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
@@ -218,7 +222,7 @@ namespace gmBind2
 		}
 		Class &constructor(const char *_name = 0, const char *_undertable = 0)
 		{
-			gmFunctionEntry fn = {0,0,0,0};
+			gmFunctionEntry fn = {0,0,0};
 			fn.m_name =  _name ? _name : ClassBase<ClassT>::GetClassName();
 			fn.m_function = ClassBase<ClassT>::gmfDefaultConstructor;
 			fn.m_functor = 0;
@@ -227,7 +231,7 @@ namespace gmBind2
 		}
 		Class &constructorArgs(const char *_name = 0, const char *_undertable = 0)
 		{
-			gmFunctionEntry fn = {0,0,0,0};
+			gmFunctionEntry fn = {0,0,0};
 			fn.m_name =  _name ? _name : ClassBase<ClassT>::GetClassName();
 			fn.m_function = ClassBase<ClassT>::gmfArgConstructor;
 			fn.m_functor = 0;
@@ -376,6 +380,21 @@ namespace gmBind2
 					{
 						propfuncs.m_Setter(bo->m_NativeObj, a_thread, a_operands, propfuncs.m_PropertyOffset, propfuncs.m_Static);
 						return;
+					}
+					else
+					{
+						if(gmMachine::s_printCallback)
+						{
+							enum { BufferLen = 256 };
+							char buffer[BufferLen*2];
+							char buffer2[BufferLen];
+							
+							sprintf(buffer,"Read Only: Unable to Set %s.%s to %s", 
+								ClassBase<ClassT>::GetClassName(),
+								pString, 
+								a_operands[1].AsString(a_thread->GetMachine(),buffer2,BufferLen));
+							gmMachine::s_printCallback(a_thread->GetMachine(),buffer);
+						}
 					}
 				}
 			}

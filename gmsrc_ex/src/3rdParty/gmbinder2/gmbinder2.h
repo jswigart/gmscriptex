@@ -318,40 +318,56 @@ namespace gmBind2
 	//////////////////////////////////////////////////////////////////////////
 	// Return values
 	template<typename T>
-	inline void PushReturnToGM(gmThread *a_thread, T arg) 
+	inline int PushReturnToGM(gmThread *a_thread, T arg) 
 	{
 		if(ClassBase<T>::GetClassType() != GM_NULL)
 		{
 			BoundObject<T> *bo = new BoundObject<T>(new T(arg));
 			a_thread->PushNewUser(bo, ClassBase<T>::GetClassType());
+			return GM_OK;
 		}
 		else
-			a_thread->PushNull();
+		{
+			const char *ArgTypeName = TypeName<T>();
+			GM_EXCEPTION_MSG("Unknown Return Type: %s",ArgTypeName?ArgTypeName:"unknown");
+			return GM_EXCEPTION;
+		}
 	}
 	template<>
-	inline void PushReturnToGM<bool>(gmThread *a_thread, bool arg)
+	inline int PushReturnToGM<bool>(gmThread *a_thread, bool arg)
 	{
 		a_thread->PushInt(arg?1:0);
+		return GM_OK;
 	}
 	template<>
-	inline void PushReturnToGM<int>(gmThread *a_thread, int arg)
+	inline int PushReturnToGM<int>(gmThread *a_thread, int arg)
 	{
 		a_thread->PushInt(arg);
+		return GM_OK;
 	}
 	template<>
-	inline void PushReturnToGM<float>(gmThread *a_thread, float arg)
+	inline int PushReturnToGM<float>(gmThread *a_thread, float arg)
 	{
 		a_thread->PushFloat(arg);
+		return GM_OK;
 	}
 	template<>
-	inline void PushReturnToGM<const char*>(gmThread *a_thread, const char* arg)
+	inline int PushReturnToGM<const char*>(gmThread *a_thread, const char* arg)
 	{
 		a_thread->PushNewString(arg);
+		return GM_OK;
 	}
 	template<>
-	inline void PushReturnToGM<float*>(gmThread *a_thread, float *arg)
+	inline int PushReturnToGM<float*>(gmThread *a_thread, float *arg)
 	{
 		a_thread->PushVector(arg);
+		return GM_OK;
+	}
+	template<>
+	inline int PushReturnToGM<std::string>(gmThread *a_thread, std::string arg)
+	{
+		a_thread->PushNewString(arg.c_str());
+		return GM_OK;
 	}
 	//////////////////////////////////////////////////////////////////////////
 	template<typename Fn, int>
@@ -373,8 +389,7 @@ namespace gmBind2
 			GM_CHECK_NUM_PARAMS(FunctionTraits<Fn>::Arity);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = fn();
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// member function, no return value
@@ -393,8 +408,7 @@ namespace gmBind2
 			CHECKTHIS;
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)();
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 	};
 	template<typename Fn>
@@ -415,8 +429,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(0);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = fn(arg0);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// member function, no return value
@@ -437,8 +450,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(0);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)(arg0);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 	};
 	template<typename Fn>
@@ -461,8 +473,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(1);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = fn(arg0, arg1);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// member function, no return value
@@ -485,8 +496,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(1);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)(arg0, arg1);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 	};
 	template<typename Fn>
@@ -511,8 +521,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(2);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = fn(arg0, arg1, arg2);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// member function, no return value
@@ -537,8 +546,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(2);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)(arg0, arg1, arg2);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 	};
 	template<typename Fn>
@@ -565,8 +573,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(3);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = fn(arg0, arg1, arg2, arg3);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// member function, no return value
@@ -593,8 +600,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(3);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)(arg0, arg1, arg2, arg3);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 	};
 	//...
@@ -617,8 +623,7 @@ namespace gmBind2
 			GM_CHECK_NUM_PARAMS(FunctionTraits<Fn>::Arity);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = fn();
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// member function, no return value
@@ -637,8 +642,7 @@ namespace gmBind2
 			CHECKTHISOP;
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)();
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 	};
 	template<typename Fn>
@@ -663,8 +667,7 @@ namespace gmBind2
 			CHECKOPERAND;
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)(operand);
-			PushReturnToGM(a_thread, ret);
-			return GM_OK;
+			return PushReturnToGM(a_thread, ret);
 		}
 	};
 	//////////////////////////////////////////////////////////////////////////

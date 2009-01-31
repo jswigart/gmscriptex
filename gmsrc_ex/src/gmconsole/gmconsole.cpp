@@ -53,6 +53,65 @@ bool GM_CDECL gmeMachineCallback(gmMachine * a_machine, gmMachineCommand a_comma
 	return false;
 }
 
+class BindClass
+{
+public:
+	void FuncNoRetNoArg() 
+	{
+		std::cout << __FUNCTION__ << std::endl; 
+	}
+	bool FuncBoolNoArg()
+	{
+		std::cout << __FUNCTION__ << std::endl; return true; 
+	}
+	std::string FuncStringNoArg()
+	{
+		std::cout << __FUNCTION__ << std::endl; 
+		return "success!"; 
+	}
+	std::string FuncStringArg(std::string str)
+	{
+		std::cout << __FUNCTION__ << std::endl;
+		return str;
+	}
+
+	static void Bind(gmMachine *a_machine)
+	{
+		gmBind2::Class<BindClass>("BindClass",a_machine)
+			.constructor()
+			.constructor((const char *)0,"Under")
+			.func(&BindClass::FuncNoRetNoArg,"FuncNoRetNoArg")
+			.func(&BindClass::FuncBoolNoArg,"FuncBoolNoArg")
+			.func(&BindClass::FuncStringNoArg,"FuncStringNoArg")
+			.func(&BindClass::FuncStringArg,"FuncStringArg")
+			.var(&BindClass::TestInt,"TestInt")
+			.var(&BindClass::TestFloat,"TestFloat")
+			.var(&BindClass::TestVector,"TestVector")
+			.var_readonly(&BindClass::TestFloatReadOnly,"TestFloatReadOnly")
+			.var(&BindClass::TestStdString,"TestStdString")
+			.var(&BindClass::TestGCTable,"TestGCTable")
+			.var(&BindClass::TestGCFunction,"TestGCFunction")
+			;
+	}
+	/*improved error handling on returns of unknown types
+		print message on attempts to set read only variables
+		misc fixes*/
+	BindClass() : TestInt(1), TestFloat(2.f), TestStdString("foo"), TestFloatReadOnly(50.f)
+	{
+		TestVector[0] = 1;
+		TestVector[1] = 2;
+		TestVector[2] = 3;
+	}
+private:
+	int							TestInt;
+	float						TestFloat;
+	float						TestFloatReadOnly;
+	float						TestVector[3];
+	std::string					TestStdString;
+	gmGCRoot<gmTableObject>		TestGCTable;
+	gmGCRoot<gmFunctionObject>	TestGCFunction;
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -88,6 +147,8 @@ void main(int argc, char * argv[], char * envp[])
 	std::cout << "Lib Bound: System" << std::endl;
 	//gmBindVector3Lib(g_machine);
 	//std::cout << "Lib Bound: Vector3" << std::endl;
+
+	BindClass::Bind(g_machine);
 
 	//
 	// execute loop
