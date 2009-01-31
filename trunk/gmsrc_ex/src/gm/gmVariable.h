@@ -102,13 +102,30 @@ struct gmVariable
 	}
 	void SetVector(const gmVec3Data &a_val) 
 	{
+		m_type = GM_VEC3;
 		m_value.m_vec3 = a_val; 
 	}
 	void SetVector(float a_x, float a_y, float a_z) 
 	{
+		m_type = GM_VEC3;
 		m_value.m_vec3.x = a_x; 
 		m_value.m_vec3.y = a_y; 
 		m_value.m_vec3.z = a_z; 
+	}
+	void GetVector(float &a_x, float &a_y, float &a_z) 
+	{
+		a_x = m_value.m_vec3.x; 
+		a_y = m_value.m_vec3.y; 
+		a_z = m_value.m_vec3.z; 
+	}
+
+	void Set(gmMachine *a_machine, float *a_value) 
+	{
+		SetVector(a_value[0],a_value[1],a_value[2]); 
+	}
+	void Get(gmMachine *a_machine, float *a_value)
+	{
+		GetVector(a_value[0],a_value[1],a_value[2]);
 	}
 #endif
 
@@ -230,6 +247,7 @@ struct gmVariable
 	}
 	void Get(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value);
 	void Get(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value);
+
 };
 
 
