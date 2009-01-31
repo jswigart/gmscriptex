@@ -444,6 +444,26 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="binds"
+			>
+			<File
+				RelativePath="..\binds\gmGCRoot.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmGCRoot.h"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmGCRootUtil.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmGCRootUtil.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

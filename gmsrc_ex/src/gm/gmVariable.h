@@ -31,6 +31,9 @@ class gmTableObject;
 class gmFunctionObject;
 class gmUserObject;
 
+template <class T>
+class gmGCRoot;
+
 /// \enum gmType
 /// \brief gmType is an enum of the possible scripting types.
 typedef int gmType;
@@ -161,6 +164,7 @@ struct gmVariable
 	/// Return c string or empty string
 	const char* GetCStringSafe(const char *_def = "") const;
 	/// Return user type ptr or null
+	gmUserObject *gmVariable::GetUser() const { return ((gmUserObject *)m_value.m_ref); }
 	void* GetUserSafe(int a_userType) const;
 	gmUserObject *GetUserObjectSafe(int a_userType) const;
 
@@ -183,6 +187,49 @@ struct gmVariable
 		return 0;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	// for script binding helpers
+	void Set(gmMachine *a_machine, bool a_value) { SetInt(a_value?1:0); }
+	void Set(gmMachine *a_machine, int a_value) { SetInt(a_value); }
+	void Set(gmMachine *a_machine, float a_value) { SetFloat(a_value); }
+	void Set(gmMachine *a_machine, gmStringObject *a_value) { SetString(a_value); }
+	void Set(gmMachine *a_machine, gmTableObject *a_value) { SetTable(a_value); }
+	void Set(gmMachine *a_machine, gmFunctionObject *a_value) { SetFunction(a_value); }
+	void Set(gmMachine *a_machine, gmUserObject *a_value) { SetUser(a_value); }
+	void Set(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value);
+	void Set(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value);
+	
+
+	void Get(gmMachine *a_machine, bool &a_value)
+	{
+		a_value = GetInt()!=0;
+	}
+	void Get(gmMachine *a_machine, int &a_value) 
+	{
+		a_value = GetInt();
+	}
+	void Get(gmMachine *a_machine, float &a_value)
+	{
+		a_value = GetFloat();
+	}
+	void Get(gmMachine *a_machine, gmStringObject *&a_value)
+	{
+		a_value = GetStringObjectSafe();
+	}
+	void Get(gmMachine *a_machine, gmTableObject *&a_value)
+	{
+		a_value = GetTableObjectSafe();
+	}
+	void Get(gmMachine *a_machine, gmFunctionObject * a_value)
+	{
+		a_value = GetFunctionObjectSafe();
+	}
+	void Get(gmMachine *a_machine, gmUserObject *&a_value)
+	{
+		a_value = GetUser();
+	}
+	void Get(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value);
+	void Get(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value);
 };
 
 

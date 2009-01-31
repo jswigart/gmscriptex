@@ -673,30 +673,11 @@ namespace gmBind2
 		template<typename T>
 		static int Get(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static) 
 		{
+			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
+			a_operands[0].Set(a_thread->GetMachine(),*var);
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
-		template<>
-		static int Get<bool>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			bool *num = a_static ? (bool*)a_offset : (bool*)((char*)p + a_offset);
-			a_operands[0].SetInt(*num?1:0);
-			return 1;
-		}
-		template<>
-		static int Get<int>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			int *num = a_static ? (int*)a_offset : (int*)((char*)p + a_offset);
-			a_operands[0].SetInt(*num);
-			return 1;
-		}
-		template<>
-		static int Get<float>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			float *num = a_static ? (float*)a_offset : (float*)((char*)p + a_offset);
-			a_operands[0].SetFloat(*num);
-			return 1;
-		}
 		template<>
 		static int Get<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
 		{
@@ -704,68 +685,20 @@ namespace gmBind2
 			a_operands[0].SetString(a_thread->GetMachine(), str->c_str());
 			return 1;
 		}
-		template<>
-		static int Get< gmGCRoot<gmFunctionObject> >(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			gmGCRoot<gmFunctionObject> *fo = 
-				a_static ? 
-				(gmGCRoot<gmFunctionObject>*)a_offset : 
-			(gmGCRoot<gmFunctionObject> *)((char*)p + a_offset);
-
-			if(*fo)
-			{
-				a_operands[0].SetFunction(*fo);
-			}			
-			return 1;
-		}
 		//////////////////////////////////////////////////////////////////////////
 		template<typename T>
 		static int Set(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static) 
 		{
+			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
+			a_operands[1].Get(a_thread->GetMachine(),*var);
 			return 1; 
 		}
 		//////////////////////////////////////////////////////////////////////////
-		template<>
-		static int Set<bool>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			bool *num = a_static ? (bool*)a_offset : (bool*)((char*)p + a_offset);
-			*num = a_operands[1].GetIntSafe()!=0;
-			return 1;
-		}
-		template<>
-		static int Set<int>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			int *num = a_static ? (int*)a_offset : (int*)((char*)p + a_offset);
-			*num = a_operands[1].GetIntSafe();
-			return 1;
-		}
-		template<>
-		static int Set<float>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			float *num = a_static ? (float*)a_offset : (float*)((char*)p + a_offset);
-			*num = a_operands[1].GetFloatSafe();
-			return 1;
-		}
 		template<>
 		static int Set<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
 		{
 			std::string *str = a_static ? (std::string*)a_offset : (std::string *)((char*)p + a_offset);
 			*str = a_operands[1].GetCStringSafe();
-			return 1;
-		}
-		template<>
-		static int Set< gmGCRoot<gmFunctionObject> >(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
-		{
-			gmGCRoot<gmFunctionObject> *fo = 
-				a_static ? 
-				(gmGCRoot<gmFunctionObject>*)a_offset : 
-				(gmGCRoot<gmFunctionObject> *)((char*)p + a_offset);
-
-			gmFunctionObject *fnOp = a_operands[1].GetFunctionObjectSafe();
-			if(fnOp)
-			{
-				fo->Set(fnOp,a_thread->GetMachine());
-			}
 			return 1;
 		}
 	};

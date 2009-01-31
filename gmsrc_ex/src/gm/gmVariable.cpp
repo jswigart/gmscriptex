@@ -14,6 +14,7 @@ See Copyright Notice in gmMachine.h
 #include "gmThread.h"
 #include "gmStringObject.h"
 #include "gmUserObject.h"
+#include "gmGCRoot.h"
 
 // Init statics and constants
 gmVariable gmVariable::s_null = gmVariable(GM_NULL, 0);
@@ -192,3 +193,33 @@ gmUserObject *gmVariable::GetUserObjectSafe(int a_userType) const
 	return NULL;
 }
 
+void gmVariable::Set(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value)
+{
+	if(a_value)
+		SetFunction(a_value);
+	else
+		Nullify();
+}
+void gmVariable::Set(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value)
+{
+	if(a_value)
+		SetTable(a_value);
+	else
+		Nullify();
+}
+void gmVariable::Get(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value)
+{
+	gmFunctionObject *a_v = GetFunctionObjectSafe();
+	if(a_v)
+		a_value.Set(a_v,a_machine);
+	else
+		a_value.Set(NULL,a_machine);
+}
+void gmVariable::Get(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value)
+{
+	gmTableObject *a_v = GetTableObjectSafe();
+	if(a_v)
+		a_value.Set(a_v,a_machine);
+	else
+		a_value.Set(NULL,a_machine);
+}
