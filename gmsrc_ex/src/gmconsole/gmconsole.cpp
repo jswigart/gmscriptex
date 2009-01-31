@@ -199,10 +199,7 @@ void main(int argc, char * argv[], char * envp[])
 			
 			{
 				gmBind2::Function callFn(g_machine,"InTable.TestFunc");
-				gmVariable returnVal = callFn << 1 << 2 << 3 << gmBind2::Null() << 4 << gmBind2::Call();
-
-				char buffer[256];
-				std::cout << returnVal.AsString(g_machine,buffer,256) << std::endl;
+				callFn << 1 << 2 << 3 << gmBind2::Null() << 4 << gmBind2::CallAsync();
 			}
 			continue;
 		}

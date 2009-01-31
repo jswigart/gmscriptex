@@ -816,18 +816,64 @@ namespace gmBind2
 
 	struct Null {};
 	struct Call {};
+	struct CallAsync {};
 
 	class Function
 	{
 	public:
-		gmVariable operator<<(const Call& /*run*/)
+		Function(gmMachine *_machine, const char *_funcname, const gmVariable &_this = gmVariable::s_null)
+			: m_Machine(_machine)
+			, m_Function(NULL)
+			, m_Thread(NULL)
+			, m_ParamCount(0)
+			, m_This(_this)
+			, m_ReturnVal(gmVariable::s_null)
+			, m_ThreadId(GM_INVALID_THREAD)
+		{
+			gmVariable v = _machine->Lookup(_funcname);
+			m_Function = v.GetFunctionObjectSafe();
+
+			if(m_Function && m_Machine)
+			{
+				m_Thread = m_Machine->CreateThread();   // Create thread for func to run on      
+				m_Thread->Push(m_This);					// this
+				m_Thread->PushFunction(m_Function);		// function
+			}
+		}
+
+		gmVariable operator<<(const Call& run)
+		{
+			return _Call(false);
+		}
+		void operator<<(const CallAsync& run)
+		{
+			_Call(true);
+		}
+		
+	//private:
+		gmVariable			m_This;
+		gmVariable			m_ReturnVal;
+		gmMachine			*m_Machine;
+		gmFunctionObject	*m_Function;
+		gmThread			*m_Thread;
+		int					m_ParamCount;
+		int					m_ThreadId;
+	private:
+		gmVariable _Call(bool _async = false)
 		{
 			if(m_Thread)
 			{
 				int state = m_Thread->PushStackFrame(m_ParamCount);
 				if(state != gmThread::KILLED) // Can be killed immedialy if it was a C function
 				{
-					state = m_Thread->Sys_Execute(&m_ReturnVal);
+					if(_async)
+					{
+						state = m_Thread->GetState();
+					}
+					else
+					{
+						state = m_Thread->Sys_Execute(&m_ReturnVal);
+					}
 				}
 				else
 				{
@@ -849,34 +895,6 @@ namespace gmBind2
 			}
 			return m_ReturnVal;
 		}
-
-		Function(gmMachine *_machine, const char *_funcname)
-			: m_Machine(_machine)
-			, m_Function(NULL)
-			, m_Thread(NULL)
-			, m_ParamCount(0)
-			, m_This(gmVariable::s_null)
-			, m_ReturnVal(gmVariable::s_null)
-			, m_ThreadId(GM_INVALID_THREAD)
-		{
-			gmVariable v = _machine->Lookup(_funcname);
-			m_Function = v.GetFunctionObjectSafe();
-
-			if(m_Function && m_Machine)
-			{
-				m_Thread = m_Machine->CreateThread();   // Create thread for func to run on      
-				m_Thread->Push(m_This);					// this
-				m_Thread->PushFunction(m_Function);		// function
-			}
-		}
-	//private:
-		gmVariable			m_This;
-		gmVariable			m_ReturnVal;
-		gmMachine			*m_Machine;
-		gmFunctionObject	*m_Function;
-		gmThread			*m_Thread;
-		int					m_ParamCount;
-		int					m_ThreadId;
 	};
 
 	template <typename T>
