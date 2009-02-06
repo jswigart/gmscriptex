@@ -41,12 +41,13 @@ namespace gmBind2
 	struct BoundObject
 	{
 		ClassT		*m_NativeObj;
+		gmTableObject	*m_Table;
 		void AddRef() { ++m_RefCount; }
 		void ReleaseRef() { --m_RefCount; }
 		int RefCount() const { return m_RefCount; }
 		bool IsNative() const { return m_Native; }
 		void SetNative(bool _b) { m_Native = _b; }
-		BoundObject(ClassT *o) : m_NativeObj(o), m_Native(false), m_RefCount(0) {}
+		BoundObject(ClassT *o) : m_NativeObj(o), m_Native(false), m_Table(0), m_RefCount(0) {}
 	private:
 		mutable int m_RefCount;
 		bool		m_Native;

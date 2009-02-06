@@ -40,14 +40,16 @@ namespace gmBind2
 
 		static gmType GetClassType()		{ return m_ClassType; }
 		static const char *GetClassName()	{ return m_ClassName; }
+		static bool IsExtensible()			{ return m_Extensible; }
 
-		ClassBase(const char *a_classname, gmMachine *a_machine)
+		ClassBase(const char *a_classname, gmMachine *a_machine, bool _extensible)
 		{
 			GM_ASSERT(!m_ClassName && !m_ClassType);
 			{
 				m_Machine = a_machine;
 				m_ClassName = a_classname;
 				m_ClassType = a_machine->CreateUserType(a_classname);
+				m_Extensible = _extensible;
 
 				m_Machine->RegisterUserCallbacks(GetClassType(), 
 					gmfTraceObject, 
@@ -59,6 +61,8 @@ namespace gmBind2
 		static gmType		m_ClassType;
 		static const char	*m_ClassName;
 
+		static bool			m_Extensible;
+
 		gmMachine			*m_Machine;
 
 		static pfnAsStringCallback		m_AsStringCallback;
@@ -67,12 +71,16 @@ namespace gmBind2
 		static int gmfDefaultConstructor(gmThread *a_thread)
 		{
 			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT());
+			if(ClassBase<ClassT>::IsExtensible())
+				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
 			a_thread->PushNewUser(bo, GetClassType());
 			return GM_OK;
 		}
 		static int gmfArgConstructor(gmThread *a_thread)
 		{
 			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT(a_thread));
+			if(ClassBase<ClassT>::IsExtensible())
+				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
 			a_thread->PushNewUser(bo, GetClassType());
 			return GM_OK;
 		}
@@ -87,6 +95,8 @@ namespace gmBind2
 		static bool gmfTraceObject(gmMachine *a_machine, gmUserObject*a_object, gmGarbageCollector*a_gc, const int a_workLeftToGo, int& a_workDone)
 		{
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_object->m_user);
+			if(bo && bo->m_Table)
+				a_gc->GetNextObject(bo->m_Table);
 			if(bo && bo->m_NativeObj)
 			{
 				if(ClassBase<ClassT>::m_TraceCallback)
@@ -119,6 +129,9 @@ namespace gmBind2
 
 	template <typename ClassT>
 	const char *ClassBase<ClassT>::m_ClassName = 0;
+
+	template <typename ClassT>
+	bool ClassBase<ClassT>::m_Extensible = false;
 
 	template <typename ClassT>
 	typename ClassBase<ClassT>::pfnAsStringCallback ClassBase<ClassT>::m_AsStringCallback = 0;
@@ -264,6 +277,8 @@ namespace gmBind2
 			if(a_instance && ClassBase<ClassT>::GetClassType() != GM_NULL)
 			{
 				BoundObject<ClassT> *bo = new BoundObject<ClassT>(a_instance);
+				if(ClassBase<ClassT>::IsExtensible())
+					bo->m_Table = a_machine->AllocTableObject();
 				bo->SetNative(a_native);
 				return ObjRef<ClassT>(a_machine->AllocUserObject(bo, ClassBase<ClassT>::GetClassType()));
 			}
@@ -297,22 +312,24 @@ namespace gmBind2
 			if(a_instance && ClassBase<ClassT>::GetClassType() != GM_NULL)
 			{
 				BoundObject<ClassT> *bo = new BoundObject<ClassT>(a_instance);
+				if(ClassBase<ClassT>::IsExtensible())
+					bo->m_Table = a_thread->GetMachine()->AllocTableObject();
 				bo->SetNative(a_native);
 				a_thread->PushNewUser(bo, ClassBase<ClassT>::GetClassType());
 			}
 		}
 		//////////////////////////////////////////////////////////////////////////
-		Class(const char *_classname, gmMachine *_machine) : ClassBase<ClassT>(_classname, _machine)
+		Class(const char *_classname, gmMachine *_machine, bool _extensible = true) : ClassBase<ClassT>(_classname, _machine,_extensible)
 		{
 			GM_ASSERT(m_ClassType!=GM_NULL);
 
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_GETDOT, NULL, gmOpGetDot);
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_SETDOT, NULL, gmOpSetDot);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_GETDOT, NULL, gmBind2OpGetDot);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_SETDOT, NULL, gmBind2OpSetDot);
 #if GM_BOOL_OP
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_BOOL, NULL, gmOpBool);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_BOOL, NULL, gmBind2OpBool);
 #endif
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_GETIND, NULL, gmOpGetInd);
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_SETIND, NULL, gmOpSetInd);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_GETIND, NULL, gmBind2OpGetInd);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_SETIND, NULL, gmBind2OpSetInd);
 		}
 
 	private:
@@ -331,7 +348,7 @@ namespace gmBind2
 		static PropertyMap m_Properties;
 		//////////////////////////////////////////////////////////////////////////
 
-		static void GM_CDECL gmOpGetDot(gmThread * a_thread, gmVariable * a_operands)
+		static void GM_CDECL gmBind2OpGetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
 			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::GetClassType());
@@ -355,10 +372,18 @@ namespace gmBind2
 						return;
 					}
 				}
+				else
+				{
+					if(bo->m_Table)
+					{
+						a_operands[0] = bo->m_Table->Get(a_thread->GetMachine(),pString);
+						return;
+					}
+				}
 			}
 			a_operands[0].Nullify();
 		}
-		static void GM_CDECL gmOpSetDot(gmThread * a_thread, gmVariable * a_operands)
+		static void GM_CDECL gmBind2OpSetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
 			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::GetClassType());
@@ -381,34 +406,27 @@ namespace gmBind2
 						propfuncs.m_Setter(bo->m_NativeObj, a_thread, a_operands, propfuncs.m_PropertyOffset, propfuncs.m_Static);
 						return;
 					}
+				}
 					else
 					{
-						if(gmMachine::s_printCallback)
+					if(bo->m_Table)
 						{
-							enum { BufferLen = 256 };
-							char buffer[BufferLen*2];
-							char buffer2[BufferLen];
-							
-							sprintf(buffer,"Read Only: Unable to Set %s.%s to %s", 
-								ClassBase<ClassT>::GetClassName(),
-								pString, 
-								a_operands[1].AsString(a_thread->GetMachine(),buffer2,BufferLen));
-							gmMachine::s_printCallback(a_thread->GetMachine(),buffer);
-						}
+						bo->m_Table->Set(a_thread->GetMachine(),pString,a_operands[1]);
+						return;
 					}
 				}
 			}
 			a_operands[0].Nullify();
 		}
-		static void GM_CDECL gmOpGetInd(gmThread * a_thread, gmVariable * a_operands)
+		static void GM_CDECL gmBind2OpGetInd(gmThread * a_thread, gmVariable * a_operands)
 		{
 			a_operands[0].Nullify();
 		}
-		static void GM_CDECL gmOpSetInd(gmThread * a_thread, gmVariable * a_operands)
+		static void GM_CDECL gmBind2OpSetInd(gmThread * a_thread, gmVariable * a_operands)
 		{
 			a_operands[0].Nullify();
 		}
-		static void GM_CDECL gmOpBool(gmThread * a_thread, gmVariable * a_operands)
+		static void GM_CDECL gmBind2OpBool(gmThread * a_thread, gmVariable * a_operands)
 		{
 			a_operands[0].SetInt(a_operands[0].GetUserSafe(ClassBase<ClassT>::GetClassType()) ? 1 : 0);
 		}
