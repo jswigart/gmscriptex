@@ -89,8 +89,12 @@ namespace gmBind2
 			GM_ASSERT(a_object->m_userType == m_ClassType);
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_object->m_user);
 			if(bo->m_NativeObj && !bo->IsNative())
+			{
 				delete bo->m_NativeObj;
+				bo->m_NativeObj = NULL;
+			}
 			delete bo;
+			a_object->m_user = NULL;
 		}
 		static bool gmfTraceObject(gmMachine *a_machine, gmUserObject*a_object, gmGarbageCollector*a_gc, const int a_workLeftToGo, int& a_workDone)
 		{
@@ -102,6 +106,7 @@ namespace gmBind2
 				if(ClassBase<ClassT>::m_TraceCallback)
 					ClassBase<ClassT>::m_TraceCallback(bo->m_NativeObj, a_machine, a_gc, a_workLeftToGo, a_workDone);
 			}
+			a_workDone += 2;
 			return true;
 		}
 		static void gmfAsStringCallback(gmUserObject * a_object, char * a_buffer, int a_bufferSize)
@@ -272,7 +277,7 @@ namespace gmBind2
 			return *this;
 		}
 		//////////////////////////////////////////////////////////////////////////
-		static ObjRef<ClassT> WrapObject(gmMachine *a_machine, ClassT *a_instance, bool a_native = true)
+		static gmGCRoot<gmUserObject> WrapObject(gmMachine *a_machine, ClassT *a_instance, bool a_native = true)
 		{
 			if(a_instance && ClassBase<ClassT>::GetClassType() != GM_NULL)
 			{
@@ -280,9 +285,45 @@ namespace gmBind2
 				if(ClassBase<ClassT>::IsExtensible())
 					bo->m_Table = a_machine->AllocTableObject();
 				bo->SetNative(a_native);
-				return ObjRef<ClassT>(a_machine->AllocUserObject(bo, ClassBase<ClassT>::GetClassType()));
+				return gmGCRoot<gmUserObject>(
+					a_machine->AllocUserObject(bo, ClassBase<ClassT>::GetClassType()),a_machine);
 			}
-			return ObjRef<ClassT>();
+			return gmGCRoot<gmUserObject>();
+		}
+		static void NullifyUserObject(gmGCRoot<gmUserObject> a_userObj)
+		{
+			if(a_userObj)
+			{
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::GetClassType());
+				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
+				GM_ASSERT(bo && bo->IsNative());
+				if(!bo->IsNative())
+					delete bo->m_NativeObj;
+				bo->m_NativeObj = NULL;
+			}
+		}
+		static BoundObject<ClassT>*GetBoundObject(gmGCRoot<gmUserObject> a_userObj)
+		{
+			if(a_userObj)
+			{
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::GetClassType());
+				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
+				return bo;
+			}
+			return NULL;
+		}
+		static void CloneTable(gmMachine *a_machine, gmGCRoot<gmUserObject> a_userObj, gmGCRoot<gmUserObject> a_cloneTo)
+		{
+			BoundObject<ClassT> *boFrom = GetBoundObject(a_userObj);
+			BoundObject<ClassT> *boTo = GetBoundObject(a_cloneTo);
+			GM_ASSERT(boFrom && boTo);
+			if(boFrom && boTo)
+			{
+				if(boFrom->m_Table)
+				{
+					boTo->m_Table = boFrom->m_Table->Duplicate(a_machine);
+				}				
+			}
 		}
 		static bool FromParam(gmThread *a_thread, int a_param, ClassT *&a_instance)
 		{

@@ -41,93 +41,12 @@ namespace gmBind2
 	struct BoundObject
 	{
 		ClassT		*m_NativeObj;
-		gmTableObject	*m_Table;
-		void AddRef() { ++m_RefCount; }
-		void ReleaseRef() { --m_RefCount; }
-		int RefCount() const { return m_RefCount; }
+		gmTableObject	*m_Table;		
 		bool IsNative() const { return m_Native; }
 		void SetNative(bool _b) { m_Native = _b; }
-		BoundObject(ClassT *o) : m_NativeObj(o), m_Native(false), m_Table(0), m_RefCount(0) {}
+		BoundObject(ClassT *o) : m_NativeObj(o), m_Native(false), m_Table(0) {}
 	private:
-		mutable int m_RefCount;
 		bool		m_Native;
-	};
-	//////////////////////////////////////////////////////////////////////////
-	template <typename ClassT>
-	class ObjRef
-	{
-	public:
-		operator bool() const
-		{
-			BoundObject<ClassT> *bo = m_UserObject ? static_cast<BoundObject<ClassT>*>(m_UserObject->m_user) : 0;
-			return bo && bo->m_NativeObj != 0;
-		}
-		ClassT *operator->()
-		{
-			BoundObject<ClassT> *bo = m_UserObject ? static_cast<BoundObject<ClassT>*>(m_UserObject->m_user) : 0;
-			return bo ? bo->m_NativeObj : NULL;
-		}
-		gmUserObject *GetUserObject()
-		{
-			return m_UserObject;
-		}
-		ObjRef& operator = (int a_null)
-		{
-			GM_ASSERT(a_null == 0);
-			ReleaseRef();
-			m_UserObject = NULL;
-			return *this;
-		}
-		ObjRef& operator = (const ObjRef &ob)
-		{
-			if(m_UserObject != ob.m_UserObject)
-			{
-				ReleaseRef();
-				m_UserObject = ob.m_UserObject;
-				AddRef();
-			}
-			return *this;
-		}
-
-		int operator == (const ObjRef& ob) const { return m_UserObject == ob.m_UserObject; }
-		int operator != (const ObjRef& ob) const { return !operator==(ob); }
-
-		ObjRef(const ObjRef &ob) : m_UserObject(NULL) { *this = ob; }
-		ObjRef(gmUserObject *ob = NULL)
-			: m_UserObject(NULL)
-		{
-			if(ob && ob->GetType() == ClassBase<ClassT>::GetClassType())
-			{
-				m_UserObject = ob;
-				AddRef();
-			}
-		}
-		~ObjRef() 
-		{
-			ReleaseRef();
-		}
-	private:
-		void AddRef()
-		{
-			BoundObject<ClassT> *pObj = m_UserObject ? static_cast<BoundObject<ClassT>*>(m_UserObject->m_user) : 0;
-			if(pObj)
-			{
-				pObj->AddRef();
-			}
-		}
-		void ReleaseRef()
-		{
-			BoundObject<ClassT> *pObj = m_UserObject ? static_cast<BoundObject<ClassT>*>(m_UserObject->m_user) : 0;
-			if(pObj)
-			{
-				pObj->ReleaseRef();
-				if(pObj->RefCount()<=0 && pObj->IsNative())
-				{
-					pObj->m_NativeObj = 0;
-				}
-			}
-		}
-		gmUserObject *m_UserObject;
 	};
 	//////////////////////////////////////////////////////////////////////////
 #define CHECKTYPE_ARG(argnum) \
@@ -368,6 +287,12 @@ namespace gmBind2
 	inline int PushReturnToGM<std::string>(gmThread *a_thread, std::string arg)
 	{
 		a_thread->PushNewString(arg.c_str());
+		return GM_OK;
+	}
+	template<>
+	inline int PushReturnToGM<Vec3>(gmThread *a_thread, Vec3 arg)
+	{
+		a_thread->PushVector(arg);
 		return GM_OK;
 	}
 	//////////////////////////////////////////////////////////////////////////
@@ -761,7 +686,6 @@ namespace gmBind2
 		{
 			gmFunctionObject* funcObj = m_Machine->AllocFunctionObject();
 			funcObj->m_cFunction = 0;
-			funcObj->m_cUserData = 0;
 			funcObj->m_cFunctor = new GMExportFunctor<Fn>(a_fn);
 			m_Table->Set(m_Machine,a_funcname,gmVariable(funcObj));
 			return *this;
@@ -786,8 +710,8 @@ namespace gmBind2
 			GM_ASSERT(ClassBase<T>::GetClassType() != GM_NULL);
 			if(ClassBase<T>::GetClassType() != GM_NULL)
 			{
-				ObjRef<T> r =Class<T>::WrapObject(m_Machine,a_var,false);
-				m_Table->Set(m_Machine,a_varname,gmVariable(r.GetUserObject()));
+				gmGCRoot<gmUserObject> r =Class<T>::WrapObject(m_Machine,a_var,false);
+				m_Table->Set(m_Machine,a_varname,gmVariable(r));
 			}
 			return *this;
 		}

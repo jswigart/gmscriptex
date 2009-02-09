@@ -204,7 +204,7 @@ int lines_intersect(int x1,int y1,   /* First line segment */
 /* A main program to test the function.
  */
 
-bool Line::Intersect(const Line& src,Vector3d &sect)
+bool Line::Intersect(const Line& src,Vec3 &sect)
 {
 	int x,y;
 
@@ -241,8 +241,8 @@ void BoundingBox::TransformBoundAABB(const MyMatrix &transform,const BoundingBox
 
 void BoundingBox::BoundTest(const MyMatrix &transform,float x,float y,float z)
 {
-	Vector3d pos(x,y,z);
-	Vector3d t;
+	Vec3 pos(x,y,z);
+	Vec3 t;
 	transform.Transform(pos,t);
 	MinMax(t);
 };

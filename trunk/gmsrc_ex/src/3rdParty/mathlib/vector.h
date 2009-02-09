@@ -70,90 +70,93 @@
 const float DEG_TO_RAD = ((2.0f * 3.14152654f) / 360.0f);
 const float RAD_TO_DEG = (360.0f / (2.0f * 3.141592654f));
 
-class Vector3d
+class Vec3
 {
 public:
-	Vector3d() { };
+	Vec3() { };
 
-	Vector3d(float a,float b,float c)
+	Vec3(float a,float b,float c)
 	{
 		x = a;
 		y = b;
 		z = c;
 	}
-	Vector3d(const Vector3d &a)
+	Vec3(const Vec3 &a)
 	{
 		x = a.x;
 		y = a.y;
 		z = a.z;
 	}
-	Vector3d(const float *t)
+	Vec3(const float *t)
 	{
 		x = t[0];
 		y = t[1];
 		z = t[2];
 	}
-	Vector3d(const double *t)
+	Vec3(const double *t)
 	{
 		x = (float)t[0];
 		y = (float)t[1];
 		z = (float)t[2];
 	}
-	Vector3d(const int *t)
+	Vec3(const int *t)
 	{
 		x = (float)t[0];
 		y = (float)t[1];
 		z = (float)t[2];
 	}
-	bool operator==(const Vector3d &a) const
+	operator const float *() const { return (const float*)this;  }
+	operator float *() { return (float*)this;  }
+
+	bool operator==(const Vec3 &a) const
 	{
 		return( a.x == x && a.y == y && a.z == z );
 	}
-	bool operator!=(const Vector3d &a) const
+	bool operator!=(const Vec3 &a) const
 	{
 		return( a.x != x || a.y != y || a.z != z );
 	}
 	// Operators
-	Vector3d& operator = (const Vector3d& A) 
+	Vec3& operator = (const Vec3& A) 
 	{
 		x=A.x; y=A.y; z=A.z;
 		return(*this);  
 	}
-	Vector3d operator + (const Vector3d& A) const
+	Vec3 operator + (const Vec3& A) const
 	{
-		Vector3d Sum(x+A.x, y+A.y, z+A.z);
+		Vec3 Sum(x+A.x, y+A.y, z+A.z);
 		return(Sum); 
 	}
-	Vector3d operator - (const Vector3d& A) const
+	Vec3 operator - (const Vec3& A) const
 	{
-		Vector3d Diff(x-A.x, y-A.y, z-A.z);
+		Vec3 Diff(x-A.x, y-A.y, z-A.z);
 		return(Diff); 
 	}
-	Vector3d operator * (const float s) const
+	Vec3 operator * (const float s) const
 	{
-		Vector3d Scaled(x*s, y*s, z*s);
+		Vec3 Scaled(x*s, y*s, z*s);
 		return(Scaled); 
 	}
-	Vector3d operator + (const float s) const
+	Vec3 operator + (const float s) const
 	{
-		Vector3d Scaled(x+s, y+s, z+s);
+		Vec3 Scaled(x+s, y+s, z+s);
 		return(Scaled); 
 	}
-	Vector3d operator / (const float s) const
+	Vec3 operator / (const float s) const
 	{
 		float r = 1.0f / s;
-		Vector3d Scaled(x*r, y*r, z*r);
+		Vec3 Scaled(x*r, y*r, z*r);
 		return(Scaled);
 	}
 	void operator /= (float A)
 	{
 		x/=A; y/=A; z/=A; 
 	}
-	void operator += (const Vector3d A)
+	void operator += (const Vec3 A)
 	{
 		x+=A.x; y+=A.y; z+=A.z; 
 	}
-	void operator -= (const Vector3d A)
+	void operator -= (const Vec3 A)
 	{
 		x-=A.x; y-=A.y; z-=A.z; 
 	}
@@ -165,9 +168,9 @@ public:
 	{
 		x+=A; y+=A; z+=A; 
 	}
-	Vector3d operator - () const
+	Vec3 operator - () const
 	{
-		return Vector3d(-x, -y, -z); 
+		return Vec3(-x, -y, -z); 
 	}
 	float operator [] (const int i) const
 	{
@@ -178,7 +181,7 @@ public:
 		return( (i==0)?x:((i==1)?y:z) ); 
 	}
 	//
-	bool IsSame(const Vector3d &v,float epsilon) const
+	bool IsSame(const Vec3 &v,float epsilon) const
 	{
 		float dx = fabsf( x - v.x );
 		if ( dx > epsilon ) return false;
@@ -188,7 +191,7 @@ public:
 		if ( dz > epsilon ) return false;
 		return true;
 	}
-	float ComputeNormal(const Vector3d &A,const Vector3d &B,const Vector3d &C)
+	float ComputeNormal(const Vec3 &A,const Vec3 &B,const Vec3 &C)
 	{
 		float vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
 
@@ -221,7 +224,7 @@ public:
 
 		return mag;
 	}
-	void ScaleSumScale(float c0,float c1,const Vector3d &pos)
+	void ScaleSumScale(float c0,float c1,const Vec3 &pos)
 	{
 		x = (x*c0) + (pos.x*c1);
 		y = (y*c0) + (pos.y*c1);
@@ -266,15 +269,15 @@ public:
 	float* Ptr() { return &x; }
 
 // return -(*this).
-	Vector3d negative() const
+	Vec3 negative() const
 	{
-		return Vector3d(-x,-y,-z);
+		return Vec3(-x,-y,-z);
 	}
 	float Magnitude() const
 	{
 		return sqrt(x * x + y * y + z * z);
 	}
-	void Lerp(const Vector3d& from,const Vector3d& to,float slerp)
+	void Lerp(const Vec3& from,const Vec3& to,float slerp)
 	{
 		x = ((to.x - from.x) * slerp) + from.x;
 		y = ((to.y - from.y) * slerp) + from.y;
@@ -285,7 +288,7 @@ public:
 	// Reason for existance is so that when a bullet collides with a wall, for
 	// example, you can generate a graphic effect slightly *before* it hit the
 	// wall so that the effect doesn't sort into the wall itself.
-	void Interpolate(const Vector3d &from,const Vector3d &to,float offset)
+	void Interpolate(const Vec3 &from,const Vec3 &to,float offset)
 	{
 		x = to.x-from.x;
 		y = to.y-from.y;
@@ -301,10 +304,10 @@ public:
 		z = z*d + from.z;
 	}
 /** Computes the reflection vector between two vectors.*/
-	void Reflection(const Vector3d &a,const Vector3d &b)
+	void Reflection(const Vec3 &a,const Vec3 &b)
 	{
-		Vector3d c;
-		Vector3d d;
+		Vec3 c;
+		Vec3 d;
 
 		float dot = a.Dot(b) * 2.0f;
 
@@ -316,7 +319,7 @@ public:
 		y = -d.y;
 		z = -d.z;
 	}
-	void AngleAxis(float angle,const Vector3d& axis)
+	void AngleAxis(float angle,const Vec3& axis)
 	{
 		x = axis.x*angle;
 		y = axis.y*angle;
@@ -326,7 +329,7 @@ public:
 	{
 		return float(sqrt( x*x + y*y + z*z ));
 	}
-	float ComputePlane(const Vector3d &A,const Vector3d &B,const Vector3d &C)
+	float ComputePlane(const Vec3 &A,const Vec3 &B,const Vec3 &C)
 	{
 		float vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
 
@@ -367,30 +370,30 @@ public:
 		float l2 = x*x+y*y+z*z;
 		return l2;
 	}
-	float Distance(const Vector3d &a) const   // distance between two points.
+	float Distance(const Vec3 &a) const   // distance between two points.
 	{
-		Vector3d d(a.x-x,a.y-y,a.z-z);
+		Vec3 d(a.x-x,a.y-y,a.z-z);
 		return d.Length();
 	}	
-	float DistanceXY(const Vector3d &a) const
+	float DistanceXY(const Vec3 &a) const
 	{
 		float dx = a.x - x;
 		float dy = a.y - y;
 		float dist = dx*dx + dy*dy;
 		return dist;
 	}
-	float Distance2(const Vector3d &a) const  // squared distance.
+	float Distance2(const Vec3 &a) const  // squared distance.
 	{
 		float dx = a.x - x;
 		float dy = a.y - y;
 		float dz = a.z - z;
 		return dx*dx + dy*dy + dz*dz;
 	}
-	float Partial(const Vector3d &p) const
+	float Partial(const Vec3 &p) const
 	{
 		return (x*p.y) - (p.x*y);
 	}
-	float Area(const Vector3d &p1,const Vector3d &p2) const
+	float Area(const Vec3 &p1,const Vec3 &p2) const
 	{
 		float A = Partial(p1);
 		A+= p1.Partial(p2);
@@ -413,15 +416,15 @@ public:
 		}
 		return d;
 	}	
-	float Dot(const Vector3d &a) const
+	float Dot(const Vec3 &a) const
 	{
 		return (x * a.x + y * a.y + z * a.z );
 	}
-	Vector3d Cross(const Vector3d& other) const
+	Vec3 Cross(const Vec3& other) const
 	{
- 		return Vector3d( y*other.z - z*other.y,  z*other.x - x*other.z,  x*other.y - y*other.x );
+ 		return Vec3( y*other.z - z*other.y,  z*other.x - x*other.z,  x*other.y - y*other.x );
 	}
-	void Cross(const Vector3d &a,const Vector3d &b)  // cross two vectors result in this one.
+	void Cross(const Vec3 &a,const Vec3 &b)  // cross two vectors result in this one.
 	{
 		x = a.y*b.z - a.z*b.y;
 		y = a.z*b.x - a.x*b.z;
@@ -433,7 +436,7 @@ public:
 	//    Edge from a to b is already in face
 	//    Edge from b to c is being considered for addition to face
 	/******************************************/
-	bool Concave(const Vector3d& a,const Vector3d& b)
+	bool Concave(const Vec3& a,const Vec3& b)
 	{
 		float vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag,nx,ny,nz,mag_a,mag_b;
 
@@ -482,7 +485,7 @@ public:
 
 		return(true);
 	}
-	bool PointTestXY(const Vector3d &i,const Vector3d &j) const
+	bool PointTestXY(const Vec3 &i,const Vec3 &j) const
 	{
 		if (((( i.y <= y ) && ( y  < j.y )) ||
 				 (( j.y <= y ) && ( y  < i.y ))) &&
@@ -491,7 +494,7 @@ public:
 	}
 	// test to see if this point is inside the triangle specified by
 	// these three points on the X/Y plane.
-	bool PointInTriXY(const Vector3d &p1,const Vector3d &p2,const Vector3d &p3) const
+	bool PointInTriXY(const Vec3 &p1,const Vec3 &p2,const Vec3 &p3) const
 	{
 		float ax  = p3.x - p2.x;
 		float ay  = p3.y - p2.y;
@@ -514,7 +517,7 @@ public:
 	}
 	// test to see if this point is inside the triangle specified by
 	// these three points on the X/Y plane.
-	bool PointInTriYZ(const Vector3d &p1,const Vector3d &p2,const Vector3d &p3) const
+	bool PointInTriYZ(const Vec3 &p1,const Vec3 &p2,const Vec3 &p3) const
 	{
 		float ay  = p3.y - p2.y;
 		float az  = p3.z - p2.z;
@@ -537,7 +540,7 @@ public:
 	}
 	// test to see if this point is inside the triangle specified by
 	// these three points on the X/Y plane.
-	bool PointInTriXZ(const Vector3d &p1,const Vector3d &p2,const Vector3d &p3) const
+	bool PointInTriXZ(const Vec3 &p1,const Vec3 &p2,const Vec3 &p3) const
 	{
 		float az  = p3.z - p2.z;
 		float ax  = p3.x - p2.x;
@@ -560,13 +563,13 @@ public:
 	}
 	// Given a point and a line (defined by two points), compute the closest point
 	// in the line.  (The line is treated as infinitely long.)
-	void NearestPointInLine(const Vector3d &point,const Vector3d &line0,const Vector3d &line1)
+	void NearestPointInLine(const Vec3 &point,const Vec3 &line0,const Vec3 &line1)
 	{
-		Vector3d &nearestPoint = *this;
-		Vector3d lineDelta     = line1 - line0;
+		Vec3 &nearestPoint = *this;
+		Vec3 lineDelta     = line1 - line0;
 
 		// Handle degenerate lines
-		if ( lineDelta == Vector3d(0, 0, 0) )
+		if ( lineDelta == Vec3(0, 0, 0) )
 		{
 			nearestPoint = line0;
 		}
@@ -578,13 +581,13 @@ public:
 	}
 	// Given a point and a line segment (defined by two points), compute the closest point
 	// in the line.  Cap the point at the endpoints of the line segment.
-	void NearestPointInLineSegment(const Vector3d &point,const Vector3d &line0,const Vector3d &line1)
+	void NearestPointInLineSegment(const Vec3 &point,const Vec3 &line0,const Vec3 &line1)
 	{
-		Vector3d &nearestPoint = *this;
-		Vector3d lineDelta     = line1 - line0;
+		Vec3 &nearestPoint = *this;
+		Vec3 lineDelta     = line1 - line0;
 
 		// Handle degenerate lines
-		if ( lineDelta == Vector3d(0, 0, 0) )
+		if ( lineDelta == Vec3(0, 0, 0) )
 		{
 			nearestPoint = line0;
 		}
@@ -604,16 +607,16 @@ public:
 	// Given a point and a plane (defined by three points), compute the closest point
 	// in the plane.  (The plane is unbounded.)
 	void NearestPointInPlane(
-		const Vector3d &point,
-		const Vector3d &triangle0,
-		const Vector3d &triangle1,
-		const Vector3d &triangle2)
+		const Vec3 &point,
+		const Vec3 &triangle0,
+		const Vec3 &triangle1,
+		const Vec3 &triangle2)
 	{
-		Vector3d &nearestPoint = *this;
-		Vector3d lineDelta0    = triangle1 - triangle0;
-		Vector3d lineDelta1    = triangle2 - triangle0;
-		Vector3d pointDelta    = point - triangle0;
-		Vector3d normal;
+		Vec3 &nearestPoint = *this;
+		Vec3 lineDelta0    = triangle1 - triangle0;
+		Vec3 lineDelta1    = triangle2 - triangle0;
+		Vec3 pointDelta    = point - triangle0;
+		Vec3 normal;
 
 		// Get the normal of the polygon (doesn't have to be a unit vector)
 		normal.Cross(lineDelta0, lineDelta1);
@@ -624,10 +627,10 @@ public:
 
 	// Given a point and a plane (defined by a coplanar point and a normal), compute the closest point
 	// in the plane.  (The plane is unbounded.)
-	void NearestPointInPlane(const Vector3d &point,const Vector3d &planePoint,const Vector3d &planeNormal)
+	void NearestPointInPlane(const Vec3 &point,const Vec3 &planePoint,const Vec3 &planeNormal)
 	{
-		Vector3d &nearestPoint = *this;
-		Vector3d pointDelta    = point - planePoint;
+		Vec3 &nearestPoint = *this;
+		Vec3 pointDelta    = point - planePoint;
 
 		float delta = planeNormal.Dot(pointDelta) / planeNormal.Dot(planeNormal);
 		nearestPoint = point - planeNormal*delta;
@@ -636,17 +639,17 @@ public:
 	// Given a point and a triangle (defined by three points), compute the closest point
 	// in the triangle.  Clamp the point so it's confined to the area of the triangle.
 	void NearestPointInTriangle(
-		const Vector3d &point,
-		const Vector3d &triangle0,
-		const Vector3d &triangle1,
-		const Vector3d &triangle2)
+		const Vec3 &point,
+		const Vec3 &triangle0,
+		const Vec3 &triangle1,
+		const Vec3 &triangle2)
 	{
-		Vector3d &nearestPoint = *this;
-		Vector3d lineDelta0 = triangle1 - triangle0;
-		Vector3d lineDelta1 = triangle2 - triangle0;
+		Vec3 &nearestPoint = *this;
+		Vec3 lineDelta0 = triangle1 - triangle0;
+		Vec3 lineDelta1 = triangle2 - triangle0;
 
 		// Handle degenerate triangles
-		if ( (lineDelta0 == Vector3d(0, 0, 0)) || (lineDelta1 == Vector3d(0, 0, 0)) )
+		if ( (lineDelta0 == Vec3(0, 0, 0)) || (lineDelta1 == Vec3(0, 0, 0)) )
 		{
 			nearestPoint.NearestPointInLineSegment(point, triangle1, triangle2);
 		}
@@ -656,7 +659,7 @@ public:
 		}
 		else
 		{
-			static Vector3d axis[3];
+			static Vec3 axis[3];
 			axis[0].NearestPointInLine(triangle0, triangle1, triangle2);
 			axis[1].NearestPointInLine(triangle1, triangle0, triangle2);
 			axis[2].NearestPointInLine(triangle2, triangle0, triangle1);
@@ -669,7 +672,7 @@ public:
 			bool            bForce         = true;
 			float            bestMagnitude2 = 0;
 			float            closeMagnitude2;
-			Vector3d		closePoint;
+			Vec3		closePoint;
 
 			if ( axisDot[0] < 0 )
 			{
@@ -709,18 +712,29 @@ public:
 			// inside the triangle; use the nearest-point-on-a-plane equation
 			if ( bForce )
 			{
-				Vector3d normal;
+				Vec3 normal;
 
 				// Get the normal of the polygon (doesn't have to be a unit vector)
 				normal.Cross(lineDelta0, lineDelta1);
 
-				Vector3d pointDelta = point - triangle0;
+				Vec3 pointDelta = point - triangle0;
 				float delta = normal.Dot(pointDelta) / normal.Dot(normal);
 
 				nearestPoint = point - normal*delta;
 			}
 		}
 	}
+
+	float GetYaw() const
+	{
+		return -atan2f(-x, y);
+	}
+
+	float GetPitch() const
+	{
+		return asinf(z);
+	}
+
 //private:
 
 	float x;
@@ -729,92 +743,92 @@ public:
 };
 
 
-class Vector2d
+class Vec2
 {
 public:
-	Vector2d() { };
-	Vector2d(const Vector2d &a)
+	Vec2() { };
+	Vec2(const Vec2 &a)
 	{
 		x = a.x;
 		y = a.y;
 	}
-	Vector2d(const float *t)
+	Vec2(const float *t)
 	{
 		x = t[0];
 		y = t[1];
 	}
-	Vector2d(float a,float b)
+	Vec2(float a,float b)
 	{
 		x = a;
 		y = b;
 	}
 	const float* Ptr() const { return &x; }
 	float* Ptr() { return &x; }
-	Vector2d & operator+=(const Vector2d &a)
+	Vec2 & operator+=(const Vec2 &a)
 	{
 		x+=a.x;
 		y+=a.y;
 		return *this;
 	}
-	Vector2d & operator-=(const Vector2d &a)
+	Vec2 & operator-=(const Vec2 &a)
 	{
 		x-=a.x;
 		y-=a.y;
 		return *this;
 	}
-	Vector2d & operator*=(const Vector2d &a)
+	Vec2 & operator*=(const Vec2 &a)
 	{
 		x*=a.x;
 		y*=a.y;
 		return *this;
 	}
-	Vector2d & operator/=(const Vector2d &a)
+	Vec2 & operator/=(const Vec2 &a)
 	{
 		x/=a.x;
 		y/=a.y;
 		return *this;
 	}
-	bool operator==(const Vector2d &a) const
+	bool operator==(const Vec2 &a) const
 	{
 		if ( a.x == x && a.y == y ) return true;
 		return false;
 	}
-	bool operator!=(const Vector2d &a) const
+	bool operator!=(const Vec2 &a) const
 	{
 		if ( a.x != x || a.y != y ) return true;
 		return false;
 	}
-	Vector2d operator+(Vector2d a) const
+	Vec2 operator+(Vec2 a) const
 	{
 		a.x+=x;
 		a.y+=y;
 		return a;
 	}
-	Vector2d operator-(Vector2d a) const
+	Vec2 operator-(Vec2 a) const
 	{
 		a.x = x-a.x;
 		a.y = y-a.y;
 		return a;
 	}
-	Vector2d operator - () const
+	Vec2 operator - () const
 	{
 		return negative();
 	}
-	Vector2d operator*(Vector2d a) const
+	Vec2 operator*(Vec2 a) const
 	{
 		a.x*=x;
 		a.y*=y;
 		return a;
 	}
-	Vector2d operator*(float c) const
+	Vec2 operator*(float c) const
 	{
-		return Vector2d(x * c,y * c);
+		return Vec2(x * c,y * c);
 	}
-	Vector2d operator/(const Vector2d &a)
+	Vec2 operator/(const Vec2 &a)
 	{
-		return Vector2d(x/a.x,y/a.y);
+		return Vec2(x/a.x,y/a.y);
 	}
-	float Dot(const Vector2d &a) const
+	float Dot(const Vec2 &a) const
 	{
 		return (x * a.x + y * a.y );
 	}	
@@ -837,15 +851,15 @@ public:
 	{
 		x = y = 0;
 	}
-	Vector2d negative() const
+	Vec2 negative() const
 	{
-		return Vector2d(-x,-y);
+		return Vec2(-x,-y);
 	}
 	float magnitude() const
 	{
 		return (float)sqrtf(x * x + y * y);
 	}	
-	void Reflection(const Vector2d &a,const Vector2d &b);
+	void Reflection(const Vec2 &a,const Vec2 &b);
 	float Length() const
 	{
 		return float(sqrtf( x*x + y*y ));
@@ -854,25 +868,25 @@ public:
 	{
 		return x*x+y*y;
 	}
-	float Distance(const Vector2d &a) const
+	float Distance(const Vec2 &a) const
 	{
 		float dx = a.x - x;
 		float dy = a.y - y;
 		float d  = dx*dx+dy*dy;
 		return sqrtf(d);
 	}	
-	float Distance2(const Vector2d &a)
+	float Distance2(const Vec2 &a)
 	{
 		float dx = a.x - x;
 		float dy = a.y - y;
 		return dx*dx + dy *dy;
 	}
-	void Lerp(const Vector2d& from,const Vector2d& to,float slerp)
+	void Lerp(const Vec2& from,const Vec2& to,float slerp)
 	{
 		x = ((to.x - from.x)*slerp) + from.x;
 		y = ((to.y - from.y)*slerp) + from.y;
 	}
-	void Cross(const Vector2d &a,const Vector2d &b) 
+	void Cross(const Vec2 &a,const Vec2 &b) 
 	{
 		x = a.y*b.x - a.x*b.y;
 		y = a.x*b.x - a.x*b.x;
@@ -900,25 +914,25 @@ public:
 class Line
 {
 public:
-	Line(const Vector3d &from,const Vector3d &to)
+	Line(const Vec3 &from,const Vec3 &to)
 	{
 		mP1 = from;
 		mP2 = to;
 	}
 	// JWR  Test for the intersection of two lines.
-	bool Intersect(const Line& src,Vector3d &sect);
+	bool Intersect(const Line& src,Vec3 &sect);
 private:
-	Vector3d mP1;
-	Vector3d mP2;
+	Vec3 mP1;
+	Vec3 mP2;
 };
 
-inline Vector3d operator*(float s, const Vector3d &v)
+inline Vec3 operator*(float s, const Vec3 &v)
 {
-	return Vector3d(v.x*s, v.y*s, v.z*s);
+	return Vec3(v.x*s, v.y*s, v.z*s);
 }
-inline Vector2d operator*(float s, const Vector2d &v)
+inline Vec2 operator*(float s, const Vec2 &v)
 {
-	return Vector2d(v.x*s, v.y*s);
+	return Vec2(v.x*s, v.y*s);
 }
 
 class MyMatrix;
@@ -931,7 +945,7 @@ public:
 		bmin.Set(FLT_MAX,FLT_MAX,FLT_MAX);
 		bmax.Set(-FLT_MAX,-FLT_MAX,-FLT_MAX);
 	}
-	void MinMax(const Vector3d &p)
+	void MinMax(const Vec3 &p)
 	{
 		if ( p.x < bmin.x ) bmin.x = p.x;
 		if ( p.y < bmin.y ) bmin.y = p.y;
@@ -951,13 +965,13 @@ public:
 		if ( b.bmax.y > bmax.y ) bmax.y = b.bmax.y;
 		if ( b.bmax.z > bmax.z ) bmax.z = b.bmax.z;
 	}
-	void GetCenter(Vector3d &center) const
+	void GetCenter(Vec3 &center) const
 	{
 		center.x = (bmax.x - bmin.x)*0.5f + bmin.x;
 		center.y = (bmax.y - bmin.y)*0.5f + bmin.y;
 		center.z = (bmax.z - bmin.z)*0.5f + bmin.z;
 	}
-	void GetSides(Vector3d &sides) const
+	void GetSides(Vec3 &sides) const
 	{
 		sides.x = bmax.x - bmin.x;
 		sides.y = bmax.y - bmin.y;
@@ -971,8 +985,8 @@ public:
 
 	void BoundTest(const MyMatrix &transform,float x,float y,float z);
 
-	Vector3d bmin;
-	Vector3d bmax;
+	Vec3 bmin;
+	Vec3 bmax;
 };
 
 #endif

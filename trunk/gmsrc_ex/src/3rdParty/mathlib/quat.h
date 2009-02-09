@@ -149,14 +149,14 @@ public:
 
 	void  EulerToQuat(float roll,float pitch,float yaw); // convert euler angles to quaternion.
 
-	void  EulerToQuat(const Vector3d &v)
+	void  EulerToQuat(const Vec3 &v)
 	{
 		EulerToQuat(v.x,v.y,v.z);
 	};
 
 	// convert angle/axis into quaternion, and return
 	// rotation matrix.
-	void AngleAxis(float angle,const Vector3d &axis)
+	void AngleAxis(float angle,const Vec3 &axis)
 	{
 		float halftheta    = angle*0.5f;
 		float sinHalfTheta = (float)sin( halftheta );
@@ -230,7 +230,7 @@ public:
 		Normalize();
 	}
 
-	void getAxisAngle(Vector3d &axis,float &angle) const // returns result in *DEGREES*
+	void getAxisAngle(Vec3 &axis,float &angle) const // returns result in *DEGREES*
 	{
     angle = acosf(w) * 2.0f;		//this is getAngle()
     float sa = sqrtf(1.0f - w*w);
@@ -326,10 +326,10 @@ public:
 		return &q.x;
 	};
 
-	void RotationArc(const Vector3d& v0, const Vector3d& v1)
+	void RotationArc(const Vec3& v0, const Vec3& v1)
 	{
-		Vector3d _v0 = v0;
-		Vector3d _v1 = v1;
+		Vec3 _v0 = v0;
+		Vec3 _v1 = v1;
 		_v0.Normalize();
 		_v1.Normalize();
 		float s = sqrtf((1.0f + (v0.Dot(v1))) * 2.0f);
@@ -339,7 +339,7 @@ public:
 
 	void RandomRotation(bool x,bool y,bool z);
 
-	Vector3d q; // x/y/z components of quaternion.
+	Vec3 q; // x/y/z components of quaternion.
 	float w;        // w component of quaternion.
 };
 
@@ -481,7 +481,7 @@ inline void Quat::QuatToEuler( float &roll, float &pitch, float &yaw ) const
 class QuatPos
 {
 public:
-  Vector3d		  p;  // the translation
+  Vec3		  p;  // the translation
   float           r;  // radius/scale
   Quat            q;  // the quaternion rotation
 };

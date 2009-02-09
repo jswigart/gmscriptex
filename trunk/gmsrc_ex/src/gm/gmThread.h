@@ -193,10 +193,20 @@ public:
 	inline void * ThisUser_NoChecks(); //For use with type functions where type is already certain
 	inline gmUserObject * ThisUserObject();
 #if(GM_USE_VECTOR3_STACK)
-	inline void PushVector(const Vector3d &v)
+	inline void PushVector(const Vec3 &v)
 	{
 		m_stack[m_top].m_type = GM_VEC3;
 		m_stack[m_top++].m_value.m_vec3 = ConvertVec3(v);
+	}
+	inline void PushVector(float x, float y, float z)
+	{
+		m_stack[m_top].m_type = GM_VEC3;
+		m_stack[m_top++].m_value.m_vec3 = ConvertVec3(Vec3(x,y,z));
+	}
+	inline void PushVector(const float *v)
+	{
+		m_stack[m_top].m_type = GM_VEC3;
+		m_stack[m_top++].m_value.m_vec3 = ConvertVec3(Vec3(v[0],v[1],v[2]));
 	}
 	inline const gmVec3Data &ThisVector() const 
 	{
@@ -212,9 +222,27 @@ public:
 		if (a_param >= m_numParameters)
 			return false;
 		gmVariable *var = m_stack + m_base + a_param;
-		if (var->m_type == GM_VEC3)
+		if (var->IsVector())
+		{
 			a_value = var->m_value.m_vec3;
-		return true;
+			return true;
+		}
+		return false;
+	}
+	inline bool ParamVector(int a_param, float &a_x, float &a_y, float &a_z, float d_x, float d_y, float d_z) const 
+	{
+		gmVec3Data v;
+		if(ParamVector(a_param,v))
+		{
+			a_x = v.x;
+			a_y = v.y;
+			a_z = v.z;
+			return true;
+		}
+		// default
+		a_x = d_x;
+		a_y = d_y;
+		a_z = d_z;
 		return false;
 	}
 	inline gmVec3Data ParamVector(int a_param, const gmVec3Data &a_default = ZERO_VEC3) const
@@ -222,9 +250,16 @@ public:
 		if (a_param >= m_numParameters)
 			return a_default;
 		gmVariable *var = m_stack + m_base + a_param;
-		if (var->m_type != GM_VEC3)
-			return a_default;
-		return var->m_value.m_vec3;
+		if (var->IsVector())
+			return var->m_value.m_vec3;
+		return a_default;
+	}
+#endif
+
+#if(GM_USE_ENTITY_STACK)
+	inline void PushEntity(int _handle)
+	{
+		m_stack[m_top++].SetEntity(_handle);
 	}
 #endif
 
@@ -863,23 +898,43 @@ inline gmUserObject * gmThread::ThisUserObject()
 #endif //GM_DEBUG_BUILD
 
 #define GM_NUM_PARAMS GM_THREAD_ARG->GetNumParams()
-#if 1 // These macros only exception if param is present but type does not match
-#define GM_INT_PARAM(VAR, PARAM, DEFAULT) int VAR; if( !GM_THREAD_ARG->ParamInt((PARAM), (VAR), (DEFAULT)) ) { return GM_EXCEPTION; }
-#define GM_FLOAT_PARAM(VAR, PARAM, DEFAULT) float VAR; if( !GM_THREAD_ARG->ParamFloat((PARAM), (VAR), (DEFAULT)) )  { return GM_EXCEPTION; }
-#define GM_STRING_PARAM(VAR, PARAM, DEFAULT) const char * VAR; if( !GM_THREAD_ARG->ParamString((PARAM), (VAR), (DEFAULT)) )  { return GM_EXCEPTION; }
-#define GM_FUNCTION_PARAM(VAR, PARAM) gmFunctionObject * VAR; if( !GM_THREAD_ARG->ParamFunction((PARAM), (VAR)) )  { return GM_EXCEPTION; }
-#define GM_TABLE_PARAM(VAR, PARAM) gmTableObject * VAR; if( !GM_THREAD_ARG->ParamTable((PARAM), (VAR))  )  { return GM_EXCEPTION; }
-#define GM_USER_PARAM(OBJECT, VAR, PARAM) OBJECT VAR; if( !GM_THREAD_ARG->ParamUser((PARAM), (void*&)(VAR)) )  { return GM_EXCEPTION; }
-#define GM_FLOAT_OR_INT_PARAM(VAR, PARAM, DEFAULT) float VAR; if( !GM_THREAD_ARG->ParamFloatOrInt((PARAM), (VAR), (DEFAULT)) ) { return GM_EXCEPTION; }
-#else // Old versions
-#define GM_INT_PARAM(VAR, PARAM, DEFAULT) int VAR = GM_THREAD_ARG->ParamInt((PARAM), (DEFAULT))
-#define GM_FLOAT_PARAM(VAR, PARAM, DEFAULT) float VAR = GM_THREAD_ARG->ParamFloat((PARAM), (DEFAULT))
-#define GM_STRING_PARAM(VAR, PARAM, DEFAULT) const char * VAR = GM_THREAD_ARG->ParamString((PARAM), (DEFAULT))
-#define GM_FUNCTION_PARAM(VAR, PARAM) gmFunctionObject * VAR = GM_THREAD_ARG->ParamFunction((PARAM))
-#define GM_TABLE_PARAM(VAR, PARAM) gmTableObject * VAR = GM_THREAD_ARG->ParamTable((PARAM))
-#define GM_USER_PARAM(OBJECT, VAR, PARAM) OBJECT VAR = (OBJECT) GM_THREAD_ARG->ParamUser((PARAM));
-#define GM_FLOAT_OR_INT_PARAM(VAR, PARAM, DEFAULT) float VAR = GM_THREAD_ARG->ParamFloatOrInt((PARAM), (DEFAULT))
+
+#define GM_INT_PARAM(VAR, PARAM, DEFAULT) \
+	int VAR = DEFAULT; \
+	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamInt((PARAM), (VAR), (DEFAULT)) ) \
+{ return GM_EXCEPTION; }
+#define GM_FLOAT_PARAM(VAR, PARAM, DEFAULT) \
+	float VAR = DEFAULT; \
+	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFloat((PARAM), (VAR), (DEFAULT)) ) \
+{ return GM_EXCEPTION; }
+#define GM_STRING_PARAM(VAR, PARAM, DEFAULT) \
+	const char * VAR = DEFAULT; \
+	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamString((PARAM), (VAR), (DEFAULT)) )\
+{ return GM_EXCEPTION; }
+#define GM_FUNCTION_PARAM(VAR, PARAM, DEFAULT) \
+	gmFunctionObject * VAR = DEFAULT; \
+	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFunction((PARAM), (VAR)) )  \
+{ return GM_EXCEPTION; }
+#define GM_TABLE_PARAM(VAR, PARAM, DEFAULT) \
+	gmTableObject * VAR = DEFAULT; \
+	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamTable((PARAM), (VAR))  )  \
+{ return GM_EXCEPTION; }
+#define GM_FLOAT_OR_INT_PARAM(VAR, PARAM, DEFAULT) \
+	float VAR = DEFAULT; \
+	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFloatOrInt((PARAM), (VAR), (DEFAULT)) ) \
+{ return GM_EXCEPTION; }
+#define GM_USER_PARAM(OBJECT, VAR, PARAM) \
+	OBJECT VAR; \
+	if( !GM_THREAD_ARG->ParamUser((PARAM), (void*&)(VAR)) )  \
+{ return GM_EXCEPTION; }
+
+#if(GM_USE_VECTOR3_STACK)
+#define GM_VECTOR_PARAM(VAR, PARAM, DEFX, DEFY, DEFZ) \
+	Vec3 VAR(DEFX, DEFY, DEFZ); \
+	if(GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamVector((PARAM),VAR.x, VAR.y, VAR.z, DEFX, DEFY, DEFZ)) \
+{ return GM_EXCEPTION; }
 #endif
+
 
 //
 // EXCEPTION VERSIONS
@@ -918,7 +973,7 @@ inline gmUserObject * gmThread::ThisUserObject()
 #if(GM_USE_VECTOR3_STACK)
 #define GM_CHECK_VECTOR_PARAM(VAR, PARAM) \
 	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC3) { GM_EXCEPTION_MSG("expecting param %d as vec3", (PARAM)); return GM_EXCEPTION; } \
-	Vector3d VAR = ConvertVec3(GM_THREAD_ARG->Param((PARAM)).m_value.m_vec3);
+	Vec3 VAR = ConvertVec3(GM_THREAD_ARG->Param((PARAM)).m_value.m_vec3);
 #endif
 
 // float or int param as float variable

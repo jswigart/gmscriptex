@@ -946,9 +946,212 @@ static int GM_CDECL gmStringGetPath(gmThread * a_thread)
 	return GM_OK;
 }
 
-extern int GM_CDECL gmfToInt(gmThread * a_thread);
-extern int GM_CDECL gmfToFloat(gmThread * a_thread);
-extern int GM_CDECL gmfToString(gmThread * a_thread);
+static int GM_CDECL gmfToInt(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	switch(a_thread->ParamType(0))
+	{
+	case GM_INT:
+	case GM_FLOAT:
+		a_thread->PushInt(a_thread->Param(0).GetIntSafe());
+		break;
+	case GM_STRING:
+		{
+			gmStringObject *pString = a_thread->Param(0).GetStringObjectSafe();
+			a_thread->PushInt( (int)atoi(pString->GetString()) );
+			break;
+		}
+	default:
+		{
+			// allow a default value to be provided in place of an exception
+			// allow a default value to be provided in place of an exception
+			if(a_thread->GetNumParams()>1)
+			{
+				if(a_thread->Param(1).IsNumber())
+				{
+					a_thread->PushInt(a_thread->Param(1).GetIntSafe());
+				}
+				else
+				{
+					a_thread->Push(a_thread->Param(1));
+				}
+			}
+			else
+			{
+				GM_EXCEPTION_MSG("can't convert type %s to int",a_thread->GetMachine()->GetTypeName(a_thread->ParamType(0)));
+				return GM_EXCEPTION;
+			}
+		}
+	}	
+	return GM_OK;
+}
+static int GM_CDECL gmfToFloat(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	switch(a_thread->ParamType(0))
+	{
+	case GM_INT:
+	case GM_FLOAT:
+		a_thread->PushFloat(a_thread->Param(0).GetFloatSafe());
+		break;
+	case GM_STRING:
+		{
+			gmStringObject *pString = a_thread->Param(0).GetStringObjectSafe();
+			a_thread->PushFloat( (float)atof(pString->GetString()) );
+			break;
+		}
+	default:
+		{
+			// allow a default value to be provided in place of an exception
+			if(a_thread->GetNumParams()>1)
+			{
+				if(a_thread->Param(1).IsNumber())
+				{
+					a_thread->PushFloat(a_thread->Param(1).GetFloatSafe());
+				}
+				else
+				{
+					a_thread->Push(a_thread->Param(1));
+				}
+			}
+			else
+			{
+				GM_EXCEPTION_MSG("can't convert type %s to float",a_thread->GetMachine()->GetTypeName(a_thread->ParamType(0)));
+				return GM_EXCEPTION;
+			}
+		}
+	}	
+	return GM_OK;
+}
+static int GM_CDECL gmfToVector(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	switch(a_thread->ParamType(0))
+	{
+	case GM_STRING:
+		{
+			const char *Str = a_thread->Param(0).GetCStringSafe("");
+
+			Vec3 v;
+			if(sscanf(Str,"%f %f %f",&v.x, &v.y, &v.z)==3)
+			{
+				a_thread->PushVector(v);
+				break;
+			}
+			gmStringObject *pString = a_thread->Param(0).GetStringObjectSafe();
+			a_thread->PushFloat( (float)atof(pString->GetString()) );
+			break;
+		}
+	case GM_VEC3:
+		{
+			a_thread->Push(a_thread->Param(0));
+			break;
+		}
+	default:
+		{
+			// allow a default value to be provided in place of an exception
+			if(a_thread->GetNumParams()>1)
+			{
+				if(a_thread->Param(1).IsVector())
+				{
+					a_thread->Push(a_thread->Param(1));
+				}
+				else
+				{
+					a_thread->Push(a_thread->Param(1));
+				}
+			}
+			else
+			{
+				GM_EXCEPTION_MSG("can't convert type %s to vector",a_thread->GetMachine()->GetTypeName(a_thread->ParamType(0)));
+				return GM_EXCEPTION;
+			}
+		}
+	}	
+	return GM_OK;
+}
+static int GM_CDECL gmfToString(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	char buffer[256] = {};
+	switch(a_thread->ParamType(0))
+	{
+	case GM_INT:
+		{
+			sprintf(buffer,"%d",a_thread->Param(0).GetInt());
+			a_thread->PushNewString(buffer);
+			break;
+		}
+	case GM_FLOAT:
+		{
+			sprintf(buffer,"%f",a_thread->Param(0).GetFloat());
+			a_thread->PushNewString(buffer);
+			break;
+		}
+	case GM_STRING:
+		{
+			a_thread->Push(a_thread->Param(0));
+			break;
+		}
+	default:
+		GM_EXCEPTION_MSG("can't convert type %s to string",a_thread->GetMachine()->GetTypeName(a_thread->ParamType(0)));
+		return GM_EXCEPTION;
+	}	
+	return GM_OK;
+}
+
+static int GM_CDECL gmfIsInt(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_INT ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmfIsFloat(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_FLOAT ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmfIsFloatOrInt(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_FLOAT || a_thread->ParamType(0)==GM_INT ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmfIsVec3(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_VEC3 ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmfIsString(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_STRING ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmfIsTable(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_TABLE ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmfIsFunction(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_FUNCTION ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmfIsEntity(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_ENTITY ? 1 : 0);
+	return GM_OK;
+}
 
 static gmFunctionEntry s_stringLib[] = 
 { 
@@ -1012,22 +1215,28 @@ static gmFunctionEntry s_stringLib[] =
 	*/
 	{"CompareNoCase", gmfStringCompareNoCase},
 	/*gm
-	\function Int
+	\function ToInt
 	\brief Int will return the int value of the string
 	\return int value
 	*/
-	{"Int", gmfToInt},
+	{"ToInt", gmfToInt},
 	/*gm
-	\function Float
+	\function ToFloat
 	\brief Float will return the float value of the string
 	\return float value
 	*/
-	{"Float", gmfToFloat},
+	{"ToFloat", gmfToFloat},
 	/*gm
-	\function String
+	\function ToVector
+	\brief Float will return the float value of the string
+	\return float value
+	*/
+	{"ToVector", gmfToVector},
+	/*gm
+	\function ToString
 	\return string
 	*/
-	{"String", gmfToString},
+	{"ToString", gmfToString},
 	/*gm
 	\function Upper
 	\brief Upper will return the string as uppercase
@@ -1161,8 +1370,41 @@ static gmFunctionEntry s_stringLib[] =
 	*/
 };
 
+static gmFunctionEntry s_conversionLib[] = 
+{
+	{"ToInt", gmfToInt},
+	/*gm
+	\function ToFloat
+	\brief Float will return the float value of the string
+	\return float value
+	*/
+	{"ToFloat", gmfToFloat},
+	/*gm
+	\function ToVector
+	\brief Float will return the float value of the string
+	\return float value
+	*/
+	{"ToVector", gmfToVector},
+	/*gm
+	\function ToString
+	\return string
+	*/
+	{"ToString", gmfToString},
+
+	{"IsInt", gmfIsInt},
+	{"IsBool", gmfIsInt},
+	{"IsFloat", gmfIsFloat},
+	{"IsFloatOrInt", gmfIsFloatOrInt},
+	{"IsVec3", gmfIsVec3},
+	{"IsString", gmfIsString},
+	{"IsTable", gmfIsTable},
+	{"IsFunction", gmfIsFunction},
+	{"IsEntity", gmfIsEntity},
+};
+
 void gmBindStringLib(gmMachine * a_machine)
 {
+	a_machine->RegisterLibrary(s_conversionLib, sizeof(s_conversionLib) / sizeof(s_conversionLib[0]));
 	a_machine->RegisterTypeOperator(GM_STRING, O_BIT_XOR, NULL, gmStringOpAppendPath);
 	a_machine->RegisterTypeOperator(GM_STRING, O_GETIND, NULL, gmStringOpGetInd);
 	a_machine->RegisterTypeLibrary(GM_STRING, s_stringLib, sizeof(s_stringLib) / sizeof(s_stringLib[0]));
