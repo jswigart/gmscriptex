@@ -276,20 +276,20 @@ public:
   }
   
   /// Access the referenced type
-  operator TYPE* ()                               { return (TYPE*)m_ptrToHolder->GetPtr(); }
-  operator const TYPE* () const                   { return (TYPE*)m_ptrToHolder->GetPtr(); }
+  operator TYPE* ()                               { return m_ptrToHolder ? (TYPE*)m_ptrToHolder->GetPtr() : 0; }
+  operator const TYPE* () const                   { return m_ptrToHolder ? (TYPE*)m_ptrToHolder->GetPtr() : 0; }
   
   /// Access the object as pointer
-  TYPE* operator -> ()                            { return (TYPE*)m_ptrToHolder->GetPtr(); }
-  const TYPE* operator -> () const                { return (TYPE*)m_ptrToHolder->GetPtr(); }
+  TYPE* operator -> ()                            { return m_ptrToHolder ? (TYPE*)m_ptrToHolder->GetPtr() : 0; }
+  const TYPE* operator -> () const                { return m_ptrToHolder ? (TYPE*)m_ptrToHolder->GetPtr() : 0; }
   
   /// Access the object as reference
   TYPE& operator * ()                             { return *((TYPE*)m_ptrToHolder->GetPtr()); }
   const TYPE& operator * () const                 { return *((TYPE*)m_ptrToHolder->GetPtr()); }
 
   /// Access object with standard function instead of operator.  Useful when compiler finds conversion ambigous.
-  TYPE* Resolve()                                 { return (TYPE*)m_ptrToHolder->GetPtr(); }
-  const TYPE* Resolve() const                     { return (TYPE*)m_ptrToHolder->GetPtr(); }
+  TYPE* Resolve()                                 { return m_ptrToHolder ? (TYPE*)m_ptrToHolder->GetPtr() : 0; }
+  const TYPE* Resolve() const                     { return m_ptrToHolder ? (TYPE*)m_ptrToHolder->GetPtr() : 0; }
   
   /// Assign from other reference
   gmGCRoot<TYPE>& operator = (const gmGCRoot<TYPE>& a_ref)

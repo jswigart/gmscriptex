@@ -43,12 +43,15 @@ enum
 	GM_NULL = 0, // GM_NULL must be 0 as i have relied on this in expression testing.
 	GM_INT,
 	GM_FLOAT,
+
 #if(GM_USE_VECTOR3_STACK)
 	//GM_BROADCAST_FLOAT,
 	GM_VEC3,
 #endif
 
+#if(GM_USE_ENTITY_STACK)
 	GM_ENTITY,
+#endif
 
 	GM_STRING,
 	GM_TABLE,
@@ -76,7 +79,9 @@ struct gmVariable
 #if(GM_USE_VECTOR3_STACK)
 		gmVec3Data m_vec3;
 #endif
-		int m_hndl;
+#if(GM_USE_ENTITY_STACK)
+		int m_enthndl;
+#endif		
 	} m_value;
 
 	inline gmVariable() 
@@ -95,7 +100,21 @@ struct gmVariable
 	explicit inline gmVariable(gmUserObject * a_user) { SetUser(a_user); }
 
 #if(GM_USE_VECTOR3_STACK)
-	explicit inline gmVariable(const gmVec3Data &a_val) : m_type(GM_VEC3) { SetVector(a_val); }
+	explicit inline gmVariable(const gmVec3Data &a_val) 
+		: m_type(GM_VEC3) 
+	{
+		SetVector(a_val); 
+	}
+	explicit inline gmVariable(float a_x,float a_y,float a_z) 
+		: m_type(GM_VEC3) 
+	{
+		SetVector(a_x,a_y,a_z); 
+	}
+	explicit inline gmVariable(const float *a_v) 
+		: m_type(GM_VEC3)
+	{
+		SetVector(a_v); 
+	}
 	inline bool IsVector() const 
 	{
 		return m_type==GM_VEC3; 
@@ -112,21 +131,32 @@ struct gmVariable
 		m_value.m_vec3.y = a_y; 
 		m_value.m_vec3.z = a_z; 
 	}
-	void GetVector(float &a_x, float &a_y, float &a_z) 
+	bool GetVector(float &a_x, float &a_y, float &a_z) const
 	{
-		a_x = m_value.m_vec3.x; 
-		a_y = m_value.m_vec3.y; 
-		a_z = m_value.m_vec3.z; 
+		if(IsVector())
+		{
+			a_x = m_value.m_vec3.x; 
+			a_y = m_value.m_vec3.y; 
+			a_z = m_value.m_vec3.z;
+			return true;
+		}
+		return false;
 	}
-
-	void Set(gmMachine *a_machine, float *a_value) 
+	void SetVector(const float *a_value) 
 	{
 		SetVector(a_value[0],a_value[1],a_value[2]); 
 	}
-	void Get(gmMachine *a_machine, float *a_value)
+	bool GetVector(float *a_value) const
 	{
-		GetVector(a_value[0],a_value[1],a_value[2]);
+		return GetVector(a_value[0],a_value[1],a_value[2]);
 	}
+#endif
+
+#if(GM_USE_ENTITY_STACK)
+	inline bool IsEntity() const { return m_type == GM_ENTITY; }
+	inline void SetEntity(int _hndl) { m_type = GM_ENTITY; m_value.m_enthndl = _hndl; }
+	inline int GetEntity() const { return m_value.m_enthndl; }
+	static gmVariable EntityVar(int _hndl) { gmVariable v; v.SetEntity(_hndl); return v; }
 #endif
 
 	inline void SetInt(int a_value) { m_type = GM_INT; m_value.m_int = a_value; }

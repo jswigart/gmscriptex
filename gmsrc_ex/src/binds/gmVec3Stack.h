@@ -10,15 +10,15 @@ struct gmVec3Data
 	float x, y, z;
 };
 
-inline gmVec3Data ConvertVec3(const Vector3d &v)
+inline gmVec3Data ConvertVec3(const Vec3 &v)
 {
 	gmVec3Data vr = {v.x,v.y,v.z};
 	return vr;
 }
 
-inline Vector3d ConvertVec3(const gmVec3Data &v)
+inline Vec3 ConvertVec3(const gmVec3Data &v)
 {
-	return Vector3d(v.x,v.y,v.z);
+	return Vec3(v.x,v.y,v.z);
 }
 extern gmVec3Data ZERO_VEC3;
 

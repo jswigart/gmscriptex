@@ -75,7 +75,7 @@ public:
 	{
 		Set(mem);
 	}
-	MyMatrix(const MyMatrix &m,const Vector3d &t)
+	MyMatrix(const MyMatrix &m,const Vec3 &t)
 	{
 		memcpy(mElement,m.mElement,sizeof(float)*4*4);
 		mElement[3][0]-=t.x;
@@ -132,7 +132,7 @@ public:
 
 	};
 
-	void Set(const Vector3d& m0,const Vector3d &m1,const Vector3d &m2)
+	void Set(const Vec3& m0,const Vec3 &m1,const Vec3 &m2)
 	{
 		mElement[0][0] = m0.x;
 		mElement[0][1] = m0.y;
@@ -196,9 +196,9 @@ public:
 		return (mElement[0][2] * x) +  (mElement[1][2] * y) +  (mElement[2][2] * z) + mElement[3][2];
 	}
 
-	inline	Vector3d Transform(const Vector3d & v) const
+	inline	Vec3 Transform(const Vec3 & v) const
 	{
-		Vector3d t;
+		Vec3 t;
 		t.x = (mElement[0][0] * v.x) +
 			(mElement[1][0] * v.y) +
 			(mElement[2][0] * v.z) + mElement[3][0];
@@ -213,7 +213,7 @@ public:
 		return t;
 	}
 
-	void Transform(const Vector3d & v,Vector3d &t) const
+	void Transform(const Vec3 & v,Vec3 &t) const
 	{
 		t.x = (mElement[0][0] * v.x) +
 			(mElement[1][0] * v.y) +
@@ -244,7 +244,7 @@ public:
 
 	}
 
-	void Transform(const Vector3d & v,Vector3d &t,const Vector3d &o) const
+	void Transform(const Vec3 & v,Vec3 &t,const Vec3 &o) const
 	{
 		t.x = (mElement[0][0] * v.x) +
 			(mElement[1][0] * v.y) +
@@ -259,7 +259,7 @@ public:
 			(mElement[2][2] * v.z) + (mElement[3][2]-o.z);
 	}
 
-	void Transform(const Vector2d & v,Vector2d &t) const
+	void Transform(const Vec2 & v,Vec2 &t) const
 	{
 		t.x = (mElement[0][0] * v.x) +
 			(mElement[1][0] * v.y) + mElement[2][0];
@@ -268,7 +268,7 @@ public:
 			(mElement[1][1] * v.y) + mElement[2][1];
 	};
 
-	inline void TransformRotateOnly(const Vector3d &v, Vector3d &t) const
+	inline void TransformRotateOnly(const Vec3 &v, Vec3 &t) const
 	{
 		//Rotate the vector, but do not translate it
 		t.x = (mElement[0][0] * v.x) +
@@ -305,7 +305,7 @@ public:
 		memset(mElement,0,sizeof(float)*16);
 	}
 
-	void GetPositionFromViewMatrix(Vector3d &pos) const
+	void GetPositionFromViewMatrix(Vec3 &pos) const
 	{
 		pos.x=-(mElement[3][0]*mElement[0][0] + mElement[3][1]*mElement[0][1] + mElement[3][2]*mElement[0][2]);
 		pos.y=-(mElement[3][0]*mElement[1][0] + mElement[3][1]*mElement[1][1] + mElement[3][2]*mElement[1][2]);
@@ -341,17 +341,17 @@ public:
 		mElement[3][2] = -Q*fNearPlane;
 	}
 
-	void SetViewMatrix(const Vector3d &eye,
-		const Vector3d &look,
-		const Vector3d &up)
+	void SetViewMatrix(const Vec3 &eye,
+		const Vec3 &look,
+		const Vec3 &up)
 	{
-		Vector3d vFrom    = eye;
-		Vector3d vAt      = look;
-		Vector3d vWorldUp = up;
+		Vec3 vFrom    = eye;
+		Vec3 vAt      = look;
+		Vec3 vWorldUp = up;
 
 		// Get the z basis vector, which points straight ahead. This is the
 		// difference from the eyepoint to the lookat point.
-		Vector3d vView;
+		Vec3 vView;
 
 		vView.x = vAt.x - vFrom.x;
 		vView.y = vAt.y - vFrom.y;
@@ -370,7 +370,7 @@ public:
 		// Get the dot product, and calculate the projection of the z basis
 		// vector onto the up vector. The projection is the y basis vector.
 		float fDotProduct = vWorldUp.Dot(vView);
-		Vector3d vUp;
+		Vec3 vUp;
 
 		vUp.x = vWorldUp.x - fDotProduct*vView.x;
 		vUp.y = vWorldUp.y - fDotProduct*vView.y;
@@ -403,7 +403,7 @@ public:
 
 		// The x basis vector is found simply with the cross product of the y
 		// and z basis vectors
-		Vector3d vRight;
+		Vec3 vRight;
 		vRight.x = vUp.y*vView.z - vUp.z*vView.y;
 		vRight.y = vUp.z*vView.x - vUp.x*vView.z;
 		vRight.z = vUp.x*vView.y - vUp.y*vView.x;
@@ -428,15 +428,15 @@ public:
 		mElement[3][2] = - vFrom.Dot(vView);
 	}
 
-	void LookAtMatrix(const Vector3d &from,const Vector3d &to,const Vector3d &up)
+	void LookAtMatrix(const Vec3 &from,const Vec3 &to,const Vec3 &up)
 	{
 		Identity();
 
-		Vector3d row2 = to - from;
+		Vec3 row2 = to - from;
 		row2.Normalize();
 
-		Vector3d row0;
-		Vector3d row1;
+		Vec3 row0;
+		Vec3 row1;
 
 		row0.Cross( up, row2 );
 		row1.Cross( row2, row0 );
@@ -465,13 +465,13 @@ public:
 		float centerx,float centery,float centerz,
 		float upx,float upy,float upz)
 	{
-		Vector3d vLookatPt(centerx,centery,centerz);
-		Vector3d vEyePt(eyex,eyey,eyez);
-		Vector3d vUpVec(upx,upy,upz);
+		Vec3 vLookatPt(centerx,centery,centerz);
+		Vec3 vEyePt(eyex,eyey,eyez);
+		Vec3 vUpVec(upx,upy,upz);
 		SetViewMatrix(vEyePt,vLookatPt,vUpVec);
 	}
 
-	void SetScale(const Vector3d &p)
+	void SetScale(const Vec3 &p)
 	{
 		MyMatrix work;
 
@@ -506,7 +506,7 @@ public:
 		mElement[3][2] = tz;
 	}
 
-	void SetTranslation(const Vector3d& pos)
+	void SetTranslation(const Vec3& pos)
 	{
 		mElement[3][0] = pos.x;
 		mElement[3][1] = pos.y;
@@ -621,11 +621,11 @@ public:
 
 	float getDeterminant() const
 	{
-		Vector3d tmpv;
+		Vec3 tmpv;
 
-		Vector3d p0( mElement[0][0], mElement[0][1], mElement[0][2] );
-		Vector3d p1( mElement[1][0], mElement[1][1], mElement[1][2] );
-		Vector3d p2( mElement[2][0], mElement[2][1], mElement[2][2] );
+		Vec3 p0( mElement[0][0], mElement[0][1], mElement[0][2] );
+		Vec3 p1( mElement[1][0], mElement[1][1], mElement[1][2] );
+		Vec3 p2( mElement[2][0], mElement[2][1], mElement[2][2] );
 
 		tmpv.Cross(p1, p2);
 
@@ -650,11 +650,11 @@ public:
 		}
 	}
 
-	void setFromXZ(const Vector3d &rowX,const Vector3d &rowZ)
+	void setFromXZ(const Vec3 &rowX,const Vec3 &rowZ)
 	{
 		Identity();
 
-		Vector3d rowY;
+		Vec3 rowY;
 		rowY.Cross( rowZ, rowX );
 
 		mElement[0][0] = rowX.x;
@@ -670,21 +670,21 @@ public:
 		mElement[2][2] = rowZ.z;
 	}
 
-	void GetXaxis(Vector3d &axis) const
+	void GetXaxis(Vec3 &axis) const
 	{
 		axis.x = mElement[0][0];
 		axis.y = mElement[0][1];
 		axis.z = mElement[0][2];
 	}
 
-	void GetYaxis(Vector3d &axis) const
+	void GetYaxis(Vec3 &axis) const
 	{
 		axis.x = mElement[1][0];
 		axis.y = mElement[1][1];
 		axis.z = mElement[1][2];
 	}
 
-	void GetZaxis(Vector3d &axis) const
+	void GetZaxis(Vec3 &axis) const
 	{
 		axis.x = mElement[2][0];
 		axis.y = mElement[2][1];
@@ -710,7 +710,7 @@ public:
 		tz = mElement[3][2];
 	}
 
-	void GetTranslation(Vector3d &t) const
+	void GetTranslation(Vec3 &t) const
 	{
 		t.x = mElement[3][0];
 		t.y = mElement[3][1];
@@ -718,7 +718,7 @@ public:
 	}
 
 	// inverse rotate translate a point
-	void InverseRotateTranslate(const Vector3d &v,Vector3d &t) const
+	void InverseRotateTranslate(const Vec3 &v,Vec3 &t) const
 	{
 		// Invert translation of source vector
 
@@ -746,9 +746,9 @@ public:
 		//Compensate for floating-point error in the matrix by making sure 
 		//  our rotation axes are three orthogonal unit vectors
 		//Algorithm blatantly ganked from a demo app by Chris Hecker
-		Vector3d XAxis(mElement[0][0], mElement[0][1], mElement[0][2]);
-		Vector3d YAxis(mElement[1][0], mElement[1][1], mElement[1][2]);
-		Vector3d ZAxis(mElement[2][0], mElement[2][1], mElement[2][2]);
+		Vec3 XAxis(mElement[0][0], mElement[0][1], mElement[0][2]);
+		Vec3 YAxis(mElement[1][0], mElement[1][1], mElement[1][2]);
+		Vec3 ZAxis(mElement[2][0], mElement[2][1], mElement[2][2]);
 
 		XAxis.Normalize();
 
@@ -782,9 +782,9 @@ public:
 		}
 	}
 
-	void Set(const Vector3d &basis,const Vector3d &normal);
+	void Set(const Vec3 &basis,const Vec3 &normal);
 
-	void SetFromXY(const Vector3d &ax,const Vector3d &ay)
+	void SetFromXY(const Vec3 &ax,const Vec3 &ay)
 	{
 		mElement[0][0] = ax.x;
 		mElement[0][1] = ax.y;
@@ -794,7 +794,7 @@ public:
 		mElement[1][1] = ay.y;
 		mElement[1][2] = ay.z;
 
-		Vector3d az;
+		Vec3 az;
 
 		az.Cross(ax,ay);
 
@@ -808,7 +808,7 @@ public:
 	// then multiplies that times the parent...
 	// then extracts the pose (translation and rotation) from
 	// the combined matrix.
-	void GetPose(const Vector3d &pos,const Quat &rot,Vector3d &tpos,Quat&trot) const;
+	void GetPose(const Vec3 &pos,const Quat &rot,Vec3 &tpos,Quat&trot) const;
 
 	void InvertUnscaled(const MyMatrix &invert)
 	{
@@ -820,7 +820,7 @@ public:
 
 		invert.Get3x3Transpose(*this);
 
-		Vector3d p, q;
+		Vec3 p, q;
 		invert.GetTranslation(p);
 		TransformRotateOnly(p,q);
 		SetTranslation(-q);

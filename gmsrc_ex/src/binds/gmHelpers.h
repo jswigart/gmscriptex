@@ -152,6 +152,69 @@ GM_FORCEINLINE bool gmGetFloatOrIntParamAsInt(gmThread * a_thread, int a_paramIn
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+GM_FORCEINLINE float gmGetFloatOrIntParamAsFloat(const gmVariable &_var)
+{
+	if(_var.m_type == GM_INT)
+	{
+		return (float)_var.m_value.m_int;
+	}
+	else
+	{
+		return _var.m_value.m_float;
+	}
+}
+
+
+GM_FORCEINLINE bool gmGetFloatOrIntParamAsFloat(const gmVariable &_var, float& a_retValue)
+{
+	if(_var.m_type == GM_INT)
+	{
+		a_retValue = (float)_var.m_value.m_int;
+		return true;
+	}
+	else if(_var.m_type == GM_FLOAT)
+	{
+		a_retValue = _var.m_value.m_float;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+GM_FORCEINLINE int gmGetFloatOrIntParamAsInt(const gmVariable &_var)
+{
+	if(_var.m_type == GM_INT)
+	{
+		return _var.m_value.m_int;
+	}
+	else
+	{
+		return (int)_var.m_value.m_float;
+	}
+}
+
+GM_FORCEINLINE bool gmGetFloatOrIntParamAsInt(const gmVariable &_var, int& a_retValue)
+{
+	if(_var.m_type == GM_INT)
+	{
+		a_retValue = _var.m_value.m_int;
+		return true;
+	}
+	else if(_var.m_type == GM_FLOAT)
+	{
+		a_retValue = (int)_var.m_value.m_float;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 /*!
   \brief gmRandomInt() returns a random int b/n two values
          Beware of overflow since ints are only 32bit on Intel

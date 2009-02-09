@@ -6,6 +6,8 @@
 #include "gmThread.h"
 #include "gmHelpers.h"
 
+#include "matrix.h"
+
 gmVec3Data ZERO_VEC3 = {};
 
 //////////////////////////////////////////////////////////////////////////
@@ -262,22 +264,22 @@ int GM_CDECL gmVec3Create(gmThread *a_thread)
 	switch (a_thread->GetNumParams())
 	{
 	case 0:
-		a_thread->PushVector(Vector3d(0.f,0.f,0.f));
+		a_thread->PushVector(Vec3(0.f,0.f,0.f));
 		break;
 	case 1: 
 		{
 			float num = gmGetFloatOrIntParamAsFloat(a_thread, 0);
-			a_thread->PushVector(Vector3d(num, num, num));
+			a_thread->PushVector(Vec3(num, num, num));
 			break;
 		}
 	case 2:
-		a_thread->PushVector(Vector3d(
+		a_thread->PushVector(Vec3(
 			gmGetFloatOrIntParamAsFloat(a_thread, 0), 
 			gmGetFloatOrIntParamAsFloat(a_thread, 1),
 			0.f));
 		break;
 	case 3:
-		a_thread->PushVector(Vector3d(gmGetFloatOrIntParamAsFloat(a_thread, 0), gmGetFloatOrIntParamAsFloat(a_thread, 1), gmGetFloatOrIntParamAsFloat(a_thread, 2)));
+		a_thread->PushVector(Vec3(gmGetFloatOrIntParamAsFloat(a_thread, 0), gmGetFloatOrIntParamAsFloat(a_thread, 1), gmGetFloatOrIntParamAsFloat(a_thread, 2)));
 		break;
 	default:
 		//LOG_ERROR << "Invalid number of paramters to math.Vector() - expecting 0, 1, 2, or 3" << nl;
@@ -289,26 +291,26 @@ int GM_CDECL gmVec3Create(gmThread *a_thread)
 // Functions
 int GM_CDECL gmVec3Normalize(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	v.Normalize();
 	a_thread->PushVector(v);
 	return GM_OK;
 }
 int GM_CDECL gmVec3Length(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	a_thread->PushFloat(v.Length());
 	return GM_OK;
 }
 int GM_CDECL gmVec3Length2(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	a_thread->PushFloat(v.Length2());
 	return GM_OK;
 }
 int GM_CDECL gmVec3Concave(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
 	a_thread->PushInt(v.Concave(v0,v1)?1:0);
@@ -316,52 +318,52 @@ int GM_CDECL gmVec3Concave(gmThread *a_thread)
 }
 int GM_CDECL gmVec3CrossProduct(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
-	Vector3d vOut;
+	Vec3 vOut;
 	a_thread->PushVector(v.Cross(v0));
 	return GM_OK;
 }
 int GM_CDECL gmVec3DotProduct(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.Dot(v0));
 	return GM_OK;
 }
 int GM_CDECL gmVec3Distance(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.Distance(v0));
 	return GM_OK;
 }
 int GM_CDECL gmVec3Distance2(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.Distance2(v0));
 	return GM_OK;
 }
 int GM_CDECL gmVec3DistanceXY(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.DistanceXY(v0));
 	return GM_OK;
 }
 int GM_CDECL gmVec3Reflection(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.Reflection(v,v0);
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
 int GM_CDECL gmVec3Set(gmThread *a_thread)
 {
-	Vector3d v = ConvertVec3(a_thread->ThisVector());
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	if(a_thread->Param(0).IsNumber())
 		v.x = a_thread->Param(0).GetFloatSafe();
 	if(a_thread->Param(1).IsNumber())
@@ -369,6 +371,18 @@ int GM_CDECL gmVec3Set(gmThread *a_thread)
 	if(a_thread->Param(2).IsNumber())
 		v.z = a_thread->Param(2).GetFloatSafe();
 	a_thread->PushVector(v);
+	return GM_OK;
+}
+int GM_CDECL gmVec3GetYaw(gmThread *a_thread)
+{
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
+	a_thread->PushFloat(v.GetYaw());
+	return GM_OK;
+}
+int GM_CDECL gmVec3GetPitch(gmThread *a_thread)
+{
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
+	a_thread->PushFloat(v.GetPitch());
 	return GM_OK;
 }
 //////////////////////////////////////////////////////////////////////////
@@ -385,7 +399,7 @@ int GM_CDECL gmAngleAxis(gmThread *a_thread)
 {
 	GM_CHECK_FLOAT_OR_INT_PARAM(angl,0);
 	GM_CHECK_VECTOR_PARAM(axis,1);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.AngleAxis(angl*DEG_TO_RAD,axis);
 	a_thread->PushVector(vOut);
 	return GM_OK;
@@ -395,7 +409,7 @@ int GM_CDECL gmComputeNormal(gmThread *a_thread)
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
 	GM_CHECK_VECTOR_PARAM(v2,2);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.ComputeNormal(v0,v1,v2);
 	a_thread->PushVector(vOut);
 	return GM_OK;
@@ -404,7 +418,7 @@ int GM_CDECL gmCrossProduct(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.Cross(v0,v1);
 	a_thread->PushVector(vOut);
 	return GM_OK;
@@ -421,7 +435,7 @@ int GM_CDECL gmLerp(gmThread *a_thread)
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
 	GM_CHECK_FLOAT_OR_INT_PARAM(t,2);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.Lerp(v0,v1,t);
 	a_thread->PushVector(vOut);
 	return GM_OK;
@@ -430,7 +444,7 @@ int GM_CDECL gmReflection(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.Reflection(v0,v1);
 	a_thread->PushVector(vOut);
 	return GM_OK;
@@ -440,7 +454,7 @@ int GM_CDECL gmNearestPointInLine(gmThread *a_thread)
 	GM_CHECK_VECTOR_PARAM(pt,0);
 	GM_CHECK_VECTOR_PARAM(v0,1);
 	GM_CHECK_VECTOR_PARAM(v1,2);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.NearestPointInLine(pt,v0,v1);
 	a_thread->PushVector(vOut);
 	return GM_OK;
@@ -450,7 +464,7 @@ int GM_CDECL gmNearestPointInLineSegment(gmThread *a_thread)
 	GM_CHECK_VECTOR_PARAM(pt,0);
 	GM_CHECK_VECTOR_PARAM(v0,1);
 	GM_CHECK_VECTOR_PARAM(v1,2);
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.NearestPointInLineSegment(pt,v0,v1);
 	a_thread->PushVector(vOut);
 	return GM_OK;
@@ -464,7 +478,7 @@ int GM_CDECL gmNearestPointInPlane(gmThread *a_thread)
 		GM_CHECK_VECTOR_PARAM(v1,2);
 		GM_CHECK_VECTOR_PARAM(v2,3);
 
-		Vector3d vOut;
+		Vec3 vOut;
 		vOut.NearestPointInPlane(pt,v0,v1,v2);
 		a_thread->PushVector(vOut);
 		return GM_OK;
@@ -475,7 +489,7 @@ int GM_CDECL gmNearestPointInPlane(gmThread *a_thread)
 		GM_CHECK_VECTOR_PARAM(pp,1);
 		GM_CHECK_VECTOR_PARAM(pn,1);
 
-		Vector3d vOut;
+		Vec3 vOut;
 		vOut.NearestPointInPlane(pt,pp,pn);
 		a_thread->PushVector(vOut);
 		return GM_OK;
@@ -491,16 +505,19 @@ int GM_CDECL gmNearestPointInTriangle(gmThread *a_thread)
 	GM_CHECK_VECTOR_PARAM(v1,2);
 	GM_CHECK_VECTOR_PARAM(v2,3);
 
-	Vector3d vOut;
+	Vec3 vOut;
 	vOut.NearestPointInTriangle(pt,v0,v1,v2);
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
+
 //////////////////////////////////////////////////////////////////////////
 gmFunctionEntry vec3_lib[] = 
 {
 	{"Vector3",					gmVec3Create},
 	{"Vec3",					gmVec3Create},
+	{"Vector2",					gmVec3Create},
+	{"Vec2",					gmVec3Create},
 
 	{"Area",					gmArea},
 	{"AngleAxis",				gmAngleAxis},
@@ -530,6 +547,9 @@ gmFunctionEntry vec3_methods[] =
 	
 	{"Set",			gmVec3Set},
 	{"SetXYZ",		gmVec3Set},
+
+	{"GetYaw",		gmVec3GetYaw},
+	{"GetPitch",	gmVec3GetPitch},	
 };
 
 void BindVector3Stack(gmMachine *a_machine)

@@ -106,22 +106,22 @@ void MyMatrix::Rotate(float x,float y,float z)
 void MyMatrix::Rotate(float angle,float x,float y,float z)
 {
 	Quat q;
-	Vector3d axis(x,y,z);
+	Vec3 axis(x,y,z);
 	q.AngleAxis(angle,axis);
 	q.QuatToMatrix(*this);
 }
 
 //***************************************************************************
-void MyMatrix::Set(const Vector3d &facing,const Vector3d &N)
+void MyMatrix::Set(const Vec3 &facing,const Vec3 &N)
 {
 	//n cross ((h cross n) /|h cross n|)
-	Vector3d r0;
+	Vec3 r0;
 	r0.Cross(facing,N);
 	r0.Normalize();
-	Vector3d v0;
+	Vec3 v0;
 	v0.Cross(N,r0);
 
-	Vector3d v1;
+	Vec3 v1;
 
 	v1.Cross(N,v0);
 
@@ -149,9 +149,9 @@ void MyMatrix::Set(const Vector3d &facing,const Vector3d &N)
 }
 
 
-void MyMatrix::GetPose(const Vector3d &pos,
+void MyMatrix::GetPose(const Vec3 &pos,
 					   const Quat &rot,
-					   Vector3d &tpos,
+					   Vec3 &tpos,
 					   Quat &trot) const
 {
 	MyMatrix child;

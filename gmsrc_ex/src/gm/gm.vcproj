@@ -448,6 +448,14 @@
 			Name="binds"
 			>
 			<File
+				RelativePath="..\binds\gmCall.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmCall.h"
+				>
+			</File>
+			<File
 				RelativePath="..\binds\gmGCRoot.cpp"
 				>
 			</File>
@@ -461,6 +469,54 @@
 			</File>
 			<File
 				RelativePath="..\binds\gmGCRootUtil.h"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmSqliteLib.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\binds\gmSqliteLib.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\binds\gmStringLib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmStringLib.h"
 				>
 			</File>
 		</Filter>
