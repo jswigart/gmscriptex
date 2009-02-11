@@ -459,7 +459,7 @@ public:
 	/// \sa CreateUserType()
 	gmUserObject * AllocUserObject(void * a_user, int a_userType);
 
-	gmVariable Lookup(const char *a_string);
+	gmVariable Lookup(const char *a_string, gmTableObject *a_tbl = NULL);
 	const char *ReverseLookup(const char *a_string, const gmVariable &_value);
 
 	//

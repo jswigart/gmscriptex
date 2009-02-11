@@ -312,6 +312,16 @@ namespace gmBind2
 			}
 			return NULL;
 		}
+		static gmTableObject*GetTable(gmGCRoot<gmUserObject> a_userObj)
+		{
+			if(a_userObj)
+			{
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::GetClassType());
+				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
+				return bo->m_Table;
+			}
+			return NULL;
+		}
 		static void CloneTable(gmMachine *a_machine, gmGCRoot<gmUserObject> a_userObj, gmGCRoot<gmUserObject> a_cloneTo)
 		{
 			BoundObject<ClassT> *boFrom = GetBoundObject(a_userObj);
