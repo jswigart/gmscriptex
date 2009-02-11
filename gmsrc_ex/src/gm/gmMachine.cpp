@@ -1907,29 +1907,70 @@ void gmMachine::SetBaseForType(gmType a_type, gmType a_base)
 	}
 }
 
-gmVariable gmMachine::Lookup(const char *a_string)
+gmVariable gmMachine::Lookup(const char *a_string, gmTableObject *a_tbl)
 {
 	static const int BUF_SZ = 2048;
 	char buffer[BUF_SZ] = {};
 	GM_ASSERT(strlen(a_string) < BUF_SZ);
 	strncpy(buffer, a_string, BUF_SZ);
 
-	gmTableObject *pCurrentTable = GetGlobals();
+	gmTableObject *pCurrentTable = a_tbl ? a_tbl : GetGlobals();
 
-	gmVariable var;
+	gmVariable var = gmVariable::s_null;
+
 	char *pStart = buffer, *pEnd = buffer;
-	while(pCurrentTable && (pEnd = strchr(pStart, '.')))
+	while(pCurrentTable && pEnd && *pEnd)
 	{
-		*pEnd = 0;
+		switch(*pEnd)
+		{
+		case '.':
+		case '[':
+			{
+				*pEnd = 0;
 
-		// Get the next item based on this token.
-		var = pCurrentTable->Get(this, pStart);
+				// Get the next item based on this token.
+				var = pCurrentTable->Get(this, pStart);
 
-		// If it's a table, set the table pointer so the lookup can walk down.
-		pCurrentTable = var.GetTableObjectSafe();
+				// If it's a table, set the table pointer so the lookup can walk down.
+				pCurrentTable = var.GetTableObjectSafe();
 
-		// Next token.
-		pStart = pEnd + 1;
+				// Next token.
+				pStart = pEnd + 1;
+
+				pEnd = pStart;
+
+				break;
+			}
+		case ']':
+			{
+				// find the index at the closing brackets
+				while(pEnd && *pEnd && *pEnd != ']')
+					++pEnd;
+
+				if(*pEnd == ']')
+				{
+					*pEnd = 0;
+
+					const int index = (int)atoi(pStart);
+
+					// Get the next item based on this token.
+					var = pCurrentTable->Get(gmVariable(index));
+
+					// If it's a table, set the table pointer so the lookup can walk down.
+					pCurrentTable = var.GetTableObjectSafe();
+
+					// Next token.
+					pStart = pEnd + 1;
+
+					// eat
+					while(pStart && *pStart && *pStart=='.')
+						++pStart;
+					pEnd = pStart;
+				}
+				break;
+			}
+		}
+		++pEnd;
 	}
 
 	// Should have the last token here.
