@@ -230,6 +230,20 @@ namespace gmBind2
 			m_Properties.insert(std::make_pair(_name, pr));
 			return *this;
 		}
+		Class &var_bitfield(int ClassT::* _var, int _bit, const char *_name)
+		{
+			struct CV { int ClassT::* var; } cv; // Cast Variable helper.
+			cv.var = _var;
+
+			gmPropertyFunctionPair pr;
+			pr.m_Getter = GMProperty::GetBitField<VarType>;
+			pr.m_Setter = GMProperty::SetBitField<VarType>;
+			pr.m_PropertyOffset = (size_t)(*(int**)&cv);
+			pr.m_BitfieldOffset = _bit;
+			pr.m_Static = false;
+			m_Properties.insert(std::make_pair(_name, pr));
+			return *this;
+		}
 		Class &constructor(RawFunctionType f, const char *_name = 0, const char *_undertable = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
@@ -391,8 +405,9 @@ namespace gmBind2
 			gmBindProp	m_Getter;
 			gmBindProp	m_Setter;
 			size_t		m_PropertyOffset;
+			size_t		m_BitfieldOffset;
 			bool		m_Static;
-			gmPropertyFunctionPair() : m_Getter(0), m_Setter(0), m_PropertyOffset(0) { }
+			gmPropertyFunctionPair() : m_Getter(0), m_Setter(0), m_PropertyOffset(0), m_BitfieldOffset(0) { }
 		};
 
 		typedef std::map<std::string, gmPropertyFunctionPair> PropertyMap;

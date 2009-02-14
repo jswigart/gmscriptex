@@ -718,6 +718,15 @@ static int GM_CDECL gmTableDuplicate(gmThread * a_thread)
 	return GM_OK;
 }
 
+static int GM_CDECL gmTableCopyTo(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(2);
+	GM_CHECK_TABLE_PARAM(table, 0);
+	GM_CHECK_TABLE_PARAM(tableTo, 1);
+	table->CopyTo(a_thread->GetMachine(),tableTo);
+	return GM_OK;
+}
+
 static int GM_CDECL gmTableRandom(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
@@ -1320,6 +1329,13 @@ static gmFunctionEntry s_binding[] =
 	\return table
 	*/
 	{"tableDuplicate", gmTableDuplicate},
+	/*gm
+	\function tableCopyTo
+	\brief tableCopyTo copy the contents of param0 table to param1 table
+	\param table
+	\param tableTo
+	*/
+	{"tableCopyTo", gmTableCopyTo},	
 	/*gm
 	\function tableRandom
 	\brief randomize an indexed table
