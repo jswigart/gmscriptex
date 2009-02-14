@@ -75,6 +75,7 @@ public:
 
 	inline int Count() const { return m_slotsUsed; }
 	gmTableObject * Duplicate(gmMachine * a_machine);
+	void CopyTo(gmMachine * a_machine, gmTableObject *a_copyTo);
 
 
 	//

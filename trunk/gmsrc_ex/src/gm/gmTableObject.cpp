@@ -320,7 +320,16 @@ gmTableObject * gmTableObject::Duplicate(gmMachine * a_machine)
 	return object;
 }
 
-
+void gmTableObject::CopyTo(gmMachine * a_machine, gmTableObject *a_copyTo)
+{
+	gmTableIterator it;
+	gmTableNode *pNode = GetFirst(it);
+	while(pNode)
+	{
+		a_copyTo->Set(a_machine,pNode->m_key,pNode->m_value);
+		pNode = GetNext(it);
+	}
+}
 
 void gmTableObject::Construct(gmMachine * a_machine)
 {
