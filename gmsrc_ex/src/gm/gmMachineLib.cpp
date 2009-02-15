@@ -892,8 +892,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 	GM_CHECK_STRING_PARAM(format, 0);
 	int param = 1;
 	int len = 0, size = 0;
-	const int bufferSize = 128;
-	char * str = NULL, buffer[bufferSize];
+	const int bufferSize = 1024;
+	char * str = NULL, buffer[bufferSize] = {};
 
 	while(*format)
 	{
