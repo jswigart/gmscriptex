@@ -600,7 +600,7 @@ namespace gmBind2
 	namespace GMProperty
 	{
 		template<typename T>
-		static int Get(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static) 
+		static int Get(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
 		{
 			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
 			a_operands[0].Set(a_thread->GetMachine(),*var);
@@ -608,7 +608,7 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<>
-		static int Get<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
+		static int Get<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			const std::string *str = a_static ? (std::string*)a_offset : (const std::string*)((char*)p + a_offset);
 			a_operands[0].SetString(a_thread->GetMachine(), str->c_str());
@@ -616,7 +616,7 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<typename T>
-		static int Set(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static) 
+		static int Set(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
 		{
 			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
 			a_operands[1].Get(a_thread->GetMachine(),*var);
@@ -624,11 +624,31 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<>
-		static int Set<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, bool a_static)
+		static int Set<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			std::string *str = a_static ? (std::string*)a_offset : (std::string *)((char*)p + a_offset);
 			*str = a_operands[1].GetCStringSafe();
 			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		// Bitfield stuff.
+		template<typename T>
+		static int GetBitField(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		{
+			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
+			a_operands[0].SetInt((*var)&(1<<a_bit)?1:0);
+			return 1;
+		}
+		template<typename T>
+		static int SetBitField(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		{
+			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
+			const int bitfield = a_operands[1].GetInt();
+			if(bitfield)
+				*var |= (1<<a_bit);
+			else
+				*var &= ~(1<<a_bit);
+			return 1; 
 		}
 	};
 	//////////////////////////////////////////////////////////////////////////

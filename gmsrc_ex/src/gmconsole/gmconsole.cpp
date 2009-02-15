@@ -56,6 +56,13 @@ bool GM_CDECL gmeMachineCallback(gmMachine * a_machine, gmMachineCommand a_comma
 class BindClass
 {
 public:
+	enum Flags
+	{
+		Flag0,
+		Flag1,
+		Flag2,
+		Flag3,
+	};
 	void FuncNoRetNoArg() 
 	{
 		std::cout << __FUNCTION__ << std::endl; 
@@ -92,14 +99,17 @@ public:
 			.func(&BindClass::FuncRaw,"FuncRaw")
 			.var(&BindClass::TestInt,"TestInt")
 			.var(&BindClass::TestFloat,"TestFloat")
-			.var(&BindClass::TestVector,"TestVector")
+			//.var(&BindClass::TestVector,"TestVector")
 			.var_readonly(&BindClass::TestFloatReadOnly,"TestFloatReadOnly")
 			.var(&BindClass::TestStdString,"TestStdString")
 			.var(&BindClass::TestGCTable,"TestGCTable")
 			.var(&BindClass::TestGCFunction,"TestGCFunction")
+			.var_bitfield(&BindClass::BitField,Flag0,"BitField0")
+			.var_bitfield(&BindClass::BitField,Flag1,"BitField1")
+			.var_bitfield(&BindClass::BitField,Flag2,"BitField2")
 			;
 	}
-	BindClass() : TestInt(1), TestFloat(2.f), TestStdString("foo"), TestFloatReadOnly(50.f)
+	BindClass() : TestInt(1), BitField(0), TestFloat(2.f), TestStdString("foo"), TestFloatReadOnly(50.f)
 	{
 		TestVector[0] = 1;
 		TestVector[1] = 2;
@@ -107,6 +117,7 @@ public:
 	}
 private:
 	int							TestInt;
+	int							BitField;
 	float						TestFloat;
 	float						TestFloatReadOnly;
 	float						TestVector[3];

@@ -230,9 +230,10 @@ namespace gmBind2
 			m_Properties.insert(std::make_pair(_name, pr));
 			return *this;
 		}
-		Class &var_bitfield(int ClassT::* _var, int _bit, const char *_name)
+		template<typename VarType>
+		Class &var_bitfield(VarType ClassT::* _var, int _bit, const char *_name)
 		{
-			struct CV { int ClassT::* var; } cv; // Cast Variable helper.
+			struct CV { VarType ClassT::* var; } cv; // Cast Variable helper.
 			cv.var = _var;
 
 			gmPropertyFunctionPair pr;
@@ -399,7 +400,7 @@ namespace gmBind2
 
 	private:
 		//////////////////////////////////////////////////////////////////////////
-		typedef int (*gmBindProp)(void *p, gmThread * a_thread, gmVariable * a_operands, size_t a_offset, bool a_static);
+		typedef int (*gmBindProp)(void *p, gmThread * a_thread, gmVariable * a_operands, size_t a_offset, size_t a_bit, bool a_static);
 		struct gmPropertyFunctionPair
 		{
 			gmBindProp	m_Getter;
@@ -434,7 +435,13 @@ namespace gmBind2
 					gmPropertyFunctionPair &propfuncs = it->second;
 					if(propfuncs.m_Getter)
 					{
-						propfuncs.m_Getter(bo->m_NativeObj, a_thread, a_operands, propfuncs.m_PropertyOffset, propfuncs.m_Static);
+						propfuncs.m_Getter(
+							bo->m_NativeObj, 
+							a_thread, 
+							a_operands, 
+							propfuncs.m_PropertyOffset, 
+							propfuncs.m_BitfieldOffset,
+							propfuncs.m_Static);
 						return;
 					}
 				}
@@ -469,7 +476,13 @@ namespace gmBind2
 					gmPropertyFunctionPair &propfuncs = it->second;
 					if(propfuncs.m_Setter)
 					{
-						propfuncs.m_Setter(bo->m_NativeObj, a_thread, a_operands, propfuncs.m_PropertyOffset, propfuncs.m_Static);
+						propfuncs.m_Setter(
+							bo->m_NativeObj, 
+							a_thread, 
+							a_operands, 
+							propfuncs.m_PropertyOffset, 
+							propfuncs.m_BitfieldOffset,
+							propfuncs.m_Static);
 						return;
 					}
 				}
