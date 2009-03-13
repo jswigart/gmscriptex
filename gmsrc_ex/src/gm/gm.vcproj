@@ -243,10 +243,6 @@
 				RelativePath=".\gmVariable.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\binds\gmVec3Stack.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -385,10 +381,6 @@
 				RelativePath=".\gmVariable.h"
 				>
 			</File>
-			<File
-				RelativePath="..\binds\gmVec3Stack.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -447,6 +439,14 @@
 		<Filter
 			Name="binds"
 			>
+			<File
+				RelativePath="..\binds\gmArrayLib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmArrayLib.h"
+				>
+			</File>
 			<File
 				RelativePath="..\binds\gmCall.cpp"
 				>
@@ -517,6 +517,14 @@
 			</File>
 			<File
 				RelativePath="..\binds\gmStringLib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmVec3Stack.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmVec3Stack.h"
 				>
 			</File>
 		</Filter>

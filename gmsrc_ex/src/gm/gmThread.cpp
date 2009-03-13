@@ -727,11 +727,13 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				{
 					base[localkey] = node->m_key;
 					base[localvalue] = node->m_value;
-					top->m_type = GM_INT; top->m_value.m_int = 1;
+					top->m_type = GM_INT; 
+					top->m_value.m_int = 1;
 				}
 				else
 				{
-					top->m_type = GM_INT; top->m_value.m_int = 0;
+					top->m_type = GM_INT; 
+					top->m_value.m_int = 0;
 				}
 				++top;
 				break;
