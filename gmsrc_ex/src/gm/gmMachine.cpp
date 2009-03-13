@@ -487,7 +487,7 @@ void gmMachine::RegisterUserCallbacks(gmType a_type, gmGCTraceCallback a_gcTrace
 	m_types[a_type].m_gcTrace = a_gcTrace;
 	m_types[a_type].m_gcDestruct = a_gcDestruct;
 	m_types[a_type].m_asString = a_asString;
-	m_types[a_type].m_dbgInfo = a_dbgInfo;  
+	m_types[a_type].m_dbgInfo = a_dbgInfo;
 }
 
 #else //GM_USE_INCGC
@@ -496,7 +496,7 @@ void gmMachine::RegisterUserCallbacks(gmType a_type, gmGarbageCollectCallback a_
 	m_types[a_type].m_mark = a_mark;
 	m_types[a_type].m_gc = a_gc;
 	m_types[a_type].m_asString = a_asString;
-	m_types[a_type].m_dbgInfo = a_dbgInfo;  
+	m_types[a_type].m_dbgInfo = a_dbgInfo;
 }
 #endif //GM_USE_INCGC
 
@@ -1651,6 +1651,7 @@ void gmMachine::Type::Init()
 	memset(m_operators, 0, sizeof(gmptr) * O_MAXOPERATORS);
 	m_asString = NULL;
 	m_dbgInfo = NULL;
+	m_ForEach = NULL;
 #if GM_USE_INCGC
 	m_gcDestruct = NULL;
 	m_gcTrace = NULL;
@@ -1709,6 +1710,10 @@ void gmMachine::ResetDefaultTypes()
 	m_types[GM_VEC3].m_name = AllocPermanantStringObject("vector3");
 	BindVector3Stack(this);
 #endif
+
+	//////////////////////////////////////////////////////////////////////////
+	// Set up internal callback functions.
+	m_types[GM_TABLE].m_ForEach = gmTableObject_ForEach;
 }
 
 

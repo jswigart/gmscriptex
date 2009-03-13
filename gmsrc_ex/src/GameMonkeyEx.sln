@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gm_ex", "gm\gm.vcproj", "{8C9CC332-D582-453A-AF10-20B100857587}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gme", "gme\gme.vcproj", "{491CFDF5-B202-4FAD-B47E-810376C9DF27}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8C9CC332-D582-453A-AF10-20B100857587} = {8C9CC332-D582-453A-AF10-20B100857587}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gml", "gml\gml.vcproj", "{5478A397-2EE5-45CE-BE46-665C630518F4}"
 	ProjectSection(ProjectDependencies) = postProject

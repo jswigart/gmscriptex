@@ -447,3 +447,19 @@ gmVariable gmTableObject::GetLinearSearch(const char * a_key) const
 	}
 	return gmVariable::s_null;
 }
+
+bool gmTableObject_ForEach(gmMachine *a_machine, gmVariable &a_obj, gmVariable &a_iter, gmVariable &a_keyOut, gmVariable &a_valOut)
+{	
+	GM_ASSERT(a_iter.m_type == GM_INT);
+	gmTableIterator it = (gmTableIterator)a_iter.m_value.m_int;
+	gmTableObject *table = (gmTableObject *) GM_MOBJECT(a_machine, a_obj.m_value.m_ref);
+	gmTableNode *node = table->GetNext(it);
+	a_iter.m_value.m_int = it;
+	if(node)
+	{
+		a_keyOut = node->m_key;
+		a_valOut = node->m_value;
+		return true;
+	}
+	return false;
+}

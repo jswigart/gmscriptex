@@ -712,8 +712,35 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				gmuint32 localkey = localvalue >> 16;
 				localvalue &= 0xffff;
 
-				// iterator is at tos-1, table is at tos -2, push int 1 if continuing loop. write key and value into localkey and localvalue
-				if(top[-2].m_type != GM_TABLE) 
+				// iterator is at tos-1, table is at tos -2, 
+				// push int 1 if continuing loop. write key and value into localkey and localvalue
+				gmVariable &feVar = top[-2];
+				gmVariable &feIter = top[-1];
+
+				gmForEachCallback foreach = m_machine->GetUserForEachCallback(feVar.m_type);
+				if(!foreach)
+				{
+					GMTHREAD_LOG("foreach expression is not valid type");
+					goto LabelException;
+				}
+
+				const bool bKeepLooping = foreach(m_machine,feVar,feIter,base[localkey],base[localvalue]);
+
+				if(bKeepLooping)
+				{
+					top->m_type = GM_INT; 
+					top->m_value.m_int = 1;
+				}
+				else
+				{
+					top->m_type = GM_INT; 
+					top->m_value.m_int = 0;
+				}
+				++top;
+
+				//////////////////////////////////////////////////////////////////////////
+				// OLD
+				/*if(top[-2].m_type != GM_TABLE) 
 				{
 					GMTHREAD_LOG("foreach expression is not table type");
 					goto LabelException;
@@ -735,7 +762,8 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 					top->m_type = GM_INT; 
 					top->m_value.m_int = 0;
 				}
-				++top;
+				++top;*/
+				//////////////////////////////////////////////////////////////////////////
 				break;
 			}
 		case BC_POP :
