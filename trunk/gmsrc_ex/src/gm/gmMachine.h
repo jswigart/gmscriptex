@@ -96,9 +96,11 @@ typedef void (GM_CDECL *gmGarbageCollectCallback)(gmMachine * a_machine, gmUserO
 ///        convert the type to a string < 256 characters long.
 /// \param a_bufferSize at least 256 chars
 typedef void (GM_CDECL *gmAsStringCallback)(gmUserObject * a_userObj, char * a_buffer, int a_bufferSize);
+typedef bool (GM_CDECL *gmForEachCallback)(gmMachine * a_machine, gmVariable &a_obj, gmVariable &a_iter, gmVariable &a_keyOut, gmVariable &a_valOut);
 typedef void (GM_CDECL *gmPrintCallback)(gmMachine * a_machine, const char * a_string);
 typedef bool (GM_CDECL *gmThreadIteratorCallback)(gmThread * a_thread, void * a_context);
 typedef bool (GM_CDECL *gmUserBreakCallback)(gmThread * a_thread);
+
 
 // the following callbacks return true if the thread is to yield after completion of the callback.
 typedef bool (GM_CDECL *gmDebugLineCallback)(gmThread * a_thread);
@@ -400,7 +402,12 @@ public:
 
 	/// \brief RegisterUserCallbacks() will register user type garbage collect methods.
 #if GM_USE_INCGC
-	void RegisterUserCallbacks(gmType a_type, gmGCTraceCallback a_gcTrace, gmGCDestructCallback a_gcDestruct, gmAsStringCallback a_asString = NULL, gmDebugChildInfoCallback a_dbgInfo = NULL);
+	void RegisterUserCallbacks(
+		gmType a_type, 
+		gmGCTraceCallback a_gcTrace, 
+		gmGCDestructCallback a_gcDestruct, 
+		gmAsStringCallback a_asString = NULL, 
+		gmDebugChildInfoCallback a_dbgInfo = NULL);
 
 	/// \brief GetUserMarkCallback() will return the gc mark call back for a user type
 	inline gmGCTraceCallback GetUserGCTraceCallback(gmType a_type) const { return m_types[a_type].m_gcTrace; }
@@ -410,7 +417,12 @@ public:
 
 #else //GM_USE_INCGC
 
-	void RegisterUserCallbacks(gmType a_type, gmGarbageCollectCallback a_mark, gmGarbageCollectCallback a_gc, gmAsStringCallback a_asString = NULL, gmDebugChildInfoCallback a_dbgInfo = NULL);
+	void RegisterUserCallbacks(
+		gmType a_type, 
+		gmGarbageCollectCallback a_mark, 
+		gmGarbageCollectCallback a_gc, 
+		gmAsStringCallback a_asString = NULL, 
+		gmDebugChildInfoCallback a_dbgInfo = NULL);
 
 	/// \brief GetUserMarkCallback() will return the gc mark call back for a user type
 	inline gmGarbageCollectCallback GetUserMarkCallback(gmType a_type) const { return m_types[a_type].m_mark; }
@@ -424,6 +436,8 @@ public:
 	inline gmAsStringCallback GetUserAsStringCallback(gmType a_type) const { return m_types[a_type].m_asString; }
 	inline gmDebugChildInfoCallback GetUserDebugChildInfoCallback(gmType a_type) const { return m_types[a_type].m_dbgInfo; }
 
+	inline void SetUserForEachCallback(gmType a_type, gmForEachCallback a_func) { m_types[a_type].m_ForEach = a_func; }
+	inline gmForEachCallback GetUserForEachCallback(gmType a_type) const { return m_types[a_type].m_ForEach; }
 	//
 	//
 	// Object Interface
@@ -601,6 +615,7 @@ protected:
 #endif //GM_USE_INCGC
 		gmAsStringCallback m_asString;                ///< user type AsString callback
 		gmDebugChildInfoCallback m_dbgInfo;			  ///< user type debug info callback
+		gmForEachCallback m_ForEach;
 
 		gmType				m_ParentType;
 
