@@ -211,7 +211,7 @@ struct gmVariable
 	/// Return c string or empty string
 	const char* GetCStringSafe(const char *_def = "") const;
 	/// Return user type ptr or null
-	gmUserObject *gmVariable::GetUser() const { return ((gmUserObject *)m_value.m_ref); }
+	gmUserObject *GetUser() const { return ((gmUserObject *)m_value.m_ref); }
 	void* GetUserSafe(int a_userType) const;
 	gmUserObject *GetUserObjectSafe(int a_userType) const;
 
