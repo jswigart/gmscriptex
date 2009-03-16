@@ -710,6 +710,19 @@ static int GM_CDECL gmTableCount(gmThread * a_thread)
 	return GM_OK;
 }
 
+static int GM_CDECL gmTableClear(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_TABLE_PARAM(table, 0);
+		
+	gmTableIterator tIt;
+	while(gmTableNode *pNode = table->GetFirst(tIt))
+	{
+		table->Set(a_thread->GetMachine(),pNode->m_key,pNode->m_value);
+	}
+	return GM_OK;
+}
+
 static int GM_CDECL gmTableDuplicate(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
@@ -1322,6 +1335,14 @@ static gmFunctionEntry s_binding[] =
 	\return int
 	*/
 	{"tableCount", gmTableCount},
+
+	/*gm
+	\function TableClear
+	\brief TableClear will clear the contents of a table, without creating a new table
+	\param table
+	*/
+	{"tableClear", gmTableClear},
+	
 	/*gm
 	\function tableDuplicate
 	\brief tableDuplicate will duplicate the passed table object
