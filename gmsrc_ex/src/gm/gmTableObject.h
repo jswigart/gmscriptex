@@ -100,6 +100,7 @@ public:
 
 	gmTableNode * GetNext(gmTableIterator& a_it) const;
 
+	void RemoveAndDeleteAll(gmMachine * a_machine);
 protected:
 
 	/// \brief Non-public constructor.  Create via gmMachine.
@@ -117,7 +118,7 @@ private:
 
 	void Construct(gmMachine * a_machine);
 
-	void RemoveAndDeleteAll(gmMachine * a_machine);
+	
 	inline gmTableNode * GetAtHashPos(const gmVariable* a_key) const
 	{
 		unsigned int hash = a_key->m_value.m_ref;
