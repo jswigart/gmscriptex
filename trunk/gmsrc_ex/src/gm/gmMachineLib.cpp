@@ -715,11 +715,7 @@ static int GM_CDECL gmTableClear(gmThread * a_thread)
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_TABLE_PARAM(table, 0);
 		
-	gmTableIterator tIt;
-	while(gmTableNode *pNode = table->GetFirst(tIt))
-	{
-		table->Set(a_thread->GetMachine(),pNode->m_key,pNode->m_value);
-	}
+	table->RemoveAndDeleteAll(a_thread->GetMachine());
 	return GM_OK;
 }
 

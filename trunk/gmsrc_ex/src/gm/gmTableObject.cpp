@@ -448,6 +448,15 @@ gmVariable gmTableObject::GetLinearSearch(const char * a_key) const
 	return gmVariable::s_null;
 }
 
+void gmTableObject::RemoveAndDeleteAll(gmMachine * a_machine)
+{
+	gmTableIterator tIt;
+	while(gmTableNode *pNode = GetFirst(tIt))
+	{
+		Set(a_machine,pNode->m_key,pNode->m_value);
+	}
+}
+
 bool gmTableObject_ForEach(gmMachine *a_machine, gmVariable &a_obj, gmVariable &a_iter, gmVariable &a_keyOut, gmVariable &a_valOut)
 {	
 	GM_ASSERT(a_iter.m_type == GM_INT);
