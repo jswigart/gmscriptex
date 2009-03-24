@@ -62,6 +62,8 @@
 
 #include "vector.h"
 
+class Quat;
+
 /** Represents a 4x4 rotation/translation matrix .*/
 class MyMatrix
 {

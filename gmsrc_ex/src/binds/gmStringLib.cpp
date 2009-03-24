@@ -15,6 +15,8 @@ See Copyright Notice in gmMachine.h
 #include "gmMachine.h"
 #include "gmHelpers.h"
 
+#include <string>
+#include <algorithm>
 
 //
 // String
@@ -222,13 +224,9 @@ static int GM_CDECL gmfStringLower(gmThread * a_thread)
 	gmStringObject * strObj = (gmStringObject *) GM_OBJECT(var->m_value.m_ref);
 	const char * str = (const char *) *strObj;
 
-	int length = strObj->GetLength();
-	char * buffer = (char *) alloca(length + 1);
-	memcpy(buffer, str, length + 1);
-
-	strlwr(buffer);
-
-	a_thread->PushNewString(buffer, length);
+	std::string s(str);
+	std::transform(s.begin(),s.end(),s.begin(),tolower);
+	a_thread->PushNewString(s.c_str(), s.length());
 
 	return GM_OK;
 }
@@ -243,13 +241,10 @@ static int GM_CDECL gmfStringUpper(gmThread * a_thread)
 	gmStringObject * strObj = (gmStringObject *) GM_OBJECT(var->m_value.m_ref);
 	const char * str = (const char *) *strObj;
 
-	int length = strObj->GetLength();
-	char * buffer = (char *) alloca(length + 1);
-	memcpy(buffer, str, length + 1);
+	std::string s(str);
 
-	strupr(buffer);
-
-	a_thread->PushNewString(buffer, length);
+	std::transform(s.begin(),s.end(),s.begin(),tolower);
+	a_thread->PushNewString(s.c_str(), s.length());
 
 	return GM_OK;
 }
