@@ -520,6 +520,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\binds\gmSystemLib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmSystemLib.h"
+				>
+			</File>
+			<File
 				RelativePath="..\binds\gmVec3Stack.cpp"
 				>
 			</File>
