@@ -672,6 +672,38 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
         if(res == SYS_EXCEPTION) goto LabelException;
         break;
       }
+#if GM_USE_FORK
+    // duplicates the current thread and just the local stack frame
+    // and branches around the forked section of code
+     case BC_FORK :
+     {
+        int id;
+        gmThread* newthr = GetMachine()->CreateThread(&id);
+        GM_ASSERT( newthr );
+
+        // make sure there is enough room
+        newthr->Touch( m_size - m_base + 2 );
+        // copy stack and vars
+        memcpy( newthr->m_stack, &m_stack[ m_base - 2 ], sizeof( gmVariable ) * (m_top - m_base + 2 ) );
+
+        newthr->m_top = m_top - m_base + 2;
+        newthr->m_frame = m_machine->Sys_AllocStackFrame();
+        newthr->m_frame->m_prev = 0;
+        newthr->m_frame->m_returnAddress = 0;
+        newthr->m_frame->m_returnBase = 0;
+
+        newthr->m_base = 2;
+        newthr->m_instruction = instruction + sizeof(gmptr); // skip branch on other thread
+        newthr->PushInt( GetId() );
+
+        instruction = code + OPCODE_PTR_NI( instruction );   // branch
+
+        top->m_type = GM_INT;
+        top->m_value.m_int = newthr->GetId();
+        ++top;
+        break;
+     }
+#endif //GM_USE_FORK
       case BC_FOREACH :
       {
         gmuint32 localvalue = OPCODE_PTR(instruction);
@@ -681,9 +713,39 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
         // iterator is at tos-1, table is at tos -2, push int 1 if continuing loop. write key and value into localkey and localvalue
         if(top[-2].m_type != GM_TABLE) 
         {
+#if GM_USER_FOREACH
+          gmTypeIteratorCallback itrfunc = m_machine->GetUserTypeIteratorCallback(top[-2].m_type);
+          if (!itrfunc)
+          {
+            GMTHREAD_LOG("foreach expression has no iterator function");
+            goto LabelException;
+          }
+
+          gmTypeIterator it = (gmTypeIterator) top[-1].m_value.m_int;
+          gmUserObject *obj = (gmUserObject*)GM_MOBJECT(m_machine, top[-2].m_value.m_ref);
+          // Do callback for getnext
+          gmVariable localvar;
+          gmVariable localkeyvar;
+          itrfunc(this, obj, it, &localkeyvar, &localvar);
+          if (it != GM_TYPE_ITR_NULL)
+          {
+            base[localkey] = localkeyvar;
+            base[localvalue] = localvar;
+            top->m_type = GM_INT; top->m_value.m_int = 1;
+          }
+          else
+          {
+            top->m_type = GM_INT; top->m_value.m_int = 0;
+          }
+          top[-1].m_value.m_int = it;
+          ++top;
+#else //GM_USER_FOREACH (original)
           GMTHREAD_LOG("foreach expression is not table type");
           goto LabelException;
+#endif //GM_USER_FOREACH
         }
+        else
+        {
         GM_ASSERT(top[-1].m_type == GM_INT);
         gmTableIterator it = (gmTableIterator) top[-1].m_value.m_int;
         gmTableObject * table = (gmTableObject *) GM_MOBJECT(m_machine, top[-2].m_value.m_ref);
@@ -700,6 +762,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
           top->m_type = GM_INT; top->m_value.m_int = 0;
         }
         ++top;
+        }
         break;
       }
       case BC_POP :

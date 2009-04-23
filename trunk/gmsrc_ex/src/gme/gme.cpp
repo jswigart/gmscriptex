@@ -378,7 +378,9 @@ void main(int argc, char * argv[], char * envp[])
   gmBindMathLib(g_machine);
   gmBindStringLib(g_machine);
   gmBindArrayLib(g_machine);
+#if GM_SYSTEM_LIB
   gmBindSystemLib(g_machine);
+#endif
   gmBindVector3Lib(g_machine);
   gmeInit(g_machine);
 

@@ -544,6 +544,13 @@ const char * gmMachine::GetTypeName(gmType a_type)
 	return (const char *) *m_types[a_type].m_name;
 }
 
+#if GM_USER_FOREACH
+bool gmMachine::RegisterTypeIterator(gmType a_type, gmTypeIteratorCallback a_callback)
+{
+	m_types[a_type].m_itrFunc = a_callback;
+	return true;
+}
+#endif //GM_USER_FOREACH
 
 
 int gmMachine::CheckSyntax(const char * a_string)
@@ -1651,15 +1658,17 @@ void gmMachine::Type::Init()
 	memset(m_operators, 0, sizeof(gmptr) * O_MAXOPERATORS);
 	m_asString = NULL;
 	m_dbgInfo = NULL;
-	m_ForEach = NULL;
+	m_ParentType = GM_NULL;
 #if GM_USE_INCGC
 	m_gcDestruct = NULL;
 	m_gcTrace = NULL;
 #else
 	m_mark = NULL;
 	m_gc = NULL;
-#endif
-	m_ParentType = GM_NULL;
+#endif	  
+#if GM_USER_FOREACH
+  m_itrFunc = NULL;
+#endif //GM_USER_FOREACH
 }
 
 
@@ -1710,10 +1719,6 @@ void gmMachine::ResetDefaultTypes()
 	m_types[GM_VEC3].m_name = AllocPermanantStringObject("vector3");
 	BindVector3Stack(this);
 #endif
-
-	//////////////////////////////////////////////////////////////////////////
-	// Set up internal callback functions.
-	m_types[GM_TABLE].m_ForEach = gmTableObject_ForEach;
 }
 
 

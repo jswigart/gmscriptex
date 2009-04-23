@@ -128,7 +128,7 @@ enum gmCodeTreeNodeStatementType
 	CTNST_DOWHILE,
 	CTNST_IF,
 	CTNST_COMPOUND,
-	CTNST_FORK,
+  CTNST_FORK,                                     // If GM_USE_FORK
 };
 
 

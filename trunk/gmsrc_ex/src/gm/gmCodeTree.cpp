@@ -188,7 +188,9 @@ static void PrintRecursive(const gmCodeTreeNode * a_node, FILE * a_fp, bool a_fi
 				case CTNST_DOWHILE : fprintf(a_fp, "CTNST_DOWHILE:%04d"GM_NL, a_node->m_lineNumber); break;
 				case CTNST_IF : fprintf(a_fp, "CTNST_IF:%04d"GM_NL, a_node->m_lineNumber); break;
 				case CTNST_COMPOUND : fprintf(a_fp, "CTNST_COMPOUND:%04d"GM_NL, a_node->m_lineNumber); break;
+#if GM_USE_FORK
 				case CTNST_FORK : fprintf(a_fp, "CTNST_FORK:%04d"GM_NL, a_node->m_lineNumber); break;
+#endif //GM_USE_FORK
 				default : fprintf(a_fp, "UNKNOWN STATEMENT:"GM_NL); break;
 				}
 			}

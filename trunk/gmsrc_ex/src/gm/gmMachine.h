@@ -96,11 +96,9 @@ typedef void (GM_CDECL *gmGarbageCollectCallback)(gmMachine * a_machine, gmUserO
 ///        convert the type to a string < 256 characters long.
 /// \param a_bufferSize at least 256 chars
 typedef void (GM_CDECL *gmAsStringCallback)(gmUserObject * a_userObj, char * a_buffer, int a_bufferSize);
-typedef bool (GM_CDECL *gmForEachCallback)(gmMachine * a_machine, gmVariable &a_obj, gmVariable &a_iter, gmVariable &a_keyOut, gmVariable &a_valOut);
 typedef void (GM_CDECL *gmPrintCallback)(gmMachine * a_machine, const char * a_string);
 typedef bool (GM_CDECL *gmThreadIteratorCallback)(gmThread * a_thread, void * a_context);
 typedef bool (GM_CDECL *gmUserBreakCallback)(gmThread * a_thread);
-
 
 // the following callbacks return true if the thread is to yield after completion of the callback.
 typedef bool (GM_CDECL *gmDebugLineCallback)(gmThread * a_thread);
@@ -109,6 +107,18 @@ typedef bool (GM_CDECL *gmDebugRetCallback)(gmThread * a_thread);
 typedef bool (GM_CDECL *gmDebugIsBrokenCallback)(gmThread * a_thread); // returns true if the thread is broken, or if the thread is pending delete after exception
 
 typedef void (GM_CDECL *gmDebugChildInfoCallback)(gmUserObject *a_object, gmMachine *a_machine, gmChildInfoCallback a_infoCallback);
+
+#if GM_USER_FOREACH
+/// Iterator types (NOTE: Should use these enums in gmCodeGen.cpp)
+typedef int gmTypeIterator;
+enum
+{
+    GM_TYPE_ITR_NULL = -1,
+    GM_TYPE_ITR_FIRST = -2,
+};
+/// iterator callback
+typedef void (GM_CDECL *gmTypeIteratorCallback)(gmThread *a_thread, const gmUserObject *a_user, gmTypeIterator &a_it, gmVariable *a_key, gmVariable *a_value);
+#endif //GM_USER_FOREACH
 
 /// \struct gmFunctionEntry
 struct gmFunctionEntry
@@ -218,6 +228,13 @@ public:
 	/// \param a_function
 	/// \param a_nativeFunction
 	bool RegisterTypeOperator(gmType a_type, gmOperator a_operator, gmFunctionObject * a_function, gmOperatorFunction a_nativeFunction = NULL, gmFunctionEntry *a_entry = NULL);
+
+#if GM_USER_FOREACH
+  /// \brief RegisterTypeIterator() will let you assign a callback
+  /// \param a_type User type identifier
+  /// \param a_callback Iterator callback function
+  bool RegisterTypeIterator(gmType a_type, gmTypeIteratorCallback a_callback);
+#endif //GM_USER_FOREACH
 
 	/// \brief GetTypeVariable() will lookup the type variables for the given variable key.
 	inline gmVariable GetTypeVariable(gmType a_type, const gmVariable &a_key) const;
@@ -436,8 +453,11 @@ public:
 	inline gmAsStringCallback GetUserAsStringCallback(gmType a_type) const { return m_types[a_type].m_asString; }
 	inline gmDebugChildInfoCallback GetUserDebugChildInfoCallback(gmType a_type) const { return m_types[a_type].m_dbgInfo; }
 
-	inline void SetUserForEachCallback(gmType a_type, gmForEachCallback a_func) { m_types[a_type].m_ForEach = a_func; }
-	inline gmForEachCallback GetUserForEachCallback(gmType a_type) const { return m_types[a_type].m_ForEach; }
+#if GM_USER_FOREACH
+  /// \brief Return the callback associated with a_type
+  inline gmTypeIteratorCallback GetUserTypeIteratorCallback(gmType a_type) const { return m_types[a_type].m_itrFunc; }
+#endif //GM_USER_FOREACH
+
 	//
 	//
 	// Object Interface
@@ -615,7 +635,10 @@ protected:
 #endif //GM_USE_INCGC
 		gmAsStringCallback m_asString;                ///< user type AsString callback
 		gmDebugChildInfoCallback m_dbgInfo;			  ///< user type debug info callback
-		gmForEachCallback m_ForEach;
+
+#if GM_USER_FOREACH    
+	  gmTypeIteratorCallback m_itrFunc;             ///< user type iterator callback
+#endif //GM_USER_FOREACH
 
 		gmType				m_ParentType;
 

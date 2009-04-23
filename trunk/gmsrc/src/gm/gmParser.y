@@ -89,6 +89,7 @@ gmCodeTreeNode * CreateAsignExpression(int a_subTypeType, gmCodeTreeNode * a_lef
 %token KEYWORD_THIS
 %token KEYWORD_TRUE
 %token KEYWORD_FALSE
+%token KEYWORD_FORK
 %token IDENTIFIER
 %token CONSTANT_HEX
 %token CONSTANT_BINARY
@@ -230,6 +231,17 @@ selection_statement
       $$->SetChild(0, $3);
       $$->SetChild(1, $5);
       $$->SetChild(2, $7);
+    }
+  | KEYWORD_FORK identifier compound_statement
+    {
+      $$ = gmCodeTreeNode::Create(CTNT_STATEMENT, CTNST_FORK, ($2) ? $2->m_lineNumber : gmlineno );
+      $$->SetChild(0, $3 );
+      $$->SetChild(1, $2 );
+    }
+  | KEYWORD_FORK compound_statement
+    {
+      $$ = gmCodeTreeNode::Create(CTNT_STATEMENT, CTNST_FORK, ($2) ? $2->m_lineNumber : gmlineno );
+      $$->SetChild(0, $2 );
     }
   ;
 

@@ -539,6 +539,13 @@ const char * gmMachine::GetTypeName(gmType a_type)
   return (const char *) *m_types[a_type].m_name;
 }
 
+#if GM_USER_FOREACH
+bool gmMachine::RegisterTypeIterator(gmType a_type, gmTypeIteratorCallback a_callback)
+{
+	m_types[a_type].m_itrFunc = a_callback;
+	return true;
+}
+#endif //GM_USER_FOREACH
 
 
 int gmMachine::CheckSyntax(const char * a_string)
@@ -1633,6 +1640,9 @@ void gmMachine::Type::Init()
   m_gc = NULL;
 #endif
   m_asString = NULL;
+#if GM_USER_FOREACH
+  m_itrFunc = NULL;
+#endif //GM_USER_FOREACH
 }
 
 

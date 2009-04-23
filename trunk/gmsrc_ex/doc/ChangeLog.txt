@@ -322,3 +322,13 @@ o Removed a_filename from gmMachine::ExecuteFunction() since it wasn't used and 
 o Modified all GM_*_PARAM() and added overloads for all gmThread:Param*(), to check if invalid type was present.
 o Modified threadKill() to ignore threads with invalid Id instead of killing current thread.
 
+01/02/08
+o Change gmScanner.l so parser checks for End Of File, to prevent endless loop.
+
+11/04/09
+o Add GM_CHECK_THIS_* macros to gmThread.h.  Thanks Downgraded.
+o Add experimental and optional fork instruction.  Configured as GM_USE_FORK in gmConfig.h. Thanks HiVision.
+
+12/04/09
+o Add experimental foreach support for user types. Configured as GM_USER_FOREACH in gmConfig.h.  Thanks Downgraded.
+

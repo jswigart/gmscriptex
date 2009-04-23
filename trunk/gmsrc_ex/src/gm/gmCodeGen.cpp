@@ -80,6 +80,9 @@ public:
 	bool GenDeclVariable(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
 	bool GenExprFunction(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
 	bool GenExprTable(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
+#if GM_USE_FORK
+  bool GenStmtFork(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
+#endif //GM_USE_FORK
 	bool GenStmtReturn(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
 	bool GenStmtBreak(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
 	bool GenStmtContinue(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
@@ -103,8 +106,7 @@ public:
 	bool GenExprIdentifier(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
 	bool GenExprCall(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
 	bool GenExprThis(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
-	bool GenStmtFork(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode);
-
+	
 	bool m_locked;
 	int m_errors;
 	gmLog * m_log;
@@ -385,7 +387,18 @@ bool gmCodeGenPrivate::Generate(const gmCodeTreeNode * a_node, gmByteCodeGen * a
 				case CTNST_DOWHILE : res = GenStmtDoWhile(a_node, a_byteCode); break;
 				case CTNST_IF : res = GenStmtIf(a_node, a_byteCode); break;
 				case CTNST_COMPOUND : res = GenStmtCompound(a_node, a_byteCode); break;
+#if GM_USE_FORK
 				case CTNST_FORK : res = GenStmtFork(a_node, a_byteCode); break;
+#else //GM_USE_FORK
+          case CTNST_FORK: // Unsupported, but tokens exist
+          {
+            if(m_log && m_currentFunction)
+            {
+              m_log->LogEntry("error (%d) 'fork' instruction not supported", m_currentFunction->m_currentLine);
+            }
+            return false;
+          }
+#endif //GM_USE_FORK
 				default: 
 					{
 						GM_ASSERT(false);
@@ -912,12 +925,7 @@ bool gmCodeGenPrivate::GenStmtIf(const gmCodeTreeNode * a_node, gmByteCodeGen * 
 }
 
 
-
-bool gmCodeGenPrivate::GenStmtCompound(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode)
-{
-	return Generate(a_node->m_children[0], a_byteCode);
-}
-
+#if GM_USE_FORK
 bool gmCodeGenPrivate::GenStmtFork(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode)
 {
 	GM_ASSERT(a_node->m_type == CTNT_STATEMENT && a_node->m_subType == CTNST_FORK );
@@ -949,6 +957,15 @@ bool gmCodeGenPrivate::GenStmtFork(const gmCodeTreeNode * a_node, gmByteCodeGen 
 
 	return true;
 }
+#endif //GM_USE_FORK
+
+
+bool gmCodeGenPrivate::GenStmtCompound(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode)
+{
+  return Generate(a_node->m_children[0], a_byteCode);
+}
+
+
 
 bool gmCodeGenPrivate::GenExprOpDot(const gmCodeTreeNode * a_node, gmByteCodeGen * a_byteCode)
 {
