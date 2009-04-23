@@ -106,6 +106,18 @@ typedef bool (GM_CDECL *gmDebugCallCallback)(gmThread * a_thread);
 typedef bool (GM_CDECL *gmDebugRetCallback)(gmThread * a_thread);
 typedef bool (GM_CDECL *gmDebugIsBrokenCallback)(gmThread * a_thread); // returns true if the thread is broken, or if the thread is pending delete after exception
 
+#if GM_USER_FOREACH
+/// Iterator types (NOTE: Should use these enums in gmCodeGen.cpp)
+typedef int gmTypeIterator;
+enum
+{
+    GM_TYPE_ITR_NULL = -1,
+    GM_TYPE_ITR_FIRST = -2,
+};
+/// iterator callback
+typedef void (GM_CDECL *gmTypeIteratorCallback)(gmThread *a_thread, const gmUserObject *a_user, gmTypeIterator &a_it, gmVariable *a_key, gmVariable *a_value);
+#endif //GM_USER_FOREACH
+
 /// \struct gmFunctionEntry
 struct gmFunctionEntry
 {
@@ -214,6 +226,13 @@ public:
   /// \param a_function
   /// \param a_nativeFunction
   bool RegisterTypeOperator(gmType a_type, gmOperator a_operator, gmFunctionObject * a_function, gmOperatorFunction a_nativeFunction = NULL);
+
+#if GM_USER_FOREACH
+  /// \brief RegisterTypeIterator() will let you assign a callback
+  /// \param a_type User type identifier
+  /// \param a_callback Iterator callback function
+  bool RegisterTypeIterator(gmType a_type, gmTypeIteratorCallback a_callback);
+#endif //GM_USER_FOREACH
 
   /// \brief GetTypeVariable() will lookup the type variables for the given variable key.
   inline gmVariable GetTypeVariable(gmType a_type, const gmVariable &a_key) const;
@@ -418,6 +437,11 @@ public:
   /// \brief Return the callback associated with a_type
   inline gmAsStringCallback GetUserAsStringCallback(gmType a_type) const { return m_types[a_type].m_asString; }
 
+#if GM_USER_FOREACH
+  /// \brief Return the callback associated with a_type
+  inline gmTypeIteratorCallback GetUserTypeIteratorCallback(gmType a_type) const { return m_types[a_type].m_itrFunc; }
+#endif //GM_USER_FOREACH
+
   //
   //
   // Object Interface
@@ -589,6 +613,9 @@ protected:
     gmGarbageCollectCallback m_gc;                ///< user type gc callback
 #endif //GM_USE_INCGC
     gmAsStringCallback m_asString;                ///< user type AsString callback
+#if GM_USER_FOREACH    
+	  gmTypeIteratorCallback m_itrFunc;             ///< user type iterator callback
+#endif //GM_USER_FOREACH
 
     void Init();
   };

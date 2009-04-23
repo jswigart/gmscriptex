@@ -143,6 +143,4 @@ private:
 	int m_slotsUsed;
 };
 
-bool GM_CDECL gmTableObject_ForEach(gmMachine *a_machine, gmVariable &a_obj, gmVariable &a_iter, gmVariable &a_keyOut, gmVariable &a_valOut);
-
 #endif // _GMTABLEOBJECT_H_

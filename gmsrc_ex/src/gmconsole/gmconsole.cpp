@@ -157,8 +157,10 @@ void main(int argc, char * argv[], char * envp[])
 	std::cout << "Lib Bound: String" << std::endl;
 	gmBindArrayLib(g_machine);
 	std::cout << "Lib Bound: Array" << std::endl;
+#if GM_SYSTEM_LIB
 	gmBindSystemLib(g_machine);
 	std::cout << "Lib Bound: System" << std::endl;
+#endif
 	//gmBindVector3Lib(g_machine);
 	//std::cout << "Lib Bound: Vector3" << std::endl;
 

@@ -107,5 +107,7 @@ enum gmEndian
 
 
 #define GM_BOOL_OP                  1         // Spport for a bool operator on user types for use in if statements. For full effect, users will want to implement operators [bool, ==, !=, !]
+#define GM_USE_FORK                 1         // Support fork instruction 
+#define GM_USER_FOREACH             1         // Support foreach for user types
 
 #endif // _GMCONFIG_H_

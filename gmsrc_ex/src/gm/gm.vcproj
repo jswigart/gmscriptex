@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;..\binds;..\gm"
+				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;&quot;..\3rdParty\enet-1.2\include&quot;;..\binds;..\gm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -103,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;..\binds;..\gm"
+				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;&quot;..\3rdParty\enet-1.2\include&quot;;..\binds;..\gm"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -435,6 +435,78 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="enet"
+				>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\callbacks.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\callbacks.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\enet.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\host.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\list.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\list.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\packet.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\peer.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\protocol.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\protocol.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\time.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\types.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\unix.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\unix.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\utility.h"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\win32.c"
+					>
+				</File>
+				<File
+					RelativePath="..\3rdParty\enet-1.2\include\enet\win32.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="binds"
@@ -535,6 +607,26 @@
 				RelativePath="..\binds\gmVec3Stack.h"
 				>
 			</File>
+			<Filter
+				Name="enet"
+				>
+				<File
+					RelativePath="..\binds\gmEnet.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\binds\gmEnet.h"
+					>
+				</File>
+				<File
+					RelativePath="..\binds\gmEnetImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\binds\gmEnetImpl.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

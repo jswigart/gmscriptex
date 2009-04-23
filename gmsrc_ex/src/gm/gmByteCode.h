@@ -92,7 +92,9 @@ enum gmByteCode
 	BC_GETTHIS,         // get this opptr (symbol id) ++tos
 	BC_SETTHIS,         // set this opptr (symbol id) --tos
 
-	BC_FORK,
+#if GM_USE_FORK
+  BC_FORK,            // Fork
+#endif //GM_USE_FORK  
 };
 
 #if GM_COMPILE_DEBUG

@@ -866,6 +866,27 @@ inline gmUserObject * gmThread::ThisUserObject()
   if(GM_THREAD_ARG->ParamType((PARAM)) != (TYPE)) { GM_EXCEPTION_MSG("expecting param %d as user type %d", (PARAM), (TYPE)); return GM_EXCEPTION; } \
   OBJECT VAR = (OBJECT) GM_THREAD_ARG->ParamUser_NoCheckTypeOrParam((PARAM));
 
+#define GM_CHECK_THIS_NULL \
+    if(GM_THREAD_ARG->GetThis()->m_type != GM_NULL) { GM_EXCEPTION_MSG("expecting this as null"); return GM_EXCEPTION; }
+
+#define GM_CHECK_THIS_INT \
+    if(GM_THREAD_ARG->GetThis()->m_type != GM_INT) { GM_EXCEPTION_MSG("expecting this as int"); return GM_EXCEPTION; }
+
+#define GM_CHECK_THIS_FLOAT \
+    if(GM_THREAD_ARG->GetThis()->m_type != GM_FLOAT) { GM_EXCEPTION_MSG("expecting this as null"); return GM_EXCEPTION; }
+
+#define GM_CHECK_THIS_STRING \
+    if(GM_THREAD_ARG->GetThis()->m_type != GM_STRING) { GM_EXCEPTION_MSG("expecting this as string"); return GM_EXCEPTION; }
+
+#define GM_CHECK_THIS_TABLE \
+    if(GM_THREAD_ARG->GetThis()->m_type != GM_TABLE) { GM_EXCEPTION_MSG("expecting this as table"); return GM_EXCEPTION; }
+
+#define GM_CHECK_THIS_FUNCTION \
+    if(GM_THREAD_ARG->GetThis()->m_type != GM_FUNCTION) { GM_EXCEPTION_MSG("expecting this as function"); return GM_EXCEPTION; }
+
+#define GM_CHECK_THIS_USER(TYPE) \
+    if(GM_THREAD_ARG->GetThis()->m_type != TYPE) { GM_EXCEPTION_MSG("expecting this as user type %d", TYPE); return GM_EXCEPTION; }
+    
 // float or int param as float variable
 #define GM_CHECK_FLOAT_OR_INT_PARAM(VAR, PARAM) \
   float VAR; \

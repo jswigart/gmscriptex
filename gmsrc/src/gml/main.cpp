@@ -144,6 +144,10 @@ static void PrintByteCode(FILE * a_fp, const void * a_byteCode, int a_byteCodeLe
       case BC_OP_EQ : cp = "eq"; break;
       case BC_OP_NEQ : cp = "neq"; break;
 
+#ifdef GM_USE_FORK
+      case BC_FORK: cp = "fork"; opiptr = true; break;
+#endif //GM_USE_FORK
+
       default : cp = "ERROR"; break;
     }
 
