@@ -249,15 +249,15 @@ struct gmVariable
 
 	void Get(gmMachine *a_machine, bool &a_value)
 	{
-		a_value = GetInt()!=0;
+		a_value = GetIntSafe()!=0;
 	}
 	void Get(gmMachine *a_machine, int &a_value) 
 	{
-		a_value = GetInt();
+		a_value = GetIntSafe();
 	}
 	void Get(gmMachine *a_machine, float &a_value)
 	{
-		a_value = GetFloat();
+		a_value = GetFloatSafe();
 	}
 	void Get(gmMachine *a_machine, gmStringObject *&a_value)
 	{

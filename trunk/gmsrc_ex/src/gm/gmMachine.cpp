@@ -1707,6 +1707,14 @@ void gmMachine::ResetDefaultTypes()
 	m_types[GM_TABLE].m_name = AllocPermanantStringObject("table");
 	m_types[GM_FUNCTION].m_name = AllocPermanantStringObject("function");
 
+#if(GM_USE_VECTOR3_STACK)
+	m_types[GM_VEC3].m_name = AllocPermanantStringObject("vector3");
+#endif
+
+#if(GM_USE_ENTITY_STACK)
+	m_types[GM_ENTITY].m_name = AllocPermanantStringObject("entity");
+#endif
+
 	// init basic operators
 	gmInitBasicType(GM_NULL, m_types[GM_NULL].m_nativeOperators);
 	gmInitBasicType(GM_INT, m_types[GM_INT].m_nativeOperators);
@@ -1716,9 +1724,10 @@ void gmMachine::ResetDefaultTypes()
 	gmInitBasicType(GM_FUNCTION, m_types[GM_FUNCTION].m_nativeOperators);
 
 #if(GM_USE_VECTOR3_STACK)
-	m_types[GM_VEC3].m_name = AllocPermanantStringObject("vector3");
 	BindVector3Stack(this);
 #endif
+
+
 }
 
 
