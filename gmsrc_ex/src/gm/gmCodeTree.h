@@ -128,7 +128,10 @@ enum gmCodeTreeNodeStatementType
 	CTNST_DOWHILE,
 	CTNST_IF,
 	CTNST_COMPOUND,
-  CTNST_FORK,                                     // If GM_USE_FORK
+	CTNST_FORK,                         
+	CTNST_SWITCH,
+	CTNST_CASE,
+	CTNST_DEFAULT,
 };
 
 
