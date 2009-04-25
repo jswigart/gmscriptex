@@ -94,9 +94,6 @@ enum gmEndian
 
 #define GMMACHINE_CPPOWNEDGMOBJHASHSIZE 1024  // default hash table size for objects owned by cpp code, necessary for GC.
 
-#define GM_USE_VECTOR3_STACK		1
-#define GM_USE_ENTITY_STACK			1
-
 // DEBUGGING
 
 #define GMDEBUG_SUPPORT             1         // allow use with the gm debugger
@@ -105,9 +102,12 @@ enum gmEndian
 // GARBAGE COLLECTOR
 #define GM_USE_INCGC                1         // use incremental garbage collector
 
+#define GM_USE_VECTOR3_STACK	    1         // Support for stack based vector3 type
+#define GM_USE_ENTITY_STACK	    1         // Support for stack based entity handle(as an int)
 
 #define GM_BOOL_OP                  1         // Spport for a bool operator on user types for use in if statements. For full effect, users will want to implement operators [bool, ==, !=, !]
 #define GM_USE_FORK                 1         // Support fork instruction 
 #define GM_USER_FOREACH             1         // Support foreach for user types
+#define GM_USE_SWITCH		    1	      // Support switch statements
 
 #endif // _GMCONFIG_H_
