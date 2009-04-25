@@ -207,6 +207,15 @@ namespace gmBind2
 		a_var[2] = v.z;
 		return GM_OK;
 	}
+	template<> 
+	inline int GetFromGMType<Vec3>(gmThread *a_thread, int idx, Vec3 &a_var)
+	{
+		GM_CHECK_VECTOR_PARAM(v,idx);
+		a_var[0] = v.x;
+		a_var[1] = v.y;
+		a_var[2] = v.z;
+		return GM_OK;
+	}
 #endif
 	// and so forth for all the types you want to handle
 	//////////////////////////////////////////////////////////////////////////
