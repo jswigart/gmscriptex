@@ -12,7 +12,7 @@ gmVec3Data ZERO_VEC3 = {};
 
 //////////////////////////////////////////////////////////////////////////
 // Operators
-void GM_CDECL gmVector3OpAdd(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpAdd(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector() && a_operands[1].IsVector())
 	{
@@ -24,7 +24,7 @@ void GM_CDECL gmVector3OpAdd(gmThread * a_thread, gmVariable * a_operands)
 	else
 		a_operands[0].Nullify();
 }
-void GM_CDECL gmVector3OpSub(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpSub(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector() && a_operands[1].IsVector())
 	{
@@ -36,7 +36,7 @@ void GM_CDECL gmVector3OpSub(gmThread * a_thread, gmVariable * a_operands)
 	else
 		a_operands[0].Nullify();
 }
-void GM_CDECL gmVector3OpNEG(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpNEG(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector())
 	{
@@ -48,7 +48,7 @@ void GM_CDECL gmVector3OpNEG(gmThread * a_thread, gmVariable * a_operands)
 	else
 		a_operands[0].Nullify();
 }
-void GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands)
 {
 	float fScalar = 0.f;
 	if(a_operands[0].IsVector() && a_operands[1].GetFloatSafe(fScalar))
@@ -75,7 +75,7 @@ void GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands)
 	else
 		a_operands[0].Nullify();
 }
-void GM_CDECL gmVector3OpDiv(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpDiv(gmThread * a_thread, gmVariable * a_operands)
 {
 #if GMMACHINE_GMCHECKDIVBYZERO
 	if(INTTOFLOAT(a_operands + 1) != 0)
@@ -110,7 +110,7 @@ void GM_CDECL gmVector3OpDiv(gmThread * a_thread, gmVariable * a_operands)
 		a_operands[0].Nullify();
 #endif // GMMACHINE_GMCHECKDIVBYZERO
 }
-void GM_CDECL gmVector3OpEQ(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector())
 	{
@@ -131,7 +131,7 @@ void GM_CDECL gmVector3OpEQ(gmThread * a_thread, gmVariable * a_operands)
 	
 	a_operands[0].Nullify();
 }
-void GM_CDECL gmVector3OpNEQ(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector())
 	{
@@ -153,11 +153,11 @@ void GM_CDECL gmVector3OpNEQ(gmThread * a_thread, gmVariable * a_operands)
 	a_operands[0].Nullify();
 }
 
-void GM_CDECL gmVector3OpPOS(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpPOS(gmThread * a_thread, gmVariable * a_operands)
 {
 }
 
-void GM_CDECL gmVector3GetDot(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3GetDot(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmStringObject *pStr = a_operands[1].GetStringObjectSafe();
 	if(pStr)
@@ -182,7 +182,7 @@ void GM_CDECL gmVector3GetDot(gmThread * a_thread, gmVariable * a_operands)
 	else
 		a_operands[0].Nullify();
 }
-//void GM_CDECL gmVector3SetDot(gmThread * a_thread, gmVariable * a_operands)
+//static void GM_CDECL gmVector3SetDot(gmThread * a_thread, gmVariable * a_operands)
 //{
 //	gmStringObject *pStr = a_operands[2].GetStringObjectSafe();
 //	if(pStr)
@@ -199,7 +199,7 @@ void GM_CDECL gmVector3GetDot(gmThread * a_thread, gmVariable * a_operands)
 //	else
 //		a_operands[0].Nullify();
 //}
-void GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operands)
 {
 	int iIndex = 0;
 	if(a_operands[1].IsInt() && a_operands[1].GetIntSafe(iIndex,0) && iIndex >=0 && iIndex < 3)
@@ -220,7 +220,7 @@ void GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operands)
 	else
 		a_operands[0].Nullify();
 }
-//void GM_CDECL gmVector3SetInd(gmThread * a_thread, gmVariable * a_operands)
+//static void GM_CDECL gmVector3SetInd(gmThread * a_thread, gmVariable * a_operands)
 //{
 //	float fVal = 0.f;
 //	int iIndex = a_operands[1].GetInt();
@@ -245,7 +245,7 @@ void GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operands)
 //	else
 //		a_operands[0].Nullify();
 //}
-void GM_CDECL gmVector3OpNOT(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpNOT(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands->m_type == GM_NULL)
 		a_operands[0].SetInt(1);
@@ -253,13 +253,13 @@ void GM_CDECL gmVector3OpNOT(gmThread * a_thread, gmVariable * a_operands)
 		a_operands[0].SetInt(0);
 	a_operands->m_type = GM_INT;
 }
-void GM_CDECL gmVector3OpBOOL(gmThread * a_thread, gmVariable * a_operands)
+static void GM_CDECL gmVector3OpBOOL(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].SetInt(1);
 }
 //////////////////////////////////////////////////////////////////////////
 
-int GM_CDECL gmVec3Create(gmThread *a_thread) 
+static int GM_CDECL gmVec3Create(gmThread *a_thread) 
 {
 	switch (a_thread->GetNumParams())
 	{
@@ -289,26 +289,26 @@ int GM_CDECL gmVec3Create(gmThread *a_thread)
 }
 //////////////////////////////////////////////////////////////////////////
 // Functions
-int GM_CDECL gmVec3Normalize(gmThread *a_thread)
+static int GM_CDECL gmVec3Normalize(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	v.Normalize();
 	a_thread->PushVector(v);
 	return GM_OK;
 }
-int GM_CDECL gmVec3Length(gmThread *a_thread)
+static int GM_CDECL gmVec3Length(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	a_thread->PushFloat(v.Length());
 	return GM_OK;
 }
-int GM_CDECL gmVec3Length2(gmThread *a_thread)
+static int GM_CDECL gmVec3Length2(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	a_thread->PushFloat(v.Length2());
 	return GM_OK;
 }
-int GM_CDECL gmVec3Concave(gmThread *a_thread)
+static int GM_CDECL gmVec3Concave(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
@@ -316,7 +316,7 @@ int GM_CDECL gmVec3Concave(gmThread *a_thread)
 	a_thread->PushInt(v.Concave(v0,v1)?1:0);
 	return GM_OK;
 }
-int GM_CDECL gmVec3CrossProduct(gmThread *a_thread)
+static int GM_CDECL gmVec3CrossProduct(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
@@ -324,35 +324,35 @@ int GM_CDECL gmVec3CrossProduct(gmThread *a_thread)
 	a_thread->PushVector(v.Cross(v0));
 	return GM_OK;
 }
-int GM_CDECL gmVec3DotProduct(gmThread *a_thread)
+static int GM_CDECL gmVec3DotProduct(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.Dot(v0));
 	return GM_OK;
 }
-int GM_CDECL gmVec3Distance(gmThread *a_thread)
+static int GM_CDECL gmVec3Distance(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.Distance(v0));
 	return GM_OK;
 }
-int GM_CDECL gmVec3Distance2(gmThread *a_thread)
+static int GM_CDECL gmVec3Distance2(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.Distance2(v0));
 	return GM_OK;
 }
-int GM_CDECL gmVec3DistanceXY(gmThread *a_thread)
+static int GM_CDECL gmVec3DistanceXY(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	a_thread->PushFloat(v.DistanceXY(v0));
 	return GM_OK;
 }
-int GM_CDECL gmVec3Reflection(gmThread *a_thread)
+static int GM_CDECL gmVec3Reflection(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	GM_CHECK_VECTOR_PARAM(v0,0);
@@ -361,7 +361,14 @@ int GM_CDECL gmVec3Reflection(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmVec3Set(gmThread *a_thread)
+
+static int GM_CDECL gmVec3IsZero(gmThread *a_thread)
+{
+	Vec3 v = ConvertVec3(a_thread->ThisVector());
+	a_thread->PushInt(Vec3(0,0,0)==v ? 1 : 0);
+	return GM_OK;
+}
+static int GM_CDECL gmVec3Set(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	if(a_thread->Param(0).IsNumber())
@@ -373,13 +380,13 @@ int GM_CDECL gmVec3Set(gmThread *a_thread)
 	a_thread->PushVector(v);
 	return GM_OK;
 }
-int GM_CDECL gmVec3GetYaw(gmThread *a_thread)
+static int GM_CDECL gmVec3GetYaw(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	a_thread->PushFloat(v.GetYaw());
 	return GM_OK;
 }
-int GM_CDECL gmVec3GetPitch(gmThread *a_thread)
+static int GM_CDECL gmVec3GetPitch(gmThread *a_thread)
 {
 	Vec3 v = ConvertVec3(a_thread->ThisVector());
 	a_thread->PushFloat(v.GetPitch());
@@ -387,7 +394,7 @@ int GM_CDECL gmVec3GetPitch(gmThread *a_thread)
 }
 //////////////////////////////////////////////////////////////////////////
 // Math funcs
-int GM_CDECL gmArea(gmThread *a_thread)
+static int GM_CDECL gmArea(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
@@ -395,7 +402,7 @@ int GM_CDECL gmArea(gmThread *a_thread)
 	a_thread->PushFloat(v0.Area(v1,v2));
 	return GM_OK;
 }
-int GM_CDECL gmAngleAxis(gmThread *a_thread)
+static int GM_CDECL gmAngleAxis(gmThread *a_thread)
 {
 	GM_CHECK_FLOAT_OR_INT_PARAM(angl,0);
 	GM_CHECK_VECTOR_PARAM(axis,1);
@@ -404,7 +411,7 @@ int GM_CDECL gmAngleAxis(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmComputeNormal(gmThread *a_thread)
+static int GM_CDECL gmComputeNormal(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
@@ -414,7 +421,7 @@ int GM_CDECL gmComputeNormal(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmCrossProduct(gmThread *a_thread)
+static int GM_CDECL gmCrossProduct(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
@@ -423,14 +430,14 @@ int GM_CDECL gmCrossProduct(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmDotProduct(gmThread *a_thread)
+static int GM_CDECL gmDotProduct(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
 	a_thread->PushFloat(v0.Dot(v1));
 	return GM_OK;
 }
-int GM_CDECL gmLerp(gmThread *a_thread)
+static int GM_CDECL gmLerp(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
@@ -440,7 +447,7 @@ int GM_CDECL gmLerp(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmReflection(gmThread *a_thread)
+static int GM_CDECL gmReflection(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(v0,0);
 	GM_CHECK_VECTOR_PARAM(v1,1);
@@ -449,7 +456,7 @@ int GM_CDECL gmReflection(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmNearestPointInLine(gmThread *a_thread)
+static int GM_CDECL gmNearestPointInLine(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(pt,0);
 	GM_CHECK_VECTOR_PARAM(v0,1);
@@ -459,7 +466,7 @@ int GM_CDECL gmNearestPointInLine(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmNearestPointInLineSegment(gmThread *a_thread)
+static int GM_CDECL gmNearestPointInLineSegment(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(pt,0);
 	GM_CHECK_VECTOR_PARAM(v0,1);
@@ -469,7 +476,7 @@ int GM_CDECL gmNearestPointInLineSegment(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-int GM_CDECL gmNearestPointInPlane(gmThread *a_thread)
+static int GM_CDECL gmNearestPointInPlane(gmThread *a_thread)
 {	
 	if(a_thread->GetNumParams()==4)
 	{
@@ -498,7 +505,7 @@ int GM_CDECL gmNearestPointInPlane(gmThread *a_thread)
 	GM_EXCEPTION_MSG("expected 3 or 4 vector3");
 	return GM_EXCEPTION;
 }
-int GM_CDECL gmNearestPointInTriangle(gmThread *a_thread)
+static int GM_CDECL gmNearestPointInTriangle(gmThread *a_thread)
 {
 	GM_CHECK_VECTOR_PARAM(pt,0);
 	GM_CHECK_VECTOR_PARAM(v0,1);
@@ -545,6 +552,8 @@ gmFunctionEntry vec3_methods[] =
 	{"DotProduct",	gmVec3DotProduct},
 	{"Reflection",	gmVec3Reflection},
 	
+	{"IsZero",		gmVec3IsZero},
+
 	{"Set",			gmVec3Set},
 	{"SetXYZ",		gmVec3Set},
 
