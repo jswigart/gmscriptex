@@ -898,43 +898,94 @@ inline gmUserObject * gmThread::ThisUserObject()
 #endif //GM_DEBUG_BUILD
 
 #define GM_NUM_PARAMS GM_THREAD_ARG->GetNumParams()
-
+//////////////////////////////////////////////////////////////////////////
 #define GM_INT_PARAM(VAR, PARAM, DEFAULT) \
 	int VAR = DEFAULT; \
-	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamInt((PARAM), (VAR), (DEFAULT)) ) \
-{ return GM_EXCEPTION; }
+	if( GM_NUM_PARAMS > (PARAM) && GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamInt((PARAM), (VAR), (DEFAULT)) ) \
+{ \
+	GM_EXCEPTION_MSG("expecting param %d as %s, got %s", \
+	(PARAM),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_INT),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_THREAD_ARG->ParamType((PARAM)))); \
+	return GM_EXCEPTION; \
+}
+//////////////////////////////////////////////////////////////////////////
 #define GM_FLOAT_PARAM(VAR, PARAM, DEFAULT) \
 	float VAR = DEFAULT; \
-	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFloat((PARAM), (VAR), (DEFAULT)) ) \
-{ return GM_EXCEPTION; }
+	if( GM_NUM_PARAMS > (PARAM) && GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFloat((PARAM), (VAR), (DEFAULT)) ) \
+{ \
+	GM_EXCEPTION_MSG("expecting param %d as %s, got %s", \
+	(PARAM),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_FLOAT),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_THREAD_ARG->ParamType((PARAM)))); \
+	return GM_EXCEPTION; \
+}
+//////////////////////////////////////////////////////////////////////////
 #define GM_STRING_PARAM(VAR, PARAM, DEFAULT) \
 	const char * VAR = DEFAULT; \
-	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamString((PARAM), (VAR), (DEFAULT)) )\
-{ return GM_EXCEPTION; }
+	if( GM_NUM_PARAMS > (PARAM) && GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamString((PARAM), (VAR), (DEFAULT)) )\
+{ \
+	GM_EXCEPTION_MSG("expecting param %d as %s, got %s", \
+	(PARAM),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_STRING),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_THREAD_ARG->ParamType((PARAM)))); \
+	return GM_EXCEPTION; \
+}
+//////////////////////////////////////////////////////////////////////////
 #define GM_FUNCTION_PARAM(VAR, PARAM, DEFAULT) \
 	gmFunctionObject * VAR = DEFAULT; \
-	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFunction((PARAM), (VAR)) )  \
-{ return GM_EXCEPTION; }
+	if( GM_NUM_PARAMS > (PARAM) && GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFunction((PARAM), (VAR)) )  \
+{ \
+	GM_EXCEPTION_MSG("expecting param %d as %s, got %s", \
+	(PARAM),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_FUNCTION),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_THREAD_ARG->ParamType((PARAM)))); \
+	return GM_EXCEPTION; \
+}
+//////////////////////////////////////////////////////////////////////////
 #define GM_TABLE_PARAM(VAR, PARAM, DEFAULT) \
 	gmTableObject * VAR = DEFAULT; \
-	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamTable((PARAM), (VAR))  )  \
-{ return GM_EXCEPTION; }
+	if( GM_NUM_PARAMS > (PARAM) && GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamTable((PARAM), (VAR))  )  \
+{ \
+	GM_EXCEPTION_MSG("expecting param %d as %s, got %s", \
+	(PARAM),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_TABLE),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_THREAD_ARG->ParamType((PARAM)))); \
+	return GM_EXCEPTION; \
+}
+//////////////////////////////////////////////////////////////////////////
 #define GM_FLOAT_OR_INT_PARAM(VAR, PARAM, DEFAULT) \
 	float VAR = DEFAULT; \
-	if( GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFloatOrInt((PARAM), (VAR), (DEFAULT)) ) \
-{ return GM_EXCEPTION; }
-#define GM_USER_PARAM(OBJECT, VAR, PARAM) \
-	OBJECT VAR; \
-	if( !GM_THREAD_ARG->ParamUser((PARAM), (void*&)(VAR)) )  \
-{ return GM_EXCEPTION; }
-
+	if( GM_NUM_PARAMS > (PARAM) && GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamFloatOrInt((PARAM), (VAR), (DEFAULT)) ) \
+{ \
+	GM_EXCEPTION_MSG("expecting param %d as %s or %s, got %s", \
+	(PARAM),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_FLOAT),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_INT),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_THREAD_ARG->ParamType((PARAM)))); \
+	return GM_EXCEPTION; \
+}
+//////////////////////////////////////////////////////////////////////////
+//#define GM_USER_PARAM(OBJECT, VAR, PARAM) \
+//	OBJECT VAR; \
+//	if( GM_NUM_PARAMS > (PARAM) && !GM_THREAD_ARG->ParamUser((PARAM), (void*&)(VAR)) )  \
+//{ \
+//	return GM_EXCEPTION; \
+//}
+//////////////////////////////////////////////////////////////////////////
 #if(GM_USE_VECTOR3_STACK)
 #define GM_VECTOR_PARAM(VAR, PARAM, DEFX, DEFY, DEFZ) \
 	Vec3 VAR(DEFX, DEFY, DEFZ); \
-	if(GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamVector((PARAM),VAR.x, VAR.y, VAR.z, DEFX, DEFY, DEFZ)) \
-{ return GM_EXCEPTION; }
+	if( GM_NUM_PARAMS > (PARAM) && GM_THREAD_ARG->ParamType((PARAM))!=GM_NULL && !GM_THREAD_ARG->ParamVector((PARAM),VAR.x, VAR.y, VAR.z, DEFX, DEFY, DEFZ)) \
+{ \
+	GM_EXCEPTION_MSG("expecting param %d as %s, got %s", \
+	(PARAM),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_VEC3),\
+	GM_THREAD_ARG->GetMachine()->GetTypeName(GM_THREAD_ARG->ParamType((PARAM)))); \
+	return GM_EXCEPTION; \
+}
 #endif
-
+//////////////////////////////////////////////////////////////////////////
 
 //
 // EXCEPTION VERSIONS
