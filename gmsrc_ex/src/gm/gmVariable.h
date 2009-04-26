@@ -21,6 +21,10 @@ See Copyright Notice in gmMachine.h
 #include "gmVec3Stack.h"
 #endif
 
+#if(GM_USE_ENTITY_STACK)
+#include "gmEntity.h"
+#endif
+
 #define GM_MARK_PERSIST 0
 #define GM_MARK_START 1
 

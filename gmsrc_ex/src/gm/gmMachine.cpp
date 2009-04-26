@@ -1727,7 +1727,9 @@ void gmMachine::ResetDefaultTypes()
 	BindVector3Stack(this);
 #endif
 
-
+#if(GM_USE_ENTITY_STACK)
+	BindEntityStack(this);
+#endif
 }
 
 
