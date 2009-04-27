@@ -373,6 +373,17 @@ namespace gmBind2
 			}
 			return false;
 		}
+		static bool FromVar(gmThread *a_thread, gmVariable &a_var, ClassT *&a_instance)
+		{
+			gmUserObject *userObj = a_var.GetUserObjectSafe(ClassBase<ClassT>::GetClassType());
+			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(userObj?userObj->m_user:0);
+			if(bo)
+			{
+				a_instance = bo->m_NativeObj;
+				return true;
+			}
+			return false;
+		}
 		static void PushObject(gmThread *a_thread, ClassT *a_instance, bool a_native = false)
 		{
 			if(a_instance && ClassBase<ClassT>::GetClassType() != GM_NULL)
