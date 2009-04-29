@@ -36,6 +36,9 @@ namespace gmBind2
 		//////////////////////////////////////////////////////////////////////////
 		typedef void (*pfnAsStringCallback)(ClassT *a_var, char * a_buffer, int a_bufferSize);
 		typedef void (*pfnTraceCallback)(ClassT *a_var, gmMachine * a_machine, gmGarbageCollector* a_gc, const int a_workLeftToGo, int& a_workDone);
+
+		typedef bool (*pfnSetDotEx)(gmThread * a_thread, ClassT *a_var, const char *a_key, gmVariable * a_operands);
+		typedef bool (*pfnGetDotEx)(gmThread * a_thread, ClassT *a_var, const char *a_key, gmVariable * a_operands);
 		//////////////////////////////////////////////////////////////////////////
 
 		static gmType GetClassType()		{ return m_ClassType; }
@@ -67,6 +70,9 @@ namespace gmBind2
 
 		static pfnAsStringCallback		m_AsStringCallback;
 		static pfnTraceCallback			m_TraceCallback;
+
+		static pfnSetDotEx m_SetDotEx;
+		static pfnGetDotEx m_GetDotEx;
 
 		static int gmfDefaultConstructor(gmThread *a_thread)
 		{
@@ -143,6 +149,11 @@ namespace gmBind2
 
 	template <typename ClassT>
 	typename ClassBase<ClassT>::pfnTraceCallback ClassBase<ClassT>::m_TraceCallback = 0;
+
+	template <typename ClassT>
+	typename ClassBase<ClassT>::pfnGetDotEx ClassBase<ClassT>::m_GetDotEx = 0;
+	template <typename ClassT>
+	typename ClassBase<ClassT>::pfnSetDotEx ClassBase<ClassT>::m_SetDotEx = 0;	
 
 	//////////////////////////////////////////////////////////////////////////
 	template <typename ClassT>
@@ -279,6 +290,18 @@ namespace gmBind2
 		Class &trace(typename ClassBase<ClassT>::pfnTraceCallback f)
 		{
 			ClassBase<ClassT>::m_TraceCallback = f;
+			return *this;
+		}
+		Class &getDotEx(typename ClassBase<ClassT>::pfnGetDotEx f)
+		{
+			GM_ASSERT(ClassBase<ClassT>::GetClassType()!=GM_NULL);
+			ClassBase<ClassT>::m_GetDotEx = f;
+			return *this;
+		}
+		Class &setDotEx(typename ClassBase<ClassT>::pfnSetDotEx f)
+		{
+			GM_ASSERT(ClassBase<ClassT>::GetClassType()!=GM_NULL);
+			ClassBase<ClassT>::m_SetDotEx = f;
 			return *this;
 		}
 		template<class BaseClassT> 
@@ -424,7 +447,6 @@ namespace gmBind2
 
 		typedef std::map<std::string, gmPropertyFunctionPair> PropertyMap;
 		static PropertyMap m_Properties;
-		//////////////////////////////////////////////////////////////////////////
 
 		static void GM_CDECL gmBind2OpGetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
@@ -440,6 +462,13 @@ namespace gmBind2
 			const char *pString = a_operands[1].GetCStringSafe();
 			if(pString)
 			{
+				// custom handler defined?
+				if(ClassBase<ClassT>::m_GetDotEx && 
+					ClassBase<ClassT>::m_GetDotEx(a_thread,bo->m_NativeObj,pString,a_operands))
+				{
+					return;
+				}
+
 				typename Class<ClassT>::PropertyMap::iterator it = m_Properties.find(pString);
 				if(it != m_Properties.end())
 				{
@@ -467,6 +496,7 @@ namespace gmBind2
 			}
 			a_operands[0].Nullify();
 		}
+		
 		static void GM_CDECL gmBind2OpSetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
@@ -481,6 +511,13 @@ namespace gmBind2
 			const char *pString = a_operands[2].GetCStringSafe();
 			if(pString)
 			{
+				// custom handler defined?
+				if(ClassBase<ClassT>::m_SetDotEx && 
+					ClassBase<ClassT>::m_SetDotEx(a_thread,bo->m_NativeObj,pString,a_operands))
+				{
+					return;
+				}
+
 				typename Class<ClassT>::PropertyMap::iterator it = m_Properties.find(pString);
 				if(it != m_Properties.end())
 				{
