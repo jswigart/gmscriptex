@@ -181,6 +181,8 @@ struct gmVariable
 
 	// GetInt and GetFloat are not protected. User should verify the type before calling this.
 	inline int GetInt() const  { return m_value.m_int; }
+	inline bool GetInt(int &_i, int _default);
+	inline int GetInt(int _default);
 	inline float GetFloat() const { return m_value.m_float; }
 
 	/// \brief AsString will get this gm variable as a string if possible.  AsString is used for the gm "print" and system.Exec function bindings.
@@ -250,7 +252,6 @@ struct gmVariable
 	void Set(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value);
 	void Set(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value);
 	
-
 	void Get(gmMachine *a_machine, bool &a_value)
 	{
 		a_value = GetIntSafe()!=0;
@@ -346,6 +347,21 @@ inline void gmVariable::SetFunction(gmFunctionObject * a_function)
 {
 	m_type = GM_FUNCTION;
 	m_value.m_ref = ((gmObject *) a_function)->GetRef();
+}
+
+inline bool gmVariable::GetInt(int &_i, int _default)
+{
+	_i = IsInt() ? GetInt() : _default; 
+	return IsInt();
+}
+
+inline int gmVariable::GetInt(int _default)
+{
+	if(IsInt())
+	{
+		return GetInt();
+	}
+	return _default;
 }
 
 inline int gmVariable::GetIntSafe(int _default) const
