@@ -225,25 +225,25 @@ bool Line::Intersect(const Line& src,Vec3 &sect)
 
 
 
-void BoundingBox::TransformBoundAABB(const MyMatrix &transform,const BoundingBox &b)
-{
-	InitMinMax();
-	BoundTest(transform,b.bmin.x,b.bmin.y,b.bmin.z);
-	BoundTest(transform,b.bmax.x,b.bmin.y,b.bmin.z);
-	BoundTest(transform,b.bmax.x,b.bmax.y,b.bmin.z);
-	BoundTest(transform,b.bmin.x,b.bmax.y,b.bmin.z);
-	BoundTest(transform,b.bmin.x,b.bmin.y,b.bmax.z);
-	BoundTest(transform,b.bmax.x,b.bmin.y,b.bmax.z);
-	BoundTest(transform,b.bmax.x,b.bmax.y,b.bmax.z);
-	BoundTest(transform,b.bmin.x,b.bmax.y,b.bmax.z);
-}
-
-
-void BoundingBox::BoundTest(const MyMatrix &transform,float x,float y,float z)
-{
-	Vec3 pos(x,y,z);
-	Vec3 t;
-	transform.Transform(pos,t);
-	MinMax(t);
-};
+//void BoundingBox::TransformBoundAABB(const MyMatrix &transform,const BoundingBox &b)
+//{
+//	InitMinMax();
+//	BoundTest(transform,b.bmin.x,b.bmin.y,b.bmin.z);
+//	BoundTest(transform,b.bmax.x,b.bmin.y,b.bmin.z);
+//	BoundTest(transform,b.bmax.x,b.bmax.y,b.bmin.z);
+//	BoundTest(transform,b.bmin.x,b.bmax.y,b.bmin.z);
+//	BoundTest(transform,b.bmin.x,b.bmin.y,b.bmax.z);
+//	BoundTest(transform,b.bmax.x,b.bmin.y,b.bmax.z);
+//	BoundTest(transform,b.bmax.x,b.bmax.y,b.bmax.z);
+//	BoundTest(transform,b.bmin.x,b.bmax.y,b.bmax.z);
+//}
+//
+//
+//void BoundingBox::BoundTest(const MyMatrix &transform,float x,float y,float z)
+//{
+//	Vec3 pos(x,y,z);
+//	Vec3 t;
+//	transform.Transform(pos,t);
+//	MinMax(t);
+//};
 
