@@ -252,6 +252,13 @@ struct gmVariable
 	void Set(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value);
 	void Set(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value);
 	
+#if(GM_USE_VECTOR3_STACK)
+	void Set(gmMachine *a_machine, Vec3 a_value)
+	{
+		SetVector(a_value.x,a_value.y,a_value.z);		
+	}
+#endif
+
 	void Get(gmMachine *a_machine, bool &a_value)
 	{
 		a_value = GetIntSafe()!=0;
@@ -280,6 +287,12 @@ struct gmVariable
 	{
 		a_value = GetUser();
 	}
+#if(GM_USE_VECTOR3_STACK)
+	void Get(gmMachine *a_machine, Vec3 &a_value)
+	{
+		GetVector(a_value.x,a_value.y,a_value.z);		
+	}
+#endif
 	void Get(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value);
 	void Get(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value);
 

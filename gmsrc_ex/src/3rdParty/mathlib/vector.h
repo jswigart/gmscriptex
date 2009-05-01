@@ -937,56 +937,303 @@ inline Vec2 operator*(float s, const Vec2 &v)
 
 class MyMatrix;
 
+//class BoundingBox
+//{
+//public:
+//	void InitMinMax()
+//	{
+//		bmin.Set(FLT_MAX,FLT_MAX,FLT_MAX);
+//		bmax.Set(-FLT_MAX,-FLT_MAX,-FLT_MAX);
+//	}
+//	void MinMax(const Vec3 &p)
+//	{
+//		if ( p.x < bmin.x ) bmin.x = p.x;
+//		if ( p.y < bmin.y ) bmin.y = p.y;
+//		if ( p.z < bmin.z ) bmin.z = p.z;
+//
+//		if ( p.x > bmax.x ) bmax.x = p.x;
+//		if ( p.y > bmax.y ) bmax.y = p.y;
+//		if ( p.z > bmax.z ) bmax.z = p.z;
+//	}
+//	void MinMax(const BoundingBox &b)
+//	{
+//		if ( b.bmin.x < bmin.x ) bmin.x = b.bmin.x;
+//		if ( b.bmin.y < bmin.y ) bmin.y = b.bmin.y;
+//		if ( b.bmin.z < bmin.z ) bmin.z = b.bmin.z;
+//
+//		if ( b.bmax.x > bmax.x ) bmax.x = b.bmax.x;
+//		if ( b.bmax.y > bmax.y ) bmax.y = b.bmax.y;
+//		if ( b.bmax.z > bmax.z ) bmax.z = b.bmax.z;
+//	}
+//	void GetCenter(Vec3 &center) const
+//	{
+//		center.x = (bmax.x - bmin.x)*0.5f + bmin.x;
+//		center.y = (bmax.y - bmin.y)*0.5f + bmin.y;
+//		center.z = (bmax.z - bmin.z)*0.5f + bmin.z;
+//	}
+//	void GetSides(Vec3 &sides) const
+//	{
+//		sides.x = bmax.x - bmin.x;
+//		sides.y = bmax.y - bmin.y;
+//		sides.z = bmax.z - bmin.z;
+//	}
+//	float GetLength() const
+//	{
+//		return bmin.Distance(bmax);
+//	}
+//	void TransformBoundAABB(const MyMatrix &t,const BoundingBox &b);
+//
+//	void BoundTest(const MyMatrix &transform,float x,float y,float z);
+//
+//	Vec3 bmin;
+//	Vec3 bmax;
+//};
+
 class BoundingBox
 {
 public:
-	void InitMinMax()
+	bool IsZero() const
 	{
-		bmin.Set(FLT_MAX,FLT_MAX,FLT_MAX);
-		bmax.Set(-FLT_MAX,-FLT_MAX,-FLT_MAX);
+		for(int i = 0; i < 3; ++i)
+		{
+			if(mMins[i] != 0.f || 
+				mMaxs[i] != 0.f)
+				return false;
+		}
+		return true;
 	}
-	void MinMax(const Vec3 &p)
-	{
-		if ( p.x < bmin.x ) bmin.x = p.x;
-		if ( p.y < bmin.y ) bmin.y = p.y;
-		if ( p.z < bmin.z ) bmin.z = p.z;
 
-		if ( p.x > bmax.x ) bmax.x = p.x;
-		if ( p.y > bmax.y ) bmax.y = p.y;
-		if ( p.z > bmax.z ) bmax.z = p.z;
-	}
-	void MinMax(const BoundingBox &b)
+	void Set(const Vec3 &_pt)
 	{
-		if ( b.bmin.x < bmin.x ) bmin.x = b.bmin.x;
-		if ( b.bmin.y < bmin.y ) bmin.y = b.bmin.y;
-		if ( b.bmin.z < bmin.z ) bmin.z = b.bmin.z;
+		for(int i = 0; i < 3; ++i)
+		{
+			mMins[i] = _pt[i];
+			mMaxs[i] = _pt[i];
+		}
+	}
+	void SetMinMax(const Vec3 &_min, const Vec3 &_max)
+	{
+		mMins.x = _min.x < _max.x ? _min.x : _max.x;
+		mMaxs.x = _min.x > _max.x ? _min.x : _max.x;
 
-		if ( b.bmax.x > bmax.x ) bmax.x = b.bmax.x;
-		if ( b.bmax.y > bmax.y ) bmax.y = b.bmax.y;
-		if ( b.bmax.z > bmax.z ) bmax.z = b.bmax.z;
-	}
-	void GetCenter(Vec3 &center) const
-	{
-		center.x = (bmax.x - bmin.x)*0.5f + bmin.x;
-		center.y = (bmax.y - bmin.y)*0.5f + bmin.y;
-		center.z = (bmax.z - bmin.z)*0.5f + bmin.z;
-	}
-	void GetSides(Vec3 &sides) const
-	{
-		sides.x = bmax.x - bmin.x;
-		sides.y = bmax.y - bmin.y;
-		sides.z = bmax.z - bmin.z;
-	}
-	float GetLength() const
-	{
-		return bmin.Distance(bmax);
-	}
-	void TransformBoundAABB(const MyMatrix &t,const BoundingBox &b);
+		mMins.y = _min.y < _max.y ? _min.y : _max.y;
+		mMaxs.y = _min.y > _max.y ? _min.y : _max.y;
 
-	void BoundTest(const MyMatrix &transform,float x,float y,float z);
+		mMins.z = _min.z < _max.z ? _min.z : _max.z;
+		mMaxs.z = _min.z > _max.z ? _min.z : _max.z;
+	}
+	void CenterPoint(Vec3 &_out) const
+	{
+		_out.x = (mMins.x + mMaxs.x) * 0.5f;
+		_out.y = (mMins.y + mMaxs.y) * 0.5f;
+		_out.z = (mMins.z + mMaxs.z) * 0.5f;
+	}
+	void CenterTop(Vec3 &_out) const
+	{
+		_out.x = (mMins.x + mMaxs.x) * 0.5f;
+		_out.y = (mMins.y + mMaxs.y) * 0.5f;
+		_out.z = mMaxs.z;
+	}
+	void CenterBottom(Vec3 &_out) const
+	{
+		_out.x = (mMins.x + mMaxs.x) * 0.5f;
+		_out.y = (mMins.y + mMaxs.y) * 0.5f;
+		_out.z = mMins.z;
+	}
+	void MoveCenter(const Vec3 &_v)
+	{
+		Vec3 center;
+		CenterPoint(center);
+		mMins -= center;
+		mMaxs -= center;
 
-	Vec3 bmin;
-	Vec3 bmax;
+		mMins += _v;
+		mMaxs += _v;
+	}
+	void ExpandWithPoint(const Vec3 &_pt)
+	{
+		if(_pt.x < mMins.x) mMins.x = _pt.x;
+		if(_pt.x > mMaxs.x) mMaxs.x = _pt.x;
+
+		if(_pt.y < mMins.y) mMins.y = _pt.y;
+		if(_pt.y > mMaxs.y) mMaxs.y = _pt.y;
+
+		if(_pt.z < mMins.z) mMins.z = _pt.z;
+		if(_pt.z > mMaxs.z) mMaxs.z = _pt.z;
+	}
+	void ExpandWithBounds(const BoundingBox &_bbox)
+	{
+		ExpandWithPoint(_bbox.mMins);
+		ExpandWithPoint(_bbox.mMaxs);
+	}
+	void Expand(float _expand)
+	{
+		for(int i = 0; i < 3; ++i)
+		{
+			mMins[i] -= _expand;
+			mMaxs[i] += _expand;
+		}
+	}
+	void ExpandX(float _expand) { mMins.x -= _expand; mMaxs.x += _expand; }
+	void ExpandY(float _expand) { mMins.y -= _expand; mMaxs.y += _expand; }
+	void ExpandZ(float _expand) { mMins.z -= _expand; mMaxs.z += _expand; }
+	bool Intersects(const BoundingBox &_bbox) const
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			if (mMaxs[i] < _bbox.mMins[i] || mMins[i] > _bbox.mMaxs[i])
+				return false;
+		}
+		return true;
+	}
+	bool Contains(const Vec3 &_pt) const
+	{
+		if(mMaxs.x < _pt.x || mMins.x > _pt.x)
+			return false;
+		if(mMaxs.y < _pt.y || mMins.y > _pt.y)
+			return false;
+		if(mMaxs.z < _pt.z || mMins.z > _pt.z)
+			return false;
+		return true;
+	}
+	bool FindIntersection(const BoundingBox &_bbox, BoundingBox& _overlap) const
+	{
+		if(Intersects(_bbox))
+		{
+			if(mMaxs.x <= _bbox.mMaxs.x)
+				_overlap.mMaxs.x = mMaxs.x;
+			else
+				_overlap.mMaxs.x = _bbox.mMaxs.x;
+
+			if(mMins.x <= _bbox.mMins.x)
+				_overlap.mMins.x = _bbox.mMins.x;
+			else
+				_overlap.mMins.x = mMins.x;
+
+			if(mMaxs.y <= _bbox.mMaxs.y)
+				_overlap.mMaxs.y = mMaxs.y;
+			else
+				_overlap.mMaxs.y = _bbox.mMaxs.y;
+
+			if(mMins.y <= _bbox.mMins.y)
+				_overlap.mMins.y = _bbox.mMins.y;
+			else
+				_overlap.mMins.y = mMins.y;
+
+			if(mMaxs.z <= _bbox.mMaxs.z)
+				_overlap.mMaxs.z = mMaxs.z;
+			else
+				_overlap.mMaxs.z = _bbox.mMaxs.z;
+
+			if(mMins.z <= _bbox.mMins.z)
+				_overlap.mMins.z = _bbox.mMins.z;
+			else
+				_overlap.mMins.z = mMins.z;
+			return true;
+		}
+		return false;
+	}
+	float GetLengthX() const { return mMaxs.x - mMins.x; }
+	float GetLengthY() const { return mMaxs.y - mMins.y; }
+	float GetLengthZ() const { return mMaxs.z - mMins.z; }
+
+	float GetArea() const
+	{
+		return GetLengthX() * GetLengthY() * GetLengthZ();
+	}
+	float DistanceFromBottom(const Vec3 &_pt) const
+	{
+		return -(mMins.z - _pt.z);
+	}
+	float DistanceFromTop(const Vec3 &_pt) const
+	{
+		return (mMaxs.z - _pt.z);
+	}
+	void Scale(float _scale)
+	{
+		mMins.x *= _scale;
+		mMins.y *= _scale;
+		mMins.z *= _scale;
+		mMaxs.x *= _scale;
+		mMaxs.y *= _scale;
+		mMaxs.z *= _scale;
+	}
+	BoundingBox ScaleCopy(float _scale)
+	{
+		BoundingBox out = *this; // cs: was AABB, but gcc said NO
+		out.Scale(_scale);
+		return out;
+	}
+
+	void GetBottomCorners(Vec3 &_bl, Vec3 &_tl, Vec3 &_tr, Vec3 &_br)
+	{
+		_bl.x = mMins.x;
+		_bl.y = mMins.y;
+		_bl.z = mMins.x;
+
+		_tl.x = mMins.x;
+		_tl.y = mMaxs.y;
+		_tl.z = mMins.x;
+
+		_tr.x = mMaxs.x;
+		_tr.y = mMaxs.y;
+		_tr.z = mMins.x;
+
+		_br.x = mMaxs.x;
+		_br.y = mMins.y;
+		_br.z = mMins.x;
+	}
+	void GetTopCorners(Vec3 &_bl, Vec3 &_tl, Vec3 &_tr, Vec3 &_br)
+	{
+		GetBottomCorners(_bl, _tl, _tr, _br);
+		_bl.z = mMaxs.z;
+		_tl.z = mMaxs.z;
+		_tr.z = mMaxs.z;
+		_br.z = mMaxs.z;
+	}
+	void Translate(const Vec3 &_pos)
+	{
+		mMins.x += _pos.x;
+		mMaxs.x += _pos.x;
+
+		mMins.y += _pos.y;
+		mMaxs.y += _pos.y;
+
+		mMins.z += _pos.z;
+		mMaxs.z += _pos.z;
+	}
+	void UnTranslate(const Vec3 &_pos)
+	{
+		mMins.x -= _pos.x;
+		mMaxs.x -= _pos.x;
+
+		mMins.y -= _pos.y;
+		mMaxs.y -= _pos.y;
+
+		mMins.z -= _pos.z;
+		mMaxs.z -= _pos.z;
+	}
+	BoundingBox TranslateCopy(const Vec3 &_pos) const
+	{
+		BoundingBox aabb = *this;
+		aabb.Translate(_pos);
+		return aabb;
+	}
+	BoundingBox(const Vec3 &_mins, const Vec3 &_maxs)
+	{
+		SetMinMax(_mins, _maxs);
+	}
+	BoundingBox(const Vec3 &_center)
+	{
+		Set(_center);
+	}
+	BoundingBox()
+	{
+		Set(Vec3(0,0,0));
+	}
+
+	Vec3	mMins;
+	Vec3	mMaxs;
 };
 
 #endif
