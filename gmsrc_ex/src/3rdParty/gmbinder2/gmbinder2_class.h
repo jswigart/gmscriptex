@@ -428,8 +428,6 @@ namespace gmBind2
 #if GM_BOOL_OP
 			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_BOOL, NULL, gmBind2OpBool);
 #endif
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_GETIND, NULL, gmBind2OpGetInd);
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_SETIND, NULL, gmBind2OpSetInd);
 		}
 
 	private:
@@ -543,14 +541,6 @@ namespace gmBind2
 					}
 				}
 			}
-			a_operands[0].Nullify();
-		}
-		static void GM_CDECL gmBind2OpGetInd(gmThread * a_thread, gmVariable * a_operands)
-		{
-			a_operands[0].Nullify();
-		}
-		static void GM_CDECL gmBind2OpSetInd(gmThread * a_thread, gmVariable * a_operands)
-		{
 			a_operands[0].Nullify();
 		}
 		static void GM_CDECL gmBind2OpBool(gmThread * a_thread, gmVariable * a_operands)
