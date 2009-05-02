@@ -286,11 +286,11 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 		case BC_OP_GTE :
 		case BC_OP_EQ :
 		case BC_OP_NEQ :
-		case BC_GETIND :
 			{
 				operand = top - 2; 
 				--top; 
-				register gmType t1 = operand[1].m_type; 
+				register gmType t1 = operand[1].m_type;
+
 				if(operand->m_type > t1) t1 = operand->m_type; 
 				gmOperatorFunction op = OPERATOR(t1, (gmOperator) instruction32[-1]); 
 				if(op) 
@@ -298,6 +298,40 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 					op(this, operand); 
 				} 
 				else if((fn = CALLOPERATOR(t1, (gmOperator) instruction32[-1]))) 
+				{ 
+					operand[2] = operand[0]; 
+					operand[3] = operand[1]; 
+					operand[0] = gmVariable(GM_NULL, 0); 
+					operand[1] = gmVariable(GM_FUNCTION, fn->GetRef()); 
+					SetTop(operand + 4); 
+					State res = PushStackFrame(2, &instruction, &code); 
+					top = GetTop(); 
+					base = GetBase();
+					if(res == RUNNING) break;
+					if(res == SYS_YIELD) return RUNNING;
+					if(res == SYS_EXCEPTION) goto LabelException;
+					if(res == KILLED) { m_machine->Sys_SwitchState(this, KILLED); GM_ASSERT(0); } // operator should not kill a thread
+					return res;
+				} 
+				else 
+				{ 
+					GMTHREAD_LOG("operator %s undefined for type %s and %s", gmGetOperatorName((gmOperator) instruction32[-1]), m_machine->GetTypeName(operand->m_type), m_machine->GetTypeName((operand + 1)->m_type)); 
+					goto LabelException; 
+				} 
+
+				break;
+			}
+		case BC_GETIND :
+			{
+				operand = top - 2; 
+				--top; 
+
+				gmOperatorFunction op = OPERATOR(operand->m_type, (gmOperator) instruction32[-1]); 
+				if(op) 
+				{ 
+					op(this, operand); 
+				} 
+				else if((fn = CALLOPERATOR(operand->m_type, (gmOperator) instruction32[-1]))) 
 				{ 
 					operand[2] = operand[0]; 
 					operand[3] = operand[1]; 
