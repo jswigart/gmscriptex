@@ -453,7 +453,7 @@ void gmTableObject::RemoveAndDeleteAll(gmMachine * a_machine)
 	gmTableIterator tIt;
 	while(gmTableNode *pNode = GetFirst(tIt))
 	{
-		Set(a_machine,pNode->m_key,pNode->m_value);
+		Set(a_machine,pNode->m_key,gmVariable::s_null);
 	}
 }
 
