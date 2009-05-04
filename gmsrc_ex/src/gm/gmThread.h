@@ -178,6 +178,7 @@ public:
 	inline gmVariable Param(int a_param, const gmVariable& a_default);  
 	inline gmType ParamType(int a_param) const;
 	inline gmptr ParamRef(int a_param) const;
+	inline const char *ParamTypeName(int a_param) const;
 
 	//
 	// This methods. (get this as a given type)
@@ -777,6 +778,10 @@ inline gmptr gmThread::ParamRef(int a_param) const
 	return (m_stack + m_base + a_param)->m_value.m_ref;
 }
 
+inline const char *gmThread::ParamTypeName(int a_param) const
+{
+	return GetMachine()->GetTypeName(ParamType(a_param));
+}
 
 //
 // This methods.
@@ -997,33 +1002,53 @@ inline gmUserObject * gmThread::ThisUserObject()
 	if(GM_THREAD_ARG->GetNumParams() < (A)) { GM_EXCEPTION_MSG("expecting %d param(s)", (A)); return GM_EXCEPTION; }
 
 #define GM_CHECK_INT_PARAM(VAR, PARAM) \
-	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_INT) { GM_EXCEPTION_MSG("expecting param %d as int", (PARAM)); return GM_EXCEPTION; } \
+	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_INT) \
+	{ GM_EXCEPTION_MSG("expecting param %d as int, got %s", (PARAM), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+		return GM_EXCEPTION; \
+	} \
 	int VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_int;
 
 #define GM_CHECK_FLOAT_PARAM(VAR, PARAM) \
 	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_FLOAT) \
-{ GM_EXCEPTION_MSG("expecting param %d as float", (PARAM)); return GM_EXCEPTION; } \
+	{ GM_EXCEPTION_MSG("expecting param %d as float, got %s", (PARAM), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+		return GM_EXCEPTION; \
+	} \
 	float VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_float;
 
 #define GM_CHECK_STRING_PARAM(VAR, PARAM) \
-	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_STRING) { GM_EXCEPTION_MSG("expecting param %d as string", (PARAM)); return GM_EXCEPTION; } \
+	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_STRING) \
+	{ GM_EXCEPTION_MSG("expecting param %d as string, got %s", (PARAM), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+		return GM_EXCEPTION; \
+	} \
 	const char * VAR = (const char *) *((gmStringObject *) GM_OBJECT(GM_THREAD_ARG->ParamRef((PARAM))));
 
 #define GM_CHECK_FUNCTION_PARAM(VAR, PARAM) \
-	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_FUNCTION) { GM_EXCEPTION_MSG("expecting param %d as function", (PARAM)); return GM_EXCEPTION; } \
+	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_FUNCTION) \
+	{ GM_EXCEPTION_MSG("expecting param %d as function, got %s", (PARAM), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+		return GM_EXCEPTION; \
+	} \
 	gmFunctionObject * VAR = (gmFunctionObject *) GM_OBJECT(GM_THREAD_ARG->ParamRef((PARAM)));
 
 #define GM_CHECK_TABLE_PARAM(VAR, PARAM) \
-	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_TABLE) { GM_EXCEPTION_MSG("expecting param %d as table", (PARAM)); return GM_EXCEPTION; } \
+	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_TABLE) \
+	{ GM_EXCEPTION_MSG("expecting param %d as table, got %s", (PARAM), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+		return GM_EXCEPTION; \
+	} \
 	gmTableObject * VAR = (gmTableObject *) GM_OBJECT(GM_THREAD_ARG->ParamRef((PARAM)));
 
 #define GM_CHECK_USER_PARAM(OBJECT, TYPE, VAR, PARAM) \
-	if(GM_THREAD_ARG->ParamType((PARAM)) != (TYPE)) { GM_EXCEPTION_MSG("expecting param %d as user type %d", (PARAM), (TYPE)); return GM_EXCEPTION; } \
+	if(GM_THREAD_ARG->ParamType((PARAM)) != (TYPE)) \
+	{ GM_EXCEPTION_MSG("expecting param %d as user type %d, got %s", (PARAM), (TYPE), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+		return GM_EXCEPTION; \
+	} \
 	OBJECT VAR = (OBJECT) GM_THREAD_ARG->ParamUser_NoCheckTypeOrParam((PARAM));
 
 #if(GM_USE_VECTOR3_STACK)
 #define GM_CHECK_VECTOR_PARAM(VAR, PARAM) \
-	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC3) { GM_EXCEPTION_MSG("expecting param %d as vec3", (PARAM)); return GM_EXCEPTION; } \
+	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC3) \
+	{ GM_EXCEPTION_MSG("expecting param %d as vec3, got %s", (PARAM), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+		return GM_EXCEPTION; \
+	} \
 	Vec3 VAR = ConvertVec3(GM_THREAD_ARG->Param((PARAM)).m_value.m_vec3);
 #endif
 
