@@ -1977,11 +1977,17 @@ gmVariable gmMachine::Lookup(const char *a_string, gmTableObject *a_tbl)
 					// Get the next item based on this token.
 					var = pCurrentTable->Get(gmVariable(index));
 
-					// If it's a table, set the table pointer so the lookup can walk down.
-					pCurrentTable = var.GetTableObjectSafe();
-
 					// Next token.
 					pStart = pEnd + 1;
+
+					// If it's a table, set the table pointer so the lookup can walk down.
+					if(var.GetTableObjectSafe())
+						pCurrentTable = var.GetTableObjectSafe();
+					else
+					{
+						if(*pStart==NULL)
+							return var;
+					}
 
 					// eat
 					while(pStart && *pStart && *pStart=='.')

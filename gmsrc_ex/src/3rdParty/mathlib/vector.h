@@ -735,6 +735,22 @@ public:
 		return asinf(z);
 	}
 
+	void FromSpherical( float heading, float pitch, float radius ) 
+	{ 
+		float 
+			fST = sinf(heading), fCT = cosf(heading), 
+			fSP = sinf(pitch), fCP = cosf(pitch);
+		*this = Vec3(fCP*fST, fCP*fCT, fSP) * radius;
+	}
+
+	void ToSpherical( float &heading, float &pitch, float &radius )
+	{
+		// reference vector is 0,0,1
+		radius = Length();
+		pitch = radius > 0.0f ? asinf(z/radius) : 0.0f;
+		heading = atan2f(x, y);
+	}
+
 //private:
 
 	float x;

@@ -517,7 +517,16 @@ static int GM_CDECL gmNearestPointInTriangle(gmThread *a_thread)
 	a_thread->PushVector(vOut);
 	return GM_OK;
 }
-
+static int GM_CDECL gmVec3FromSpherical(gmThread *a_thread)
+{
+	GM_CHECK_FLOAT_OR_INT_PARAM(hdg,0);
+	GM_CHECK_FLOAT_OR_INT_PARAM(pitch,1);
+	GM_FLOAT_OR_INT_PARAM(rad,2,1.f);
+	Vec3 v;
+	v.FromSpherical(hdg,pitch,rad);
+	a_thread->PushVector(v);
+	return GM_OK;
+}
 //////////////////////////////////////////////////////////////////////////
 gmFunctionEntry vec3_lib[] = 
 {
@@ -537,6 +546,8 @@ gmFunctionEntry vec3_lib[] =
 	{"NearestPointInLineSegment",gmNearestPointInLineSegment},
 	{"NearestPointInPlane",		gmNearestPointInPlane},
 	{"PointInTriangle",			gmNearestPointInTriangle},
+	{"Vec3FromSpherical",		gmVec3FromSpherical},
+	
 };
 gmFunctionEntry vec3_methods[] =
 {
