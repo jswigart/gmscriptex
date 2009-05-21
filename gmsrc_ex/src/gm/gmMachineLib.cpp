@@ -15,6 +15,8 @@ See Copyright Notice in gmMachine.h
 #include "gmMachine.h"
 #include "gmUtil.h"
 
+#include "gmCall.h"
+
 #include <vector>
 #include <algorithm>
 
@@ -383,11 +385,43 @@ static int GM_CDECL gmAssert(gmThread * a_thread)
 		}
 	}
 	GM_STRING_PARAM(message, 1, "assert failed");
-	a_thread->GetMachine()->GetLog().LogEntry("%s", message);
+	GM_EXCEPTION_MSG(message);
 	return GM_EXCEPTION;
 }
 
 
+
+static int GM_CDECL gmAbort(gmThread * a_thread)
+{
+	GM_STRING_PARAM(message,0,"thread aborted");
+	GM_EXCEPTION_MSG(message);
+	return GM_EXCEPTION;
+}
+
+
+static int GM_CDECL gmUnitTest(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_FUNCTION_PARAM(fnc, 0);
+	GM_TABLE_PARAM(tbl, 1, 0);
+
+	gmMachine *pMachine = a_thread->GetMachine();
+	gmCall call;
+	if(call.BeginFunction(pMachine, fnc))
+	{
+		if(tbl)
+		{
+			call.AddParamTable(tbl);
+		}
+		int res = call.End();
+		if(res==gmThread::EXCEPTION)
+		{
+			GM_EXCEPTION_MSG("Unit Test %s failed",fnc->GetDebugName()?fnc->GetDebugName():"<unknown>");
+			return GM_EXCEPTION;
+		}
+	}
+	return GM_OK;
+}
 
 static gmType s_gmStateUserType = GM_NULL;
 
@@ -1031,6 +1065,67 @@ static int GM_CDECL gmfLookup(gmThread * a_thread)
 	return GM_OK;
 }
 
+pfnExecuteFileImpl gmImportExecuteFile = 0;
+
+static int GM_CDECL gmfImport(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_STRING_PARAM(var, 0);
+
+	gmMachine *pM = a_thread->GetMachine();
+	gmTableObject *ModulesTable = 0;
+	gmVariable vModulesTable = pM->Lookup(GM_MODULE_TABLE);
+	if(vModulesTable.IsNull())
+	{
+		ModulesTable = pM->AllocTableObject();
+		a_thread->GetMachine()->GetGlobals()->Set(pM,GM_MODULE_TABLE,gmVariable(ModulesTable));
+	}
+	else
+	{
+		ModulesTable = vModulesTable.GetTableObjectSafe();
+	}
+
+	if(!ModulesTable)
+	{
+		GM_EXCEPTION_MSG("Module table overwritten: %s!",GM_MODULE_TABLE);
+		return GM_EXCEPTION;
+	}
+
+	std::string slower(var);
+	std::transform(slower.begin(),slower.end(),slower.begin(),tolower);
+
+	// return it if it exists
+	gmTableObject *Module = ModulesTable->Get(pM,slower.c_str()).GetTableObjectSafe();
+	if(Module)
+	{
+		a_thread->PushTable(Module);
+		return GM_OK;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	if(!gmImportExecuteFile)
+	{
+		GM_EXCEPTION_MSG("No Callback provided for executing files!");
+		return GM_EXCEPTION;
+	}
+	
+	// TODO: search path support?
+
+	gmTableObject *NewModule = pM->AllocTableObject();
+	ModulesTable->Set(pM,slower.c_str(),gmVariable(NewModule));
+	if(gmImportExecuteFile(a_thread,slower.c_str(),gmVariable(NewModule))==GM_OK)
+	{
+		a_thread->PushTable(NewModule);
+		return GM_OK;
+	}
+	else
+	{
+		GM_EXCEPTION_MSG("Error loading module %s!",slower.c_str());
+		return GM_EXCEPTION;
+	}
+}
+
 #if GMMACHINE_MATHTYPES
 static int GM_CDECL gmfVector3(gmThread * a_thread)
 {
@@ -1267,6 +1362,18 @@ static gmFunctionEntry s_binding[] =
 	*/
 	{"assert", gmAssert},
 	/*gm
+	\function abort
+	\brief abort 
+	\param causes an exception on the current thread with a user defined error
+	*/
+	{"assert", gmAbort},
+	/*gm
+	\function unitTest
+	\brief unitTest 
+	\param runs a function as a test function and reports success or failure(exception)
+	*/
+	{"unitTest", gmUnitTest},
+	/*gm
 	\function sleep
 	\brief sleep will sleep this thread for the given number of seconds 
 	\param int\float seconds
@@ -1383,6 +1490,13 @@ static gmFunctionEntry s_binding[] =
 	\param string
 	*/
 	{"lookup", gmfLookup},
+
+	/*gm
+	\function import
+	\brief imports a module/library into the current script, providing a reference to it.
+	\param string
+	*/
+	{"import", gmfImport},
 
 #if GMMACHINE_MATHTYPES
 	{"Vector2", gmfVector3},

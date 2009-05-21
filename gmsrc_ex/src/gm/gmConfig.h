@@ -95,9 +95,9 @@ enum gmEndian
 #define GMMACHINE_CPPOWNEDGMOBJHASHSIZE 1024  // default hash table size for objects owned by cpp code, necessary for GC.
 
 // DEBUGGING
-
 #define GMDEBUG_SUPPORT             1         // allow use with the gm debugger
 
+#define GM_MODULE_TABLE "_MODULES"
 
 // GARBAGE COLLECTOR
 #define GM_USE_INCGC                1         // use incremental garbage collector
