@@ -1366,7 +1366,7 @@ static gmFunctionEntry s_binding[] =
 	\brief abort 
 	\param causes an exception on the current thread with a user defined error
 	*/
-	{"assert", gmAbort},
+	{"abort", gmAbort},
 	/*gm
 	\function unitTest
 	\brief unitTest 
