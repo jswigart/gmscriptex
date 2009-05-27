@@ -539,6 +539,7 @@ gmFunctionEntry vec3_lib[] =
 	{"AngleAxis",				gmAngleAxis},
 	{"ComputeNormal",			gmComputeNormal},
 	{"CrossProduct",			gmCrossProduct},
+	{"Cross",			gmCrossProduct},
 	{"DotProduct",				gmDotProduct},
 	{"Lerp",					gmLerp},
 	{"Reflection",				gmReflection},
