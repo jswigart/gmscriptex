@@ -947,72 +947,136 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 			case 'S' : 
 			case 's' : 
 				{
-					GM_STRING_PARAM(pstr, param, "");
-					++param;
+					//GM_STRING_PARAM(pstr, param, "");
+					const char *pstr = a_thread->Param(param).GetCStringSafe(0);
+					if(!pstr)
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected string as param %d",param);
+						return GM_EXCEPTION;
+					}
 					gmConcat(a_thread->GetMachine(), str, len, size, pstr, 64);
+					++param;
 					break;
 				}
 			case 'C' : 
 			case 'c' : 
 				{
-					GM_INT_PARAM(ival, param, 0);
-					++param;
-					sprintf(buffer, "%c", ival);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%c", a_thread->Param(param).GetInt());
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
 					break;
 				}
 			case 'D' :
 			case 'd' :
 				{
-					GM_INT_PARAM(ival, param, 0);
-					++param;
-					sprintf(buffer, "%d", ival);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%d", a_thread->Param(param).GetInt());
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
 					break;
 				}
 			case 'U' :
 			case 'u' :
 				{
-					GM_INT_PARAM(ival, param, 0);
-					++param;
-					sprintf(buffer, "%u", ival);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%u", a_thread->Param(param).GetInt());
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
 					break;
 				}
 			case 'B' :
 			case 'b' :
 				{
-					GM_INT_PARAM(ival, param, 0);
-					++param;
-					gmItoa(ival, buffer, 2);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					gmItoa(a_thread->Param(param).GetInt(), buffer, 2);
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
 					break;
 				}
 			case 'X' :
 			case 'x' :
 				{
-					GM_INT_PARAM(ival, param, 0);
-					++param;
-					sprintf(buffer, "%x", ival);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%x", a_thread->Param(param).GetInt());
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
 					break;
 				}
 			case 'F' :
 			case 'f' :
 				{
-					GM_FLOAT_PARAM(fval, param, 0);
-					++param;
-					sprintf(buffer, "%f", fval);
+					//GM_FLOAT_PARAM(fval, param, 0);
+					if(!a_thread->Param(param).IsFloat())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected float as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%f", a_thread->Param(param).GetFloat());
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
+					break;
+				}
+			case 'G' :
+			case 'g' :
+				{
+					//GM_FLOAT_PARAM(fval, param, 0);
+					if(!a_thread->Param(param).IsFloat())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected float as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%g", a_thread->Param(param).GetFloat());
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
 					break;
 				}
 			case 'e' :
 			case 'E' :
 				{
-					GM_FLOAT_PARAM(fval, param, 0);
-					++param;
-					sprintf(buffer, "%e", fval);
+					//GM_FLOAT_PARAM(fval, param, 0);
+					if(!a_thread->Param(param).IsFloat())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected float as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%e", a_thread->Param(param).GetFloat());
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
 					break;
 				}
 			case '%' :
