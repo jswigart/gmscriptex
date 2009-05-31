@@ -624,6 +624,17 @@ namespace gmBind2
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
+		template<>
+		static int Get< gmGCRoot<gmStringObject> >(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
+		{
+			gmGCRoot<gmStringObject> *str = a_static ? (gmGCRoot<gmStringObject>*)a_offset : (gmGCRoot<gmStringObject>*)((char*)p + a_offset);
+			if(str && *str)
+				a_operands[0].SetString(*str);
+			else
+				a_operands[0].Nullify();
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
 		template<typename T>
 		static int Set(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
 		{
@@ -637,6 +648,14 @@ namespace gmBind2
 		{
 			std::string *str = a_static ? (std::string*)a_offset : (std::string *)((char*)p + a_offset);
 			*str = a_operands[1].GetCStringSafe();
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		template<>
+		static int Set< gmGCRoot<gmStringObject> >(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
+		{
+			gmGCRoot<gmStringObject> *str = a_static ? (gmGCRoot<gmStringObject>*)a_offset : (gmGCRoot<gmStringObject> *)((char*)p + a_offset);
+			str->Set(a_operands[1].GetStringObjectSafe(),a_thread->GetMachine());
 			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
