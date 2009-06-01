@@ -41,8 +41,8 @@ namespace gmBind2
 		typedef bool (*pfnGetDotEx)(gmThread * a_thread, ClassT *a_var, const char *a_key, gmVariable * a_operands);
 		//////////////////////////////////////////////////////////////////////////
 
-		static gmType GetClassType()		{ return m_ClassType; }
-		static const char *GetClassName()	{ return m_ClassName; }
+		static gmType ClassType()		{ return m_ClassType; }
+		static const char *ClassName()	{ return m_ClassName; }
 		static bool IsExtensible()			{ return m_Extensible; }
 
 		ClassBase(const char *a_classname, gmMachine *a_machine, bool _extensible)
@@ -54,7 +54,7 @@ namespace gmBind2
 				m_ClassType = a_machine->CreateUserType(a_classname);
 				m_Extensible = _extensible;
 
-				m_Machine->RegisterUserCallbacks(GetClassType(), 
+				m_Machine->RegisterUserCallbacks(ClassType(), 
 					gmfTraceObject, 
 					gmfGarbageCollect, 
 					gmfAsStringCallback); 
@@ -79,7 +79,7 @@ namespace gmBind2
 			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT());
 			if(ClassBase<ClassT>::IsExtensible())
 				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
-			a_thread->PushNewUser(bo, GetClassType());
+			a_thread->PushNewUser(bo, ClassType());
 			return GM_OK;
 		}
 		static int gmfArgConstructor(gmThread *a_thread)
@@ -87,7 +87,7 @@ namespace gmBind2
 			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT(a_thread));
 			if(ClassBase<ClassT>::IsExtensible())
 				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
-			a_thread->PushNewUser(bo, GetClassType());
+			a_thread->PushNewUser(bo, ClassType());
 			return GM_OK;
 		}
 		static void gmfGarbageCollect(gmMachine *a_machine, gmUserObject *a_object)
@@ -164,13 +164,13 @@ namespace gmBind2
 		Class &func(Fn a_fn, const char *a_funcname)
 		{
 			typedef typename FunctionTraits<Fn>::Class_Type cls_type;
-			GM_ASSERT(ClassBase<cls_type>::GetClassType() != GM_NULL);
+			GM_ASSERT(ClassBase<cls_type>::ClassType() != GM_NULL);
 
 			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = a_funcname;
 			fn.m_function = 0;
 			fn.m_functor = new GMExportFunctor<Fn>(a_fn);
-			ClassBase<ClassT>::m_Machine->RegisterTypeLibrary(ClassBase<ClassT>::GetClassType(), &fn, 1);
+			ClassBase<ClassT>::m_Machine->RegisterTypeLibrary(ClassBase<ClassT>::ClassType(), &fn, 1);
 			return *this;
 		}
 		Class &func(RawFunctionType a_fn, const char *a_funcname)
@@ -179,7 +179,7 @@ namespace gmBind2
 			fn.m_name = a_funcname;
 			fn.m_function = a_fn;
 			fn.m_functor = 0;
-			ClassBase<ClassT>::m_Machine->RegisterTypeLibrary(ClassBase<ClassT>::GetClassType(), &fn, 1);
+			ClassBase<ClassT>::m_Machine->RegisterTypeLibrary(ClassBase<ClassT>::ClassType(), &fn, 1);
 			return *this;
 		}
 		template <typename Fn>
@@ -189,7 +189,7 @@ namespace gmBind2
 			fn.m_name = 0;
 			fn.m_function = 0;
 			fn.m_functor = new GMExportOpFunctor<Fn>(a_fn);
-			ClassBase<ClassT>::m_Machine->RegisterTypeOperator(ClassBase<ClassT>::GetClassType(), a_op, NULL, NULL, &fn);
+			ClassBase<ClassT>::m_Machine->RegisterTypeOperator(ClassBase<ClassT>::ClassType(), a_op, NULL, NULL, &fn);
 			return *this;
 		}
 		Class &rawfunc_operator(gmOperator a_op, RawFunctionType a_fn)
@@ -198,7 +198,7 @@ namespace gmBind2
 			fn.m_name = 0;
 			fn.m_function = a_fn;
 			fn.m_functor = 0;
-			ClassBase<ClassT>::m_Machine->RegisterTypeOperator(ClassBase<ClassT>::GetClassType(), a_op, NULL, NULL, &fn);
+			ClassBase<ClassT>::m_Machine->RegisterTypeOperator(ClassBase<ClassT>::ClassType(), a_op, NULL, NULL, &fn);
 			return *this;
 		}
 
@@ -259,7 +259,7 @@ namespace gmBind2
 		Class &constructor(RawFunctionType f, const char *_name = 0, const char *_undertable = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
-			fn.m_name =  _name ? _name : ClassBase<ClassT>::GetClassName();
+			fn.m_name =  _name ? _name : ClassBase<ClassT>::ClassName();
 			fn.m_function = f;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
 			return *this;
@@ -267,7 +267,7 @@ namespace gmBind2
 		Class &constructor(const char *_name = 0, const char *_undertable = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
-			fn.m_name =  _name ? _name : ClassBase<ClassT>::GetClassName();
+			fn.m_name =  _name ? _name : ClassBase<ClassT>::ClassName();
 			fn.m_function = ClassBase<ClassT>::gmfDefaultConstructor;
 			fn.m_functor = 0;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
@@ -276,7 +276,7 @@ namespace gmBind2
 		Class &constructorArgs(const char *_name = 0, const char *_undertable = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
-			fn.m_name =  _name ? _name : ClassBase<ClassT>::GetClassName();
+			fn.m_name =  _name ? _name : ClassBase<ClassT>::ClassName();
 			fn.m_function = ClassBase<ClassT>::gmfArgConstructor;
 			fn.m_functor = 0;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
@@ -294,37 +294,37 @@ namespace gmBind2
 		}
 		Class &getDotEx(typename ClassBase<ClassT>::pfnGetDotEx f)
 		{
-			GM_ASSERT(ClassBase<ClassT>::GetClassType()!=GM_NULL);
+			GM_ASSERT(ClassBase<ClassT>::ClassType()!=GM_NULL);
 			ClassBase<ClassT>::m_GetDotEx = f;
 			return *this;
 		}
 		Class &setDotEx(typename ClassBase<ClassT>::pfnSetDotEx f)
 		{
-			GM_ASSERT(ClassBase<ClassT>::GetClassType()!=GM_NULL);
+			GM_ASSERT(ClassBase<ClassT>::ClassType()!=GM_NULL);
 			ClassBase<ClassT>::m_SetDotEx = f;
 			return *this;
 		}
 		template<class BaseClassT> 
 		Class &base()
 		{
-			GM_ASSERT(ClassBase<BaseClassT>::GetClassType()!=GM_NULL);
+			GM_ASSERT(ClassBase<BaseClassT>::ClassType()!=GM_NULL);
 
 			ClassBase<ClassT>::m_Machine->SetBaseForType(
-				ClassBase<ClassT>::GetClassType(), 
-				ClassBase<BaseClassT>::GetClassType());
+				ClassBase<ClassT>::ClassType(), 
+				ClassBase<BaseClassT>::ClassType());
 			return *this;
 		}
 		//////////////////////////////////////////////////////////////////////////
 		static gmGCRoot<gmUserObject> WrapObject(gmMachine *a_machine, ClassT *a_instance, bool a_native = true)
 		{
-			if(a_instance && ClassBase<ClassT>::GetClassType() != GM_NULL)
+			if(a_instance && ClassBase<ClassT>::ClassType() != GM_NULL)
 			{
 				BoundObject<ClassT> *bo = new BoundObject<ClassT>(a_instance);
 				if(ClassBase<ClassT>::IsExtensible())
 					bo->m_Table = a_machine->AllocTableObject();
 				bo->SetNative(a_native);
 				return gmGCRoot<gmUserObject>(
-					a_machine->AllocUserObject(bo, ClassBase<ClassT>::GetClassType()),a_machine);
+					a_machine->AllocUserObject(bo, ClassBase<ClassT>::ClassType()),a_machine);
 			}
 			return gmGCRoot<gmUserObject>();
 		}
@@ -332,7 +332,7 @@ namespace gmBind2
 		{
 			if(a_userObj)
 			{
-				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::GetClassType());
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::ClassType());
 				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
 				GM_ASSERT(bo && bo->IsNative());
 				if(!bo->IsNative())
@@ -344,7 +344,7 @@ namespace gmBind2
 		{
 			if(a_userObj)
 			{
-				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::GetClassType());
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::ClassType());
 				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
 				return bo;
 			}
@@ -354,7 +354,7 @@ namespace gmBind2
 		{
 			if(a_userObj)
 			{
-				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::GetClassType());
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::ClassType());
 				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
 				return bo->m_Table;
 			}
@@ -377,7 +377,7 @@ namespace gmBind2
 		{
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_thread->ParamUserCheckType(
 				a_param, 
-				ClassBase<ClassT>::GetClassType()));
+				ClassBase<ClassT>::ClassType()));
 			if(bo)
 			{
 				a_instance = bo->m_NativeObj;
@@ -388,7 +388,7 @@ namespace gmBind2
 		static bool FromThis(gmThread *a_thread, ClassT *&a_instance)
 		{
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_thread->ThisUserCheckType(
-				ClassBase<ClassT>::GetClassType()));
+				ClassBase<ClassT>::ClassType()));
 			if(bo)
 			{
 				a_instance = bo->m_NativeObj;
@@ -398,7 +398,7 @@ namespace gmBind2
 		}
 		static bool FromVar(gmThread *a_thread, gmVariable &a_var, ClassT *&a_instance)
 		{
-			gmUserObject *userObj = a_var.GetUserObjectSafe(ClassBase<ClassT>::GetClassType());
+			gmUserObject *userObj = a_var.GetUserObjectSafe(ClassBase<ClassT>::ClassType());
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(userObj?userObj->m_user:0);
 			if(bo)
 			{
@@ -409,13 +409,13 @@ namespace gmBind2
 		}
 		static void PushObject(gmThread *a_thread, ClassT *a_instance, bool a_native = false)
 		{
-			if(a_instance && ClassBase<ClassT>::GetClassType() != GM_NULL)
+			if(a_instance && ClassBase<ClassT>::ClassType() != GM_NULL)
 			{
 				BoundObject<ClassT> *bo = new BoundObject<ClassT>(a_instance);
 				if(ClassBase<ClassT>::IsExtensible())
 					bo->m_Table = a_thread->GetMachine()->AllocTableObject();
 				bo->SetNative(a_native);
-				a_thread->PushNewUser(bo, ClassBase<ClassT>::GetClassType());
+				a_thread->PushNewUser(bo, ClassBase<ClassT>::ClassType());
 			}
 		}
 		//////////////////////////////////////////////////////////////////////////
@@ -423,10 +423,10 @@ namespace gmBind2
 		{
 			GM_ASSERT(m_ClassType!=GM_NULL);
 
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_GETDOT, NULL, gmBind2OpGetDot);
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_SETDOT, NULL, gmBind2OpSetDot);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::ClassType(), O_GETDOT, NULL, gmBind2OpGetDot);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::ClassType(), O_SETDOT, NULL, gmBind2OpSetDot);
 #if GM_BOOL_OP
-			_machine->RegisterTypeOperator( ClassBase<ClassT>::GetClassType(), O_BOOL, NULL, gmBind2OpBool);
+			_machine->RegisterTypeOperator( ClassBase<ClassT>::ClassType(), O_BOOL, NULL, gmBind2OpBool);
 #endif
 		}
 
@@ -449,8 +449,8 @@ namespace gmBind2
 		static void GM_CDECL gmBind2OpGetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
-			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::GetClassType());
-			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::GetClassType()));
+			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::ClassType());
+			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()));
 			if(!bo->m_NativeObj)
 			{
 				a_operands[0].Nullify();
@@ -498,8 +498,8 @@ namespace gmBind2
 		static void GM_CDECL gmBind2OpSetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
-			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::GetClassType());
-			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::GetClassType()));
+			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::ClassType());
+			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()));
 			if(!bo->m_NativeObj)
 			{
 				a_operands[0].Nullify();
@@ -545,7 +545,7 @@ namespace gmBind2
 		}
 		static void GM_CDECL gmBind2OpBool(gmThread * a_thread, gmVariable * a_operands)
 		{
-			a_operands[0].SetInt(a_operands[0].GetUserSafe(ClassBase<ClassT>::GetClassType()) ? 1 : 0);
+			a_operands[0].SetInt(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()) ? 1 : 0);
 		}
 	};
 
