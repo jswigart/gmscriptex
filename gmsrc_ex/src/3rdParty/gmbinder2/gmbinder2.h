@@ -77,24 +77,24 @@ namespace gmBind2
 	template<typename T>
 	int GetThisGMType(gmThread *a_thread, T *&a_var) 
 	{
-		gmType paramType = ClassBase<T>::GetClassType();
+		gmType paramType = ClassBase<T>::ClassType();
 		
 		const gmVariable *pThis = a_thread->GetThis();		
-		if(pThis->m_type != ClassBase<T>::GetClassType())
+		if(pThis->m_type != ClassBase<T>::ClassType())
 		{
 			gmType parent = a_thread->GetMachine()->GetTypeParent(pThis->m_type);
-			while(parent && parent != ClassBase<T>::GetClassType())
+			while(parent && parent != ClassBase<T>::ClassType())
 				parent = a_thread->GetMachine()->GetTypeParent(parent);
 			if(parent)
 				paramType = pThis->m_type;
 			else
-				GM_ASSERT(paramType == ClassBase<T>::GetClassType());
+				GM_ASSERT(paramType == ClassBase<T>::ClassType());
 		}
 		BoundObject<T> *bo = static_cast<BoundObject<T>*>(pThis->GetUserSafe(paramType));
 		GM_ASSERT(paramType != GM_NULL && bo && "Invalid Parameter type");
 		if(!bo || !bo->m_NativeObj)
 		{
-			GM_EXCEPTION_MSG("Script function on null %s object", ClassBase<T>::GetClassName());
+			GM_EXCEPTION_MSG("Script function on null %s object", ClassBase<T>::ClassName());
 			return GM_EXCEPTION;
 		}
 		a_var = bo->m_NativeObj;
@@ -105,7 +105,7 @@ namespace gmBind2
 	template<typename T>
 	inline int GetFromGMType(gmThread *a_thread, int idx, T &a_var)
 	{
-		if(a_thread->ParamType(idx) == ClassBase<T>::GetClassType())
+		if(a_thread->ParamType(idx) == ClassBase<T>::ClassType())
 		{
 			BoundObject<T> *bo = static_cast<BoundObject<T>*>(a_thread->ParamUser(idx));
 			a_var = *bo->m_NativeObj;
@@ -117,7 +117,7 @@ namespace gmBind2
 		gmType baseType = m->GetTypeParent(a_thread->ParamType(idx));
 		while(baseType)
 		{
-			if(baseType == ClassBase<T>::GetClassType())
+			if(baseType == ClassBase<T>::ClassType())
 			{
 				BoundObject<T> *bo = static_cast<BoundObject<T>*>(a_thread->ParamUser(idx));
 				a_var = *bo->m_NativeObj; // COPY!
@@ -128,14 +128,14 @@ namespace gmBind2
 		//////////////////////////////////////////////////////////////////////////
 		GM_EXCEPTION_MSG("expecting param %d as %s, got %s", 
 			idx, 
-			ClassBase<T>::GetClassName(), 
+			ClassBase<T>::ClassName(), 
 			a_thread->GetMachine()->GetTypeName(a_thread->ParamType(idx)));
 		return GM_EXCEPTION;
 	}
 	template<typename T>
 	inline int GetFromGMType(gmThread *a_thread, int idx, T *&a_var)
 	{
-		if(a_thread->ParamType(idx) == ClassBase<T>::GetClassType())
+		if(a_thread->ParamType(idx) == ClassBase<T>::ClassType())
 		{
 			BoundObject<T> *bo = static_cast<BoundObject<T>*>(a_thread->ParamUser(idx));
 			a_var = bo->m_NativeObj;
@@ -147,7 +147,7 @@ namespace gmBind2
 		gmType baseType = m->GetTypeParent(a_thread->ParamType(idx));
 		while(baseType)
 		{
-			if(baseType == Class<T>::GetClassType())
+			if(baseType == Class<T>::ClassType())
 			{
 				BoundObject<T> *bo = static_cast<BoundObject<T>*>(a_thread->ParamUser(idx));
 				a_var = bo->m_NativeObj;
@@ -158,7 +158,7 @@ namespace gmBind2
 		//////////////////////////////////////////////////////////////////////////
 		GM_EXCEPTION_MSG("expecting param %d as %s, got %s", 
 			idx, 
-			ClassBase<T>::GetClassName(), 
+			ClassBase<T>::ClassName(), 
 			a_thread->GetMachine()->GetTypeName(a_thread->ParamType(idx)));
 		return GM_EXCEPTION;
 	}
@@ -249,10 +249,10 @@ namespace gmBind2
 	template<typename T>
 	inline int PushReturnToGM(gmThread *a_thread, T arg) 
 	{
-		if(ClassBase<T>::GetClassType() != GM_NULL)
+		if(ClassBase<T>::ClassType() != GM_NULL)
 		{
 			BoundObject<T> *bo = new BoundObject<T>(new T(arg));
-			a_thread->PushNewUser(bo, ClassBase<T>::GetClassType());
+			a_thread->PushNewUser(bo, ClassBase<T>::ClassType());
 			return GM_OK;
 		}
 		else
@@ -755,8 +755,8 @@ namespace gmBind2
 		template <typename T>
 		Global &var(T *a_var, const char *a_varname)
 		{
-			GM_ASSERT(ClassBase<T>::GetClassType() != GM_NULL);
-			if(ClassBase<T>::GetClassType() != GM_NULL)
+			GM_ASSERT(ClassBase<T>::ClassType() != GM_NULL);
+			if(ClassBase<T>::ClassType() != GM_NULL)
 			{
 				gmGCRoot<gmUserObject> r =Class<T>::WrapObject(m_Machine,a_var,false);
 				m_Table->Set(m_Machine,a_varname,gmVariable(r));
@@ -875,8 +875,8 @@ namespace gmBind2
 	{
 		if(call.m_Thread)
 		{
-			GM_ASSERT(ClassBase<T>::GetClassType() != GM_NULL);
-			if(ClassBase<T>::GetClassType() != GM_NULL)
+			GM_ASSERT(ClassBase<T>::ClassType() != GM_NULL);
+			if(ClassBase<T>::ClassType() != GM_NULL)
 			{
 				Class<T>::PushObject(call.m_Thread,value,true);
 				++call.m_ParamCount;
