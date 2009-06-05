@@ -951,7 +951,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					const char *pstr = a_thread->Param(param).GetCStringSafe(0);
 					if(!pstr)
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected string as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -965,7 +966,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_INT_PARAM(ival, param, 0);
 					if(!a_thread->Param(param).IsInt())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected int as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -980,7 +982,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_INT_PARAM(ival, param, 0);
 					if(!a_thread->Param(param).IsInt())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected int as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -995,7 +998,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_INT_PARAM(ival, param, 0);
 					if(!a_thread->Param(param).IsInt())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected int as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -1010,7 +1014,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_INT_PARAM(ival, param, 0);
 					if(!a_thread->Param(param).IsInt())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected int as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -1025,7 +1030,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_INT_PARAM(ival, param, 0);
 					if(!a_thread->Param(param).IsInt())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected int as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -1040,7 +1046,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_FLOAT_PARAM(fval, param, 0);
 					if(!a_thread->Param(param).IsFloat())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected float as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -1055,7 +1062,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_FLOAT_PARAM(fval, param, 0);
 					if(!a_thread->Param(param).IsFloat())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected float as param %d",param);
 						return GM_EXCEPTION;
 					}
@@ -1070,7 +1078,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					//GM_FLOAT_PARAM(fval, param, 0);
 					if(!a_thread->Param(param).IsFloat())
 					{
-						a_thread->GetMachine()->Sys_Free(str);
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
 						GM_EXCEPTION_MSG("expected float as param %d",param);
 						return GM_EXCEPTION;
 					}
