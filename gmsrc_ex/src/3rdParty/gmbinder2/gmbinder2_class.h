@@ -449,9 +449,9 @@ namespace gmBind2
 		static void GM_CDECL gmBind2OpGetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
-			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::ClassType());
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()));
-			if(!bo->m_NativeObj)
+			GM_ASSERT(bo);
+			if(!bo || !bo->m_NativeObj)
 			{
 				a_operands[0].Nullify();
 				return;
@@ -498,9 +498,9 @@ namespace gmBind2
 		static void GM_CDECL gmBind2OpSetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
-			GM_ASSERT(a_operands[0].m_type == ClassBase<ClassT>::ClassType());
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()));
-			if(!bo->m_NativeObj)
+			GM_ASSERT(bo);
+			if(!bo || !bo->m_NativeObj)
 			{
 				a_operands[0].Nullify();
 				return;
