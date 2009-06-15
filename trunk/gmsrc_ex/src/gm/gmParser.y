@@ -756,6 +756,19 @@ field
     {
       $$ = CreateOperation(CTNOT_ASSIGN_FIELD, $1, $3);
     }
+  | '[' constant_field_index ']' '=' constant_expression
+	{
+	  $$ = CreateOperation(CTNOT_ASSIGN_INDEX, $2, $5);
+	}
+  ;
+
+constant_field_index
+  :
+  CONSTANT_INT
+    {
+      $$ = gmCodeTreeNode::Create(CTNT_EXPRESSION, CTNET_CONSTANT, gmlineno, CTNCT_INT);
+      $$->m_data.m_iValue = atoi(gmtext);
+    }
   ;
 
 parameter_list

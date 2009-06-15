@@ -641,6 +641,12 @@ bool gmCodeGenPrivate::GenExprTable(const gmCodeTreeNode * a_node, gmByteCodeGen
 			if(!Generate(fields->m_children[1], a_byteCode)) return false;
 			a_byteCode->EmitPtr(BC_SETDOT, m_hooks->GetSymbolId(fields->m_children[0]->m_data.m_string));
 		}
+	else if(fields->m_type == CTNT_EXPRESSION && fields->m_subType == CTNET_OPERATION && fields->m_subTypeType == CTNOT_ASSIGN_INDEX)
+    {
+	  a_byteCode->EmitPtr(BC_PUSHINT, fields->m_children[0]->m_data.m_iValue);
+      if(!Generate(fields->m_children[1], a_byteCode)) return false;
+      a_byteCode->Emit(BC_SETIND);
+	}
 		else
 		{
 			a_byteCode->EmitPtr(BC_PUSHINT, index++);
