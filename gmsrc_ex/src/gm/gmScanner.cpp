@@ -826,7 +826,7 @@ YY_RULE_SETUP
 {
             int c;
 
-            while((c = yyinput()) != 0)
+            while((c = yyinput()) != 0 && c != EOF)
                 {
                 if(c == '*')
                     {
@@ -951,7 +951,7 @@ YY_RULE_SETUP
 case 24:
 YY_RULE_SETUP
 #line 69 "gmScanner.l"
-{ return(KEYWORD_FORK);		}
+{ return(KEYWORD_FORK);      }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP

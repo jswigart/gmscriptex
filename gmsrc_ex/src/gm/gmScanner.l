@@ -31,7 +31,7 @@ FL		    (f|F)
 "/*"    {
             int c;
 
-            while((c = yyinput()) != 0)
+            while((c = yyinput()) != 0 && c != EOF)
                 {
                 if(c == '*')
                     {
