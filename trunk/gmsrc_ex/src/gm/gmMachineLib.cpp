@@ -775,7 +775,7 @@ static int GM_CDECL gmTableRandom(gmThread * a_thread)
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_TABLE_PARAM(tbl, 0);
 
-	a_thread->GetMachine()->EnableGC(false);
+	DisableGCInScope gcEn(a_thread->GetMachine());
 
 	const int iCount = tbl->Count();
 	const int iRnd = rand() % iCount;
@@ -797,7 +797,6 @@ static int GM_CDECL gmTableRandom(gmThread * a_thread)
 		pNode = tbl->GetNext(tIt);
 		++i;
 	}
-	a_thread->GetMachine()->EnableGC(true);
 	return GM_OK;
 }
 
@@ -839,7 +838,7 @@ static int GM_CDECL gmTableSort(gmThread * a_thread)
 
 	const bool bByValue = !_gmstricmp(sortby,"value");
 
-	a_thread->GetMachine()->EnableGC(false);
+	DisableGCInScope gcEn(a_thread->GetMachine());
 
 	Vars vars;
 	gmTableIterator tIt;
@@ -858,7 +857,6 @@ static int GM_CDECL gmTableSort(gmThread * a_thread)
 		sorted->Set(a_thread->GetMachine(),i,vars[i]);
 	}
 	a_thread->PushTable(sorted);
-	a_thread->GetMachine()->EnableGC(false);
 	return GM_OK;
 }
 

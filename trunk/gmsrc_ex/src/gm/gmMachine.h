@@ -737,4 +737,14 @@ inline void * gmMachine::Sys_Alloc(int a_size)
 	return m_fixedSet.Alloc(a_size); 
 }
 
+class DisableGCInScope
+{
+public:
+	DisableGCInScope(gmMachine *a_machine);
+	~DisableGCInScope();
+private:
+	gmMachine	*m_machine;
+	bool		m_OldGCState;
+};
+
 #endif // _GMMACHINE_H_
