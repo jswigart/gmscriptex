@@ -1144,6 +1144,8 @@ static int GM_CDECL gmfImport(gmThread * a_thread)
 	GM_CHECK_STRING_PARAM(var, 0);
 
 	gmMachine *pM = a_thread->GetMachine();
+	DisableGCInScope gcEn(pM);
+
 	gmTableObject *ModulesTable = 0;
 	gmVariable vModulesTable = pM->Lookup(GM_MODULE_TABLE);
 	if(vModulesTable.IsNull())
