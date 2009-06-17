@@ -126,7 +126,7 @@ static int GM_CDECL gmfSqliteQuery(gmThread * a_thread)
 			//	probably not the best approach but it works
 			//	note only strings 
 
-			a_thread->GetMachine()->EnableGC(false);
+			DisableGCInScope gcEn(a_thread->GetMachine());
 			if (nColumns!=0 && nRows!=0)
 			{
 				gmTableObject *resultTbl = a_thread->PushNewTable();
@@ -141,7 +141,6 @@ static int GM_CDECL gmfSqliteQuery(gmThread * a_thread)
 					resultTbl->Set(a_thread->GetMachine(),r,gmVariable(pRowTbl));
 				}
 			}
-			a_thread->GetMachine()->EnableGC(true);
 			sqlite3_free_table(results);
 		}
 	}

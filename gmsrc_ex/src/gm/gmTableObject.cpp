@@ -281,22 +281,18 @@ void gmTableObject::Set(gmMachine * a_machine, const gmVariable &a_key, const gm
 
 void gmTableObject::Set(gmMachine * a_machine, const char * a_key, const gmVariable &a_value)
 {
-	bool enabled = a_machine->IsGCEnabled();
-	a_machine->EnableGC(false);
+	DisableGCInScope gcEn(a_machine);
 	Set(a_machine, 
 		gmVariable(a_machine->AllocStringObject(a_key)), 
 		a_value);
-	a_machine->EnableGC(enabled);
 }
 
 void gmTableObject::Set(gmMachine * a_machine, const char * a_key, const char *a_value)
 {
-	bool enabled = a_machine->IsGCEnabled();
-	a_machine->EnableGC(false);
+	DisableGCInScope gcEn(a_machine);
 	Set(a_machine,
 		gmVariable(a_machine->AllocStringObject(a_key)), 
 		gmVariable(a_machine->AllocStringObject(a_value)));
-	a_machine->EnableGC(enabled);
 }
 
 gmTableObject * gmTableObject::Duplicate(gmMachine * a_machine)

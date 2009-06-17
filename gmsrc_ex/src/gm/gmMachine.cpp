@@ -2055,6 +2055,18 @@ const char *gmMachine::ReverseLookup(const char *a_string, const gmVariable &_va
 }
 
 
+DisableGCInScope::DisableGCInScope(gmMachine *a_machine) 
+: m_machine(a_machine)
+, m_OldGCState(true)
+{
+	m_OldGCState = m_machine->IsGCEnabled();
+	m_machine->EnableGC(false);
+}
+DisableGCInScope::~DisableGCInScope()
+{
+	m_machine->EnableGC(m_OldGCState);
+}
+
 //
 //
 // Implementation of gmHooks
