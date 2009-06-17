@@ -297,6 +297,8 @@ void gmTableObject::Set(gmMachine * a_machine, const char * a_key, const char *a
 
 gmTableObject * gmTableObject::Duplicate(gmMachine * a_machine)
 {
+	DisableGCInScope gcEn(a_machine);
+
 	gmTableObject * object = a_machine->AllocTableObject();
 
 	if(m_tableSize)

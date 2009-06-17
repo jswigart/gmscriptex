@@ -78,7 +78,10 @@ namespace gmBind2
 		{
 			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT());
 			if(ClassBase<ClassT>::IsExtensible())
+			{
+				DisableGCInScope gcEn(a_thread->GetMachine());
 				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
+			}
 			a_thread->PushNewUser(bo, ClassType());
 			return GM_OK;
 		}
@@ -86,7 +89,10 @@ namespace gmBind2
 		{
 			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT(a_thread));
 			if(ClassBase<ClassT>::IsExtensible())
+			{
+				DisableGCInScope gcEn(a_thread->GetMachine());
 				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
+			}
 			a_thread->PushNewUser(bo, ClassType());
 			return GM_OK;
 		}
@@ -319,9 +325,12 @@ namespace gmBind2
 		{
 			if(a_instance && ClassBase<ClassT>::ClassType() != GM_NULL)
 			{
+				DisableGCInScope gcEn(a_machine);
+
 				BoundObject<ClassT> *bo = new BoundObject<ClassT>(a_instance);
 				if(ClassBase<ClassT>::IsExtensible())
 					bo->m_Table = a_machine->AllocTableObject();
+
 				bo->SetNative(a_native);
 				return gmGCRoot<gmUserObject>(
 					a_machine->AllocUserObject(bo, ClassBase<ClassT>::ClassType()),a_machine);
@@ -411,6 +420,8 @@ namespace gmBind2
 		{
 			if(a_instance && ClassBase<ClassT>::ClassType() != GM_NULL)
 			{
+				DisableGCInScope gcEn(a_thread->GetMachine());
+
 				BoundObject<ClassT> *bo = new BoundObject<ClassT>(a_instance);
 				if(ClassBase<ClassT>::IsExtensible())
 					bo->m_Table = a_thread->GetMachine()->AllocTableObject();

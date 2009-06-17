@@ -773,6 +773,8 @@ namespace gmBind2
 				m_Table = m_Machine->GetGlobals()->Get(m_Machine,m_TableName).GetTableObjectSafe();
 				if(!m_Table)
 				{
+					DisableGCInScope gcEn(m_Machine);
+
 					m_Table = m_Machine->AllocTableObject();
 					m_Machine->GetGlobals()->Set(m_Machine,m_TableName,gmVariable(m_Table));
 				}
