@@ -265,9 +265,8 @@ const void * gmFunctionObject::GetInstructionAtLine(int a_line) const
 {
 	if(m_debugInfo && m_debugInfo->m_lineInfo && m_byteCode)
 	{
-		// serach for the first address using this line.
-		int i;
-		for(i = 0; i < m_debugInfo->m_lineInfoCount; ++i)
+		// search for the first address using this line.
+		for(int i = 0; i < m_debugInfo->m_lineInfoCount; ++i)
 		{
 			if(m_debugInfo->m_lineInfo[i].m_lineNumber == a_line)
 			{
@@ -278,7 +277,35 @@ const void * gmFunctionObject::GetInstructionAtLine(int a_line) const
 	return NULL;
 }
 
+const char * gmFunctionObject::GetSymbol(int a_offset, const char *a_default) const
+{
+	if(m_debugInfo && m_debugInfo->m_symbols && (a_offset >= 0) && (a_offset < m_numParamsLocals))
+	{
+		return m_debugInfo->m_symbols[a_offset];
+	}
+	return a_default;
+}
 
+const char * gmFunctionObject::GetDebugName(const char *a_default) const
+{
+	if(m_debugInfo && m_debugInfo->m_debugName)
+	{
+		return m_debugInfo->m_debugName;
+	}
+	return a_default;
+}
+
+int gmFunctionObject::GetFunctionSourceLine(int a_relativeLine)
+{
+	if(m_debugInfo && m_debugInfo->m_lineInfo)
+	{
+		if(a_relativeLine < 0 || a_relativeLine >= m_debugInfo->m_lineInfoCount)
+			return -1;
+
+		return m_debugInfo->m_lineInfo[a_relativeLine].m_lineNumber;
+	}
+	return -1;
+}
 
 gmuint32 gmFunctionObject::GetSourceId() const
 {

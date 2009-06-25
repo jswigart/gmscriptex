@@ -1083,4 +1083,6 @@ inline gmUserObject * gmThread::ThisUserObject()
   else \
 { GM_EXCEPTION_MSG("expecting param %d as float or int", (PARAM)); return GM_EXCEPTION; }
 
+void gmGetLineFromString(const char * a_string, int a_line, char * a_buffer, int a_len);
+
 #endif // _GMTHREAD_H_

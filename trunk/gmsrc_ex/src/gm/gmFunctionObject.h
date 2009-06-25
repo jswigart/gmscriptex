@@ -90,7 +90,10 @@ public:
 	inline const void * GetByteCode() const { return m_byteCode; }
 
 	/// \brief GetDebugName()
-	inline const char * GetDebugName() const;
+	const char * GetDebugName(const char *a_default = "__unknown") const;
+
+	/// \brief GetFunctionSourceLine()
+	int GetFunctionSourceLine(int a_relativeLine);
 
 	/// \brief GetLine() will return the source line for the given address
 	int GetLine(int a_address) const;
@@ -103,7 +106,7 @@ public:
 	gmuint32 GetSourceId() const;
 
 	/// \brief GetSymbol() will return the symbol name at the given offset.
-	inline const char * GetSymbol(int a_offset) const;
+	const char * GetSymbol(int a_offset, const char *a_default = "__unknown") const;
 
 	// public data
 	gmCFunction			m_cFunction;
@@ -146,25 +149,7 @@ private:
 //
 //
 
-inline const char * gmFunctionObject::GetDebugName() const
-{
-	if(m_debugInfo && m_debugInfo->m_debugName)
-	{
-		return m_debugInfo->m_debugName;
-	}
-	return "__unknown";
-}
 
-
-
-inline const char * gmFunctionObject::GetSymbol(int a_offset) const
-{
-	if(m_debugInfo && m_debugInfo->m_symbols && (a_offset >= 0) && (a_offset < m_numParamsLocals))
-	{
-		return m_debugInfo->m_symbols[a_offset];
-	}
-	return "__unknown";
-}
 
 
 #endif // _GMFUNCTIONOBJECT_H_
