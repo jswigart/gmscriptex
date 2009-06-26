@@ -382,6 +382,57 @@ namespace gmBind2
 				}				
 			}
 		}
+		static bool FromTable(gmThread *a_thread, gmGCRoot<gmUserObject> a_userObj, gmTableObject *a_table)
+		{
+			if(a_userObj && a_userObj->GetType() == ClassBase<ClassT>::ClassType())
+			{
+				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
+
+				if(!bo || !bo->m_NativeObj)
+					return false;
+				
+				bool bGood = true;
+
+				gmTableIterator tIt;
+				gmTableNode *pNode = a_table->GetFirst(tIt);
+				while(pNode)
+				{
+					const char *pString = pNode->m_key.GetCStringSafe();
+					if(pString)
+					{
+						typename Class<ClassT>::PropertyMap::iterator it = m_Properties.find(pString);
+						if(it != m_Properties.end())
+						{
+							gmPropertyFunctionPair &propfuncs = it->second;
+							if(propfuncs.m_Setter)
+							{
+								// hacky, but should be fine
+								gmVariable operands[2] = { gmVariable::s_null,pNode->m_value };
+
+								propfuncs.m_Setter(
+									bo->m_NativeObj, 
+									a_thread, 
+									operands, 
+									propfuncs.m_PropertyOffset, 
+									propfuncs.m_BitfieldOffset,
+									propfuncs.m_Static);
+								return;
+							}
+						}
+						else
+						{
+							if(bo->m_Table)
+							{
+								bo->m_Table->Set(a_thread->GetMachine(),pString,pNode->m_value);
+							}
+						}
+					}
+
+					pNode = a_table->GetNext(tIt);
+				}
+			}
+			return false;
+		}
 		static bool FromParam(gmThread *a_thread, int a_param, ClassT *&a_instance)
 		{
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_thread->ParamUserCheckType(

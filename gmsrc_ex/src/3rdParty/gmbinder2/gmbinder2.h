@@ -961,4 +961,276 @@ namespace gmBind2
 
 #include "gmbinder2_class.h"
 
+//////////////////////////////////////////////////////////////////////////
+// autoexp.dat - Copy and paste the following(minus the comment block its in),
+// under the [Visualizer] section of the file
+// C:\Program Files\Microsoft Visual Studio 8\Common7\Packages\Debugger\autoexp.datautoexp.dat
+/*
+
+;------------------------------------------------------------------------------
+;  gmTableNode
+;------------------------------------------------------------------------------
+gmTableNode{    
+	preview
+		(	
+#( 
+		"(", 
+		$e.m_key, 
+		",", 
+		$e.m_value , 
+		")"
+		)
+		)
+		children
+		(
+#(
+Key		: $e.m_key, 
+Value	: $e.m_value, 
+		  )
+		  )
+}
+
+;------------------------------------------------------------------------------
+;  gmTableObject
+;------------------------------------------------------------------------------
+gmTableObject{
+	preview
+		(	
+#(
+		"table[", $c.m_slotsUsed, "]",
+		)
+		)
+		children
+		(		
+#(
+#array 
+		(
+expr: $c.m_nodes[$i],
+size: $c.m_tableSize,
+	  ) : #(
+#array (
+expr: $e,
+size: $e.m_key.m_type != 0
+	  ) : $e
+	  )
+	  )
+	  )
+}
+
+;------------------------------------------------------------------------------
+;  gmFunctionObject
+;------------------------------------------------------------------------------
+gmFunctionObject{
+	preview
+		(	
+#if( $c.m_cFunction != 0 )
+		(
+#("function(native) = ", $c.m_cFunction ) 
+		)
+#elif( $c.m_debugInfo != 0 )
+		(
+#("function(script) = ", [ $c.m_debugInfo->m_debugName,s ] ) 
+		)
+#else
+		(
+#("function = <no debug name, use gmMachine::SetDebugMode(true)>")
+		)
+		)
+		children
+		(		
+#(
+		[actual members]			: [$e,!]
+	)
+		)
+}
+
+;------------------------------------------------------------------------------
+;  gmStringObject
+;------------------------------------------------------------------------------
+gmStringObject{
+	preview
+		(	
+#("string = ", $c.m_string ) 
+		)
+		children
+		(		
+#(
+		[actual members]			: [$e,!]
+	)
+		)
+}
+
+;------------------------------------------------------------------------------
+;  gmVariable
+;------------------------------------------------------------------------------
+gmVariable{
+	preview
+		(
+#switch ($c.m_type)
+#case 0 
+		(
+#("<null>")
+		)
+#case 1
+		(
+#("int = ", $c.m_value.m_int) 
+		)
+#case 2
+		(
+#("float = ", $c.m_value.m_float) 
+		)
+#case 3
+		(
+#( "vector = (", $c.m_value.m_vec3.x ,$c.m_value.m_vec3.y ,$c.m_value.m_vec3.z, ")" )
+		)
+#case 4 
+		(
+#("entity = ", $c.m_value.m_hndl) 
+		)
+#case 5 
+		(
+#( "string = ", [ ((gmStringObject *)$c.m_value.m_ref)->m_string,s ] )
+		)
+#case 6 
+		(
+#( "table[", ((gmTableObject*)$c.m_value.m_ref)->m_slotsUsed, "]" )
+		)
+#case 7 
+		(
+#if( ((gmFunctionObject*)$c.m_value.m_ref)->m_cFunction != 0 )
+		(
+#( "function(native) = ", ((gmFunctionObject*)$c.m_value.m_ref)->m_cFunction ) 
+		)
+#elif( ((gmFunctionObject*)$c.m_value.m_ref)->m_debugInfo != 0 )
+		(
+#( "function(script) = ", [ ((gmFunctionObject*)$c.m_value.m_ref)->m_debugInfo->m_debugName,s ] ) 
+		)
+#else
+		(
+#("function = <no debug name, use gmMachine::SetDebugMode(true)>")
+		)
+		)
+#default 
+		( 
+#("user = ", $c.m_type )
+		)
+
+		)
+
+		children
+		(
+#switch ($c.m_type)
+#case 0
+		(
+#(
+		[actual members]		: [$e,!]
+	)
+		)
+#case 1
+		(
+#(
+		[actual members]		: [$e,!],
+		int						: $c.m_value.m_int
+
+		)
+		)
+#case 2
+		(
+#(
+		[actual members]		: [$e,!],
+		float					: $c.m_value.m_float
+		)
+		)
+#case 3
+		(
+#(
+		[actual members]		: [$e,!],
+vector					: $c.m_value.m_vec3
+						  )
+						  )
+#case 4
+						  (
+#(
+						  [actual members]		: [$e,!],
+entity					: $c.m_value.m_hndl
+						  )
+						  )
+#case 5
+						  (
+#(
+						  [actual members]		: [$e,!],
+						  [string]				: [((gmStringObject *)$c.m_value.m_ref)->m_string,s]
+	)
+		)
+#case 6 
+		(
+#(
+		[actual members]		: [$e,!],
+		[table]					: ((gmTableObject *)$c.m_value.m_ref)
+		)
+		)
+#case 7 
+		(
+#(
+		[actual members]		: [$e,!],
+		[function]				: ((gmFunctionObject *)$c.m_value.m_ref)
+		)
+		)
+#default 
+		(
+#(
+		[actual members]		: [$e,!],
+		[user type]				: $c.m_type
+		)
+		)
+		)
+}
+
+;------------------------------------------------------------------------------
+;  gmThread
+;------------------------------------------------------------------------------
+gmThread{
+	preview
+		(	
+#( "this = (", $c.m_stack[$c.m_base - 2], ")" )
+		)
+		children
+		(
+#(
+		[actual members]		: [$e,!], 
+#array
+		(
+expr :	($c.m_stack)[$c.m_base + $i],
+size :  $c.m_numParameters
+		)
+		)
+		)
+}
+
+;------------------------------------------------------------------------------
+;  gmMachine
+;------------------------------------------------------------------------------
+gmMachine{
+	preview
+		(
+#( "CurrentMemoryUsage = (", $c.m_currentMemoryUsage, ")" )
+		)
+		children
+		(
+#(
+		[actual members]		: [$e,!],
+		[CurrentMemoryUsage]	: [ $c.m_currentMemoryUsage ],
+		[HardMemoryLimit]		: [ $c.m_desiredByteMemoryUsageHard ],
+		[SoftMemoryLimit]		: [ $c.m_desiredByteMemoryUsageSoft ],
+		[AutoSizeMemory]		: [ $c.m_autoMem ],
+		[GC_FullCollects]		: [ $c.m_statsGCFullCollect ],
+		[GC_IncrementalCollects]: [ $c.m_statsGCIncCollect ],
+		[GC_Warnings]			: [ $c.m_statsGCWarnings ],
+		)
+		)
+}
+
+*/
+//////////////////////////////////////////////////////////////////////////
+
 #endif // _GMBINDER_H_
