@@ -495,7 +495,7 @@ namespace gmBind2
 			CHECKTYPE_ARG(1);
 			CHECKTYPE_ARG(2);
 			CHECKTYPE_ARG(3);
-			fn(arg0, arg1, arg2);
+			fn(arg0, arg1, arg2, arg3);
 			return GM_OK;
 		}
 		//////////////////////////////////////////////////////////////////////////
@@ -535,6 +535,64 @@ namespace gmBind2
 			CHECKTYPE_ARG(3);
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			ret_type ret = (obj->*fn)(arg0, arg1, arg2, arg3);
+			return PushReturnToGM(a_thread, ret);
+		}
+	};
+	template<typename Fn>
+	struct GMExportStruct<Fn, 5>
+	{
+		//////////////////////////////////////////////////////////////////////////
+		static int Call(gmThread *a_thread, Fn fn, Meta::BoolToType<true>, Meta::BoolToType<false>)
+		{
+			GM_CHECK_NUM_PARAMS(FunctionTraits<Fn>::Arity);
+			CHECKTYPE_ARG(0);
+			CHECKTYPE_ARG(1);
+			CHECKTYPE_ARG(2);
+			CHECKTYPE_ARG(3);
+			CHECKTYPE_ARG(4);
+			fn(arg0, arg1, arg2, arg3, arg4);
+			return GM_OK;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		static int Call(gmThread *a_thread, Fn fn, Meta::BoolToType<false>, Meta::BoolToType<false>)
+		{
+			GM_CHECK_NUM_PARAMS(FunctionTraits<Fn>::Arity);
+			CHECKTYPE_ARG(0);
+			CHECKTYPE_ARG(1);
+			CHECKTYPE_ARG(2);
+			CHECKTYPE_ARG(3);
+			CHECKTYPE_ARG(4);
+			typedef typename FunctionTraits<Fn>::return_type ret_type;
+			ret_type ret = fn(arg0, arg1, arg2, arg3, arg4);
+			return PushReturnToGM(a_thread, ret);
+		}
+		//////////////////////////////////////////////////////////////////////////
+		// member function, no return value
+		static int Call(gmThread *a_thread, Fn fn, Meta::BoolToType<true>, Meta::BoolToType<true>)
+		{
+			GM_CHECK_NUM_PARAMS(FunctionTraits<Fn>::Arity);
+			CHECKTHIS;
+			CHECKTYPE_ARG(0);
+			CHECKTYPE_ARG(1);
+			CHECKTYPE_ARG(2);
+			CHECKTYPE_ARG(3);
+			CHECKTYPE_ARG(4);
+			(obj->*fn)(arg0, arg1, arg2, arg3, arg4);
+			return GM_OK;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		// member function, one return value
+		static int Call(gmThread *a_thread, Fn fn, Meta::BoolToType<false>, Meta::BoolToType<true>)
+		{
+			GM_CHECK_NUM_PARAMS(FunctionTraits<Fn>::Arity);
+			CHECKTHIS;
+			CHECKTYPE_ARG(0);
+			CHECKTYPE_ARG(1);
+			CHECKTYPE_ARG(2);
+			CHECKTYPE_ARG(3);
+			CHECKTYPE_ARG(4);
+			typedef typename FunctionTraits<Fn>::return_type ret_type;
+			ret_type ret = (obj->*fn)(arg0, arg1, arg2, arg3, arg4);
 			return PushReturnToGM(a_thread, ret);
 		}
 	};
