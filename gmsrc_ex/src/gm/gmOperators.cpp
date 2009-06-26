@@ -119,7 +119,7 @@ void GM_CDECL gmIntOpDiv(gmThread * a_thread, gmVariable * a_operands)
 		// NOTE: No proper way to signal exception from here at present
 	}
 #else // GMMACHINE_GMCHECKDIVBYZERO
-	a_operands[0].m_value.m_int /= a_operands[1].m_value.m_int;
+	a_operands[0].SetFloat((float)a_operands[0].m_value.m_int / (float)a_operands[1].m_value.m_int);
 #endif // GMMACHINE_GMCHECKDIVBYZERO
 }
 void GM_CDECL gmIntOpRem(gmThread * a_thread, gmVariable * a_operands)
