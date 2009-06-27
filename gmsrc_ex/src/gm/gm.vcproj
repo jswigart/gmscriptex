@@ -42,12 +42,10 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;&quot;..\3rdParty\enet-1.2\include&quot;;..\binds;..\gm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
-				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

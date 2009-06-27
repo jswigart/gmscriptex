@@ -39,6 +39,8 @@ namespace gmBind2
 
 		typedef bool (*pfnSetDotEx)(gmThread * a_thread, ClassT *a_var, const char *a_key, gmVariable * a_operands);
 		typedef bool (*pfnGetDotEx)(gmThread * a_thread, ClassT *a_var, const char *a_key, gmVariable * a_operands);
+
+		typedef bool (*pfnPropAccess)(ClassT *a_native, gmThread *a_thread, gmVariable *a_operands);		 
 		//////////////////////////////////////////////////////////////////////////
 
 		static gmType ClassType()		{ return m_ClassType; }
@@ -219,6 +221,7 @@ namespace gmBind2
 			pr.m_Setter = GMProperty::Set<VarType>;
 			pr.m_PropertyOffset = (size_t)(*(VarType**)&cv);
 			pr.m_Static = false;
+			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
 			return *this;
 		}
@@ -230,6 +233,7 @@ namespace gmBind2
 			pr.m_Setter = GMProperty::Set<VarType>;
 			pr.m_PropertyOffset = (size_t)(_var);
 			pr.m_Static = true;
+			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
 			return *this;
 		}	
@@ -244,6 +248,18 @@ namespace gmBind2
 			//pr.m_Setter = GMProperty::Get<VarType>;
 			pr.m_PropertyOffset = (size_t)(*(VarType**)&cv);
 			pr.m_Static = false;
+			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
+			m_Properties.insert(std::make_pair(_name, pr));
+			return *this;
+		}
+		Class &var(pfnPropAccess _getter, pfnPropAccess _setter, const char *_name)
+		{
+			gmPropertyFunctionPair pr;
+			pr.m_GetterRaw = _getter;
+			pr.m_SetterRaw = _setter;
+			pr.m_PropertyOffset = 0;
+			pr.m_Static = false;
+			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
 			return *this;
 		}
@@ -259,6 +275,7 @@ namespace gmBind2
 			pr.m_PropertyOffset = (size_t)(*(int**)&cv);
 			pr.m_BitfieldOffset = _bit;
 			pr.m_Static = false;
+			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
 			return *this;
 		}
@@ -390,7 +407,7 @@ namespace gmBind2
 
 				if(!bo || !bo->m_NativeObj)
 					return false;
-				
+
 				bool bGood = true;
 
 				gmTableIterator tIt;
@@ -494,15 +511,27 @@ namespace gmBind2
 
 	private:
 		//////////////////////////////////////////////////////////////////////////
-		typedef int (*gmBindProp)(void *p, gmThread * a_thread, gmVariable * a_operands, size_t a_offset, size_t a_bit, bool a_static);
+		typedef int (*pfnBindProp)(void *p, gmThread * a_thread, gmVariable * a_operands, size_t a_offset, size_t a_bit, bool a_static);
 		struct gmPropertyFunctionPair
 		{
-			gmBindProp	m_Getter;
-			gmBindProp	m_Setter;
+			pfnBindProp		m_Getter;
+			pfnBindProp		m_Setter;
+
+			pfnPropAccess	m_GetterRaw;
+			pfnPropAccess	m_SetterRaw;
+
 			size_t		m_PropertyOffset;
 			size_t		m_BitfieldOffset;
 			bool		m_Static;
-			gmPropertyFunctionPair() : m_Getter(0), m_Setter(0), m_PropertyOffset(0), m_BitfieldOffset(0) { }
+
+			gmPropertyFunctionPair() 
+				: m_Getter(0)
+				, m_Setter(0)
+				, m_GetterRaw(0)
+				, m_SetterRaw(0)
+				, m_PropertyOffset(0)
+				, m_BitfieldOffset(0) 
+			{}
 		};
 
 		typedef std::map<std::string, gmPropertyFunctionPair> PropertyMap;
@@ -544,6 +573,14 @@ namespace gmBind2
 							propfuncs.m_Static);
 						return;
 					}
+					else if(propfuncs.m_GetterRaw)
+					{
+						propfuncs.m_GetterRaw(
+							bo->m_NativeObj, 
+							a_thread, 
+							a_operands);
+						return;
+					}
 				}
 				else
 				{
@@ -556,7 +593,7 @@ namespace gmBind2
 			}
 			a_operands[0].Nullify();
 		}
-		
+
 		static void GM_CDECL gmBind2OpSetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
@@ -593,11 +630,19 @@ namespace gmBind2
 							propfuncs.m_Static);
 						return;
 					}
-				}
-					else
+					else if(propfuncs.m_SetterRaw)
 					{
+						propfuncs.m_SetterRaw(
+							bo->m_NativeObj, 
+							a_thread, 
+							a_operands);
+						return;
+					}
+				}
+				else
+				{
 					if(bo->m_Table)
-						{
+					{
 						bo->m_Table->Set(a_thread->GetMachine(),pString,a_operands[1]);
 						return;
 					}
