@@ -25,6 +25,7 @@
 
 #include <string>
 #include <map>
+#include <list>
 
 #define GMBIND2_DOCUMENT_SUPPORT 1
 
