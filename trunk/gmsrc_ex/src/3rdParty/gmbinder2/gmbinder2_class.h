@@ -26,6 +26,8 @@
 #include <string>
 #include <map>
 
+#define GMBIND2_DOCUMENT_SUPPORT 1
+
 namespace gmBind2
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -169,7 +171,7 @@ namespace gmBind2
 	{
 	public:
 		template <typename Fn>
-		Class &func(Fn a_fn, const char *a_funcname)
+		Class &func(Fn a_fn, const char *a_funcname, const char *_comment = 0)
 		{
 			typedef typename FunctionTraits<Fn>::Class_Type cls_type;
 			GM_ASSERT(ClassBase<cls_type>::ClassType() != GM_NULL);
@@ -179,39 +181,63 @@ namespace gmBind2
 			fn.m_function = 0;
 			fn.m_functor = new GMExportFunctor<Fn>(a_fn);
 			ClassBase<ClassT>::m_Machine->RegisterTypeLibrary(ClassBase<ClassT>::ClassType(), &fn, 1);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(a_funcname,FunctionTraits<Fn>::Arity,_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
-		Class &func(RawFunctionType a_fn, const char *a_funcname)
+		Class &func(RawFunctionType a_fn, const char *a_funcname, const char *_comment = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = a_funcname;
 			fn.m_function = a_fn;
 			fn.m_functor = 0;
 			ClassBase<ClassT>::m_Machine->RegisterTypeLibrary(ClassBase<ClassT>::ClassType(), &fn, 1);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(a_funcname,-1,_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 		template <typename Fn>
-		Class &func_operator(gmOperator a_op, Fn a_fn)
+		Class &func_operator(gmOperator a_op, Fn a_fn, const char *_comment = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = 0;
 			fn.m_function = 0;
 			fn.m_functor = new GMExportOpFunctor<Fn>(a_fn);
 			ClassBase<ClassT>::m_Machine->RegisterTypeOperator(ClassBase<ClassT>::ClassType(), a_op, NULL, NULL, &fn);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(a_op,_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
-		Class &rawfunc_operator(gmOperator a_op, RawFunctionType a_fn)
+		Class &rawfunc_operator(gmOperator a_op, RawFunctionType a_fn, const char *_comment = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
 			fn.m_name = 0;
 			fn.m_function = a_fn;
 			fn.m_functor = 0;
 			ClassBase<ClassT>::m_Machine->RegisterTypeOperator(ClassBase<ClassT>::ClassType(), a_op, NULL, NULL, &fn);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(a_op,_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 
 		template<typename VarType>
-		Class &var(VarType ClassT::* _var, const char *_name)
+		Class &var(VarType ClassT::* _var, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{
 			struct CV { VarType ClassT::* var; } cv; // Cast Variable helper.
 			cv.var = _var;
@@ -223,10 +249,16 @@ namespace gmBind2
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(_name,_type ? _type : TypeName<VarType>(),_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 		template<typename VarType>
-		Class &var(VarType * _var, const char *_name)
+		Class &var(VarType * _var, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{
 			gmPropertyFunctionPair pr;
 			pr.m_Getter = GMProperty::Get<VarType>;
@@ -235,10 +267,16 @@ namespace gmBind2
 			pr.m_Static = true;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(_name,_type ? _type : TypeName<VarType>(),_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}	
 		template<typename VarType>
-		Class &var_readonly(VarType ClassT::* _var, const char *_name)
+		Class &var_readonly(VarType ClassT::* _var, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{
 			struct CV { VarType ClassT::* var; } cv; // Cast Variable helper.
 			cv.var = _var;
@@ -250,9 +288,15 @@ namespace gmBind2
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(_name,_type ? _type : TypeName<VarType>(),_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
-		Class &var(pfnPropAccess _getter, pfnPropAccess _setter, const char *_name)
+		Class &var(pfnPropAccess _getter, pfnPropAccess _setter, const char *_name, const char *_type, const char *_comment = 0)
 		{
 			gmPropertyFunctionPair pr;
 			pr.m_GetterRaw = _getter;
@@ -261,10 +305,16 @@ namespace gmBind2
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(_name,_type ? _type : "<unknown>",_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 		template<typename VarType>
-		Class &var_bitfield(VarType ClassT::* _var, int _bit, const char *_name)
+		Class &var_bitfield(VarType ClassT::* _var, int _bit, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{
 			struct CV { VarType ClassT::* var; } cv; // Cast Variable helper.
 			cv.var = _var;
@@ -277,6 +327,12 @@ namespace gmBind2
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(_name,_type ? _type : "bool",_comment));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 		Class &constructor(RawFunctionType f, const char *_name = 0, const char *_undertable = 0)
@@ -285,6 +341,12 @@ namespace gmBind2
 			fn.m_name =  _name ? _name : ClassBase<ClassT>::ClassName();
 			fn.m_function = f;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(fn.m_name,"<constructor>",0));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 		Class &constructor(const char *_name = 0, const char *_undertable = 0)
@@ -294,6 +356,12 @@ namespace gmBind2
 			fn.m_function = ClassBase<ClassT>::gmfDefaultConstructor;
 			fn.m_functor = 0;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(fn.m_name,"<constructor>",0));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 		Class &constructorArgs(const char *_name = 0, const char *_undertable = 0)
@@ -303,6 +371,12 @@ namespace gmBind2
 			fn.m_function = ClassBase<ClassT>::gmfArgConstructor;
 			fn.m_functor = 0;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(fn.m_name,"<constructor>",0));
+#endif
+			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
 		Class &asString(typename ClassBase<ClassT>::pfnAsStringCallback f)
@@ -497,6 +571,42 @@ namespace gmBind2
 				a_thread->PushNewUser(bo, ClassBase<ClassT>::ClassType());
 			}
 		}
+#if(GMBIND2_DOCUMENT_SUPPORT)
+		static void GetPropertyTable(gmMachine *a_machine, gmTableObject *a_table)
+		{
+			int Property = 0;
+			typename Class<ClassT>::DocumentationList::iterator 
+				it = m_Documentation.begin(), 
+				itEnd = m_Documentation.end();
+			for(; it != itEnd; ++it)
+			{
+				gmDoc &doc = *it;
+
+				gmTableObject *tbl = a_machine->AllocTableObject();
+				switch(doc.m_DocType)
+				{
+				case gmDoc::Prop:
+					tbl->Set(a_machine,"Name",doc.m_Name);
+					tbl->Set(a_machine,"Type",doc.m_Type?doc.m_Type:"<unknown>");
+					tbl->Set(a_machine,"Comment",doc.m_Comment?doc.m_Comment:"");
+					break;
+				case gmDoc::Func:
+					tbl->Set(a_machine,"Name",doc.m_Name);
+					tbl->Set(a_machine,"Type","function");
+					tbl->Set(a_machine,"Arguments",gmVariable(doc.m_Arguments));
+					tbl->Set(a_machine,"Comment",doc.m_Comment?doc.m_Comment:"");
+					break;
+				case gmDoc::Operator:
+					tbl->Set(a_machine,"Name",doc.m_Name);
+					tbl->Set(a_machine,"Type","function");
+					tbl->Set(a_machine,"Operator",gmGetOperatorName(doc.m_Op));
+					break;
+				}
+				
+				a_table->Set(a_machine,Property++,gmVariable(tbl));
+			}
+		}
+#endif
 		//////////////////////////////////////////////////////////////////////////
 		Class(const char *_classname, gmMachine *_machine, bool _extensible = true) : ClassBase<ClassT>(_classname, _machine,_extensible)
 		{
@@ -530,12 +640,56 @@ namespace gmBind2
 				, m_GetterRaw(0)
 				, m_SetterRaw(0)
 				, m_PropertyOffset(0)
-				, m_BitfieldOffset(0) 
+				, m_BitfieldOffset(0)
 			{}
 		};
 
 		typedef std::map<std::string, gmPropertyFunctionPair> PropertyMap;
 		static PropertyMap m_Properties;
+
+		struct gmDoc
+		{
+			enum DocType { Prop,Func,Operator };
+			const char *m_Name;
+			const char *m_Type;
+			const char *m_Comment;
+			DocType		m_DocType;
+			int			m_Arguments;
+			gmOperator	m_Op;
+
+			gmDoc(const char *_name, const char *_type, const char *_comment)
+				: m_DocType(Prop)
+				, m_Name(_name)
+				, m_Type(_type)
+				, m_Comment(_comment)
+				, m_Arguments(0)
+				, m_Op(O_MAXOPERATORS)
+			{
+			}
+			gmDoc(const char *_name, int _args, const char *_comment)
+				: m_DocType(Func)
+				, m_Name(_name)
+				, m_Type(0)
+				, m_Comment(_comment)
+				, m_Arguments(_args)
+				, m_Op(O_MAXOPERATORS)
+			{
+			}
+			gmDoc(gmOperator _op, const char *_comment)
+				: m_DocType(Operator)
+				, m_Name(0)
+				, m_Type(0)
+				, m_Comment(_comment)
+				, m_Arguments(0)
+				, m_Op(_op)
+			{
+			}
+		};
+
+#if(GMBIND2_DOCUMENT_SUPPORT)
+		typedef std::list<gmDoc> DocumentationList;
+		static DocumentationList m_Documentation;
+#endif
 
 		static void GM_CDECL gmBind2OpGetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
@@ -658,6 +812,11 @@ namespace gmBind2
 
 	template <typename ClassT>
 	typename Class<ClassT>::PropertyMap Class<ClassT>::m_Properties;
+
+#if(GMBIND2_DOCUMENT_SUPPORT)
+	template <typename ClassT>
+	typename Class<ClassT>::DocumentationList Class<ClassT>::m_Documentation;
+#endif
 
 	//////////////////////////////////////////////////////////////////////////
 };
