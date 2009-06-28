@@ -1015,6 +1015,44 @@ namespace gmBind2
 		}
 		return call;
 	}
+	//////////////////////////////////////////////////////////////////////////
+	class TableConstructor
+	{
+	public:
+		gmGCRoot<gmTableObject> Top()
+		{
+			return m_TableStack[m_StackTop];
+		}
+		gmGCRoot<gmTableObject> Root()
+		{
+			return m_TableStack[0];
+		}
+		void Push(const char *_tablename)
+		{
+			GM_ASSERT(m_StackTop <= TableStackSize);
+			m_StackTop++;
+			m_TableStack[m_StackTop].Set(m_Machine->AllocTableObject(),m_Machine);
+			m_TableStack[m_StackTop-1]->Set(m_Machine,_tablename,gmVariable(m_TableStack[m_StackTop]));
+		}
+		void Pop()
+		{
+			if(m_StackTop>0)
+				--m_StackTop;
+		}
+		TableConstructor(gmMachine *a_machine) 
+			: m_Machine(a_machine)
+			, m_StackTop(0)
+		{
+			m_TableStack[m_StackTop].Set(m_Machine->AllocTableObject(),m_Machine);
+		}
+	private:
+		gmMachine *m_Machine;
+
+		enum { TableStackSize = 64 };
+		gmGCRoot<gmTableObject> m_TableStack[TableStackSize];
+
+		int m_StackTop;
+	};
 };
 
 #include "gmbinder2_class.h"

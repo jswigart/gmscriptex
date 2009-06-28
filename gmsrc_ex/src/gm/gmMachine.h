@@ -123,8 +123,8 @@ typedef void (GM_CDECL *gmTypeIteratorCallback)(gmThread *a_thread, const gmUser
 /// \struct gmFunctionEntry
 struct gmFunctionEntry
 {
-	const char	*m_name;
-	gmCFunction	m_function;
+	const char		*m_name;
+	gmCFunction		m_function;
 	gmObjFunctor	*m_functor;                        ///< Optional user ptr or value to assist binding
 };
 
