@@ -441,6 +441,26 @@ namespace gmBind2
 				bo->m_NativeObj = NULL;
 			}
 		}
+		static ClassT*GetNativeObject(gmGCRoot<gmUserObject> a_userObj)
+		{
+			if(a_userObj)
+			{
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::ClassType());
+				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
+				return bo->m_NativeObj;
+			}
+			return NULL;
+		}
+		static ClassT*GetNativeObject(gmUserObject *a_userObj)
+		{
+			if(a_userObj)
+			{
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::ClassType());
+				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
+				return bo->m_NativeObj;
+			}
+			return NULL;
+		}
 		static BoundObject<ClassT>*GetBoundObject(gmGCRoot<gmUserObject> a_userObj)
 		{
 			if(a_userObj)
@@ -452,6 +472,16 @@ namespace gmBind2
 			return NULL;
 		}
 		static gmTableObject*GetTable(gmGCRoot<gmUserObject> a_userObj)
+		{
+			if(a_userObj)
+			{
+				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::ClassType());
+				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
+				return bo->m_Table;
+			}
+			return NULL;
+		}
+		static gmTableObject*GetTable(gmUserObject *a_userObj)
 		{
 			if(a_userObj)
 			{
