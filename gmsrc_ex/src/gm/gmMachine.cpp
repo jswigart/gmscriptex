@@ -537,11 +537,11 @@ bool gmMachine::RegisterTypeOperator(gmType a_type, gmOperator a_operator, gmFun
 	return true;
 }
 
-
-
 const char * gmMachine::GetTypeName(gmType a_type)
 {
-	return (const char *) *m_types[a_type].m_name;
+	if(a_type >= GM_NULL && a_type < (int)m_types.Count())
+		return (const char *) *m_types[a_type].m_name;
+	return "";
 }
 
 #if GM_USER_FOREACH
