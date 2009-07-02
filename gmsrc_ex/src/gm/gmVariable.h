@@ -217,9 +217,9 @@ struct gmVariable
 	/// Return c string or empty string
 	const char* GetCStringSafe(const char *_def = "") const;
 	/// Return user type ptr or null
-	gmUserObject *GetUser() const { return ((gmUserObject *)m_value.m_ref); }
 	void* GetUserSafe(int a_userType) const;
 	gmUserObject *GetUserObjectSafe(int a_userType) const;
+	gmUserObject *GetUserObjectSafe() const;
 
 	static inline gmuint Hash(const gmVariable &a_key)
 	{
@@ -285,7 +285,7 @@ struct gmVariable
 	}
 	void Get(gmMachine *a_machine, gmUserObject *&a_value)
 	{
-		a_value = GetUser();
+		a_value = GetUserObjectSafe();
 	}
 #if(GM_USE_VECTOR3_STACK)
 	void Get(gmMachine *a_machine, Vec3 &a_value)

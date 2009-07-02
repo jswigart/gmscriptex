@@ -193,6 +193,15 @@ gmUserObject *gmVariable::GetUserObjectSafe(int a_userType) const
 	return NULL;
 }
 
+gmUserObject *gmVariable::GetUserObjectSafe() const
+{
+	if( m_type >= GM_USER )
+	{
+		return ((gmUserObject *)m_value.m_ref);
+	}
+	return NULL;
+}
+
 void gmVariable::Set(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value)
 {
 	if(a_value)
