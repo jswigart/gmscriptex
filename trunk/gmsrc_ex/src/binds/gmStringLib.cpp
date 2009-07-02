@@ -1013,7 +1013,8 @@ static int GM_CDECL gmfToFloat(gmThread * a_thread)
 			}
 			else
 			{
-				GM_EXCEPTION_MSG("can't convert type %s to float",a_thread->GetMachine()->GetTypeName(a_thread->ParamType(0)));
+				GM_EXCEPTION_MSG("can't convert type %s to float",
+					a_thread->GetMachine()->GetTypeName(a_thread->ParamType(0)));
 				return GM_EXCEPTION;
 			}
 		}

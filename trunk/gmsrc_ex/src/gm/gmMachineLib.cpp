@@ -1186,8 +1186,9 @@ static int GM_CDECL gmfImport(gmThread * a_thread)
 	// TODO: search path support?
 
 	gmTableObject *NewModule = pM->AllocTableObject();
-	ModulesTable->Set(pM,slower.c_str(),gmVariable(NewModule));
-	if(gmImportExecuteFile(a_thread,slower.c_str(),gmVariable(NewModule))==GM_OK)
+	gmVariable moduleVar(NewModule);
+	ModulesTable->Set(pM,slower.c_str(),moduleVar);
+	if(gmImportExecuteFile(a_thread,slower.c_str(),moduleVar)==GM_OK)
 	{
 		a_thread->PushTable(NewModule);
 		return GM_OK;
