@@ -173,7 +173,7 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 				}
 				else if(tableCheck)
 				{
-					Good = false;
+					Good = true;
 					
 					bool Validated = false;
 
