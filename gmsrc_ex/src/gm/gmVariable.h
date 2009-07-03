@@ -183,7 +183,9 @@ struct gmVariable
 	inline int GetInt() const  { return m_value.m_int; }
 	inline bool GetInt(int &_i, int _default);
 	inline int GetInt(int _default);
+
 	inline float GetFloat() const { return m_value.m_float; }
+	inline bool GetFloat(float &_i, float _default);
 
 	/// \brief AsString will get this gm variable as a string if possible.  AsString is used for the gm "print" and system.Exec function bindings.
 	/// \param a_buffer is a buffer you must provide for the function to write into.  this buffer needs only be 256 characters long as it is stated that
@@ -366,6 +368,12 @@ inline bool gmVariable::GetInt(int &_i, int _default)
 {
 	_i = IsInt() ? GetInt() : _default; 
 	return IsInt();
+}
+
+inline bool gmVariable::GetFloat(float &_i, float _default)
+{
+	_i = IsFloat() ? IsFloat() : _default; 
+	return IsFloat();
 }
 
 inline int gmVariable::GetInt(int _default)
