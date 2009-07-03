@@ -3,6 +3,7 @@
 #include "gmThread.h"
 #include "gmMachine.h"
 #include "gmHelpers.h"
+#include "gmCall.h"
 
 gmType GM_SCHEMA = GM_NULL;
 gmType GM_SCHEMA_ELEMENT = GM_NULL;
@@ -96,8 +97,9 @@ static bool CheckIfVarsAreEqual(const gmVariable &a, const gmVariable &b)
 	return false;
 }
 
-static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVariable &a_var, SchemaErrors &a_errs, const char *a_field)
+static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVariable &a_var, SchemaErrors &a_errs, const char *a_field, gmVariable a_this)
 {
+	gmFunctionObject *CheckCallback = a_SchemaEl->Get(a_machine,"checkcallback").GetFunctionObjectSafe();
 	//////////////////////////////////////////////////////////////////////////
 	if(gmTableObject *EnumTbl = a_SchemaEl->Get(a_machine,"enum").GetTableObjectSafe())
 	{
@@ -119,7 +121,33 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			char buffervar[BufferSize] = { " " };
 			const char *VarStr = a_var.AsString(a_machine,buffervar,BufferSize);
 			a_errs.VA("'%s': no match for '%s'",a_field,VarStr);
+			return false;
 		}
+
+		if(CheckCallback)
+		{
+			gmCall call;
+			if(call.BeginFunction(a_machine,CheckCallback,a_this))
+			{
+				call.AddParam(a_var);
+				call.End();
+
+				int RetVal = 0;
+				const char *ErrorString = 0;
+				if(call.GetReturnedString(ErrorString) && ErrorString)
+				{
+					a_errs.VA(ErrorString);
+					return false;
+				}
+				if(!call.GetReturnedInt(RetVal) || RetVal==0)
+				{
+					a_errs.VA("CheckCallback '%s' failed with unknown error.",
+						CheckCallback->GetDebugName("<unknown>"));
+					return false;
+				}
+			}
+		}
+
 		return Good;
 	}
 	//////////////////////////////////////////////////////////////////////////
@@ -133,6 +161,31 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 				a_field,
 				a_machine->GetTypeName(a_var.m_type));
 		}
+
+		if(CheckCallback)
+		{
+			gmCall call;
+			if(call.BeginFunction(a_machine,CheckCallback,a_this))
+			{
+				call.AddParam(a_var);
+				call.End();
+
+				int RetVal = 0;
+				const char *ErrorString = 0;
+				if(call.GetReturnedString(ErrorString) && ErrorString)
+				{
+					a_errs.VA(ErrorString);
+					return false;
+				}
+				if(!call.GetReturnedInt(RetVal) || RetVal==0)
+				{
+					a_errs.VA("CheckCallback '%s' failed with unknown error.",
+						CheckCallback->GetDebugName("<unknown>"));
+					return false;
+				}
+			}
+		}
+
 		return a_var.GetTableObjectSafe()!=NULL;
 	}
 	//////////////////////////////////////////////////////////////////////////
@@ -207,6 +260,31 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 				
 				tableNode = valTable->GetNext(tIt);
 			}
+
+			if(CheckCallback)
+			{
+				gmCall call;
+				if(call.BeginFunction(a_machine,CheckCallback,a_this))
+				{
+					call.AddParam(a_var);
+					call.End();
+
+					int RetVal = 0;
+					const char *ErrorString = 0;
+					if(call.GetReturnedString(ErrorString) && ErrorString)
+					{
+						a_errs.VA(ErrorString);
+						return false;
+					}
+					if(!call.GetReturnedInt(RetVal) || RetVal==0)
+					{
+						a_errs.VA("CheckCallback '%s' failed with unknown error.",
+							CheckCallback->GetDebugName("<unknown>"));
+						return false;
+					}
+				}
+			}
+
 			return Good;
 		}
 		else
@@ -240,7 +318,7 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 		gmVariable varMin = a_SchemaEl->Get(a_machine,"range_min");
 		gmVariable varMax = a_SchemaEl->Get(a_machine,"range_max");
 
-		float RangeMin = -FLT_MAX, RangeMax = FLT_MAX;
+		float RangeMin = FLT_MIN, RangeMax = FLT_MAX;
 		const bool GotMin = varMin.GetFloatSafe(RangeMin);
 		const bool GotMax = varMax.GetFloatSafe(RangeMax);
 
@@ -274,21 +352,177 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 				MaxStr?MaxStr:" ");
 			return false;
 		}
+	
+		if(CheckCallback)
+		{
+			gmCall call;
+			if(call.BeginFunction(a_machine,CheckCallback,a_this))
+			{
+				call.AddParam(a_var);
+				call.End();
+
+				int RetVal = 0;
+				const char *ErrorString = 0;
+				if(call.GetReturnedString(ErrorString) && ErrorString)
+				{
+					a_errs.VA(ErrorString);
+					return false;
+				}
+				if(!call.GetReturnedInt(RetVal) || RetVal==0)
+				{
+					a_errs.VA("CheckCallback '%s' failed with unknown error.",
+						CheckCallback->GetDebugName("<unknown>"));
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 	//////////////////////////////////////////////////////////////////////////
 	if(!a_SchemaEl->Get(a_machine,"intrange").IsNull())
 	{
-		a_SchemaEl->Get(a_machine,"range_min");
-		a_SchemaEl->Get(a_machine,"range_max");
+		if(!a_var.IsInt())
+		{
+			a_errs.VA("'%s': expected int, got %s",a_field,a_machine->GetTypeName(a_var.m_type));
+			return false;
+		}
+		const int Value = a_var.GetInt();
 
+		gmVariable varMin = a_SchemaEl->Get(a_machine,"range_min");
+		gmVariable varMax = a_SchemaEl->Get(a_machine,"range_max");
+
+		int RangeMin = INT_MIN, RangeMax = INT_MAX;
+		const bool GotMin = varMin.GetInt(RangeMin,RangeMin);
+		const bool GotMax = varMax.GetInt(RangeMax,RangeMax);
+
+		enum { BufferSize=256 };
+		char buffervar[BufferSize] = { " " };
+		char buffermin[BufferSize] = { " " };
+		char buffermax[BufferSize] = { " " };
+		const char *VarStr = a_var.AsString(a_machine,buffervar,BufferSize);
+		const char *MinStr = varMin.AsString(a_machine,buffermin,BufferSize);
+		const char *MaxStr = varMax.AsString(a_machine,buffermax,BufferSize);
+
+		if(GotMin && Value < RangeMin)
+		{
+			a_errs.VA("%s%s%sint out of range %s, expected (%s..%s)",
+				a_field?"'":"",
+				a_field?a_field:"",
+				a_field?"': ":"",
+				VarStr,
+				MinStr?MinStr:" ",
+				MaxStr?MaxStr:" ");
+			return false;
+		}
+		if(GotMax && Value > RangeMax)
+		{
+			a_errs.VA("%s%s%sint out of range %s, expected (%s..%s)",
+				a_field?"'":"",
+				a_field?a_field:"",
+				a_field?"': ":"",
+				VarStr,
+				MinStr?MinStr:" ",
+				MaxStr?MaxStr:" ");
+			return false;
+		}
+
+		if(CheckCallback)
+		{
+			gmCall call;
+			if(call.BeginFunction(a_machine,CheckCallback,a_this))
+			{
+				call.AddParam(a_var);
+				call.End();
+
+				int RetVal = 0;
+				const char *ErrorString = 0;
+				if(call.GetReturnedString(ErrorString) && ErrorString)
+				{
+					a_errs.VA(ErrorString);
+					return false;
+				}
+				if(!call.GetReturnedInt(RetVal) || RetVal==0)
+				{
+					a_errs.VA("CheckCallback '%s' failed with unknown error.",
+						CheckCallback->GetDebugName("<unknown>"));
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	//////////////////////////////////////////////////////////////////////////
 	if(!a_SchemaEl->Get(a_machine,"floatrange").IsNull())
 	{
-		a_SchemaEl->Get(a_machine,"range_min");
-		a_SchemaEl->Get(a_machine,"range_max");
+		if(!a_var.IsFloat())
+		{
+			a_errs.VA("'%s': expected float, got %s",a_field,a_machine->GetTypeName(a_var.m_type));
+			return false;
+		}
+		const float Value = a_var.GetFloat();
 
+		gmVariable varMin = a_SchemaEl->Get(a_machine,"range_min");
+		gmVariable varMax = a_SchemaEl->Get(a_machine,"range_max");
+
+		float RangeMin = FLT_MIN, RangeMax = FLT_MAX;
+		const bool GotMin = varMin.GetFloat(RangeMin,RangeMin);
+		const bool GotMax = varMax.GetFloat(RangeMax,RangeMax);
+
+		enum { BufferSize=256 };
+		char buffervar[BufferSize] = { " " };
+		char buffermin[BufferSize] = { " " };
+		char buffermax[BufferSize] = { " " };
+		const char *VarStr = a_var.AsString(a_machine,buffervar,BufferSize);
+		const char *MinStr = varMin.AsString(a_machine,buffermin,BufferSize);
+		const char *MaxStr = varMax.AsString(a_machine,buffermax,BufferSize);
+
+		if(GotMin && Value < RangeMin)
+		{
+			a_errs.VA("%s%s%sfloat out of range %s, expected (%s..%s)",
+				a_field?"'":"",
+				a_field?a_field:"",
+				a_field?"': ":"",
+				VarStr,
+				MinStr?MinStr:" ",
+				MaxStr?MaxStr:" ");
+			return false;
+		}
+		if(GotMax && Value > RangeMax)
+		{
+			a_errs.VA("%s%s%sfloat out of range %s, expected (%s..%s)",
+				a_field?"'":"",
+				a_field?a_field:"",
+				a_field?"': ":"",
+				VarStr,
+				MinStr?MinStr:" ",
+				MaxStr?MaxStr:" ");
+			return false;
+		}
+
+		if(CheckCallback)
+		{
+			gmCall call;
+			if(call.BeginFunction(a_machine,CheckCallback,a_this))
+			{
+				call.AddParam(a_var);
+				call.End();
+
+				int RetVal = 0;
+				const char *ErrorString = 0;
+				if(call.GetReturnedString(ErrorString) && ErrorString)
+				{
+					a_errs.VA(ErrorString);
+					return false;
+				}
+				if(!call.GetReturnedInt(RetVal) || RetVal==0)
+				{
+					a_errs.VA("CheckCallback '%s' failed with unknown error.",
+						CheckCallback->GetDebugName("<unknown>"));
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	return false;
 }
@@ -330,7 +564,7 @@ static int GM_CDECL gmfSchemaCheck(gmThread * a_thread)
 				else
 				{
 					const char *FieldName = pNode->m_key.GetCStringSafe("<?>");
-					VerifyValue(pM,SchemaDef,checkVar,err,FieldName);
+					VerifyValue(pM,SchemaDef,checkVar,err,FieldName,gmVariable(checktable));
 				}
 			}
 			else if(checkUser)
@@ -358,7 +592,7 @@ static int GM_CDECL gmfSchemaCheck(gmThread * a_thread)
 					else
 					{
 						const char *FieldName = pNode->m_key.GetCStringSafe("<?>");
-						if(!VerifyValue(pM,SchemaDef,checkVar,err,FieldName))
+						if(!VerifyValue(pM,SchemaDef,checkVar,err,FieldName,gmVariable(checkUser)))
 						{
 							SetDefaultValue = true;
 						}
@@ -513,7 +747,7 @@ static int gmfSchemaElementDefault(gmThread *a_thread)
 	GM_ASSERT(tbl);
 
 	SchemaErrors errs(a_thread->GetMachine());
-	if(VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(0),errs,0))
+	if(VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(0),errs,0,gmVariable::s_null))
 	{
 		tbl->Set(a_thread->GetMachine(),"default",a_thread->Param(0));
 		a_thread->PushUser(a_thread->ThisUserObject());
@@ -526,32 +760,57 @@ static int gmfSchemaElementDefault(gmThread *a_thread)
 	return GM_OK;
 }
 
-static int gmfSchemaElementCheck(gmThread *a_thread)
+static int gmfSchemaCheckCallback(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_FUNCTION_PARAM(cb,0);
 	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 
-	SchemaErrors errs(a_thread->GetMachine());
-	const bool Verified = VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(0),errs,0);
-
-	a_thread->PushInt(Verified?1:0);
+	if(tbl)
+		tbl->Set(a_thread->GetMachine(),"checkcallback",gmVariable(cb));
+	a_thread->PushUser(a_thread->ThisUserObject());
 	return GM_OK;
+}
+
+static int gmfSchemaElementCheck(gmThread *a_thread)
+{
+	GM_CHECK_NUM_PARAMS(2);
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	GM_ASSERT(tbl);
+
+	if(a_thread->ParamType(0)>=GM_USER || a_thread->ParamType(0)==GM_TABLE)
+	{
+		SchemaErrors errs(a_thread->GetMachine());
+		const bool Verified = VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(1),errs,0,a_thread->Param(0));
+
+		a_thread->PushInt(Verified?1:0);
+		return GM_OK;
+	}
+	
+	GM_EXCEPTION_MSG("expected user or table type as param 0");
+	return GM_EXCEPTION;
 }
 
 static int gmfSchemaElementCheckPrintErrors(gmThread *a_thread)
 {
-	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_NUM_PARAMS(2);
 	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 
-	SchemaErrors errs(a_thread->GetMachine());
-	const bool Verified = VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(0),errs,0);
+	if(a_thread->ParamType(0)>=GM_USER || a_thread->ParamType(0)==GM_TABLE)
+	{
+		SchemaErrors errs(a_thread->GetMachine());
+		const bool Verified = VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(1),errs,0,a_thread->Param(0));
 
-	errs.PrintErrors(a_thread->GetMachine());
+		errs.PrintErrors(a_thread->GetMachine());
 
-	a_thread->PushInt(Verified?1:0);
-	return GM_OK;
+		a_thread->PushInt(Verified?1:0);
+		return GM_OK;
+	}
+
+	GM_EXCEPTION_MSG("expected user or table type as param 0");
+	return GM_EXCEPTION;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -635,6 +894,8 @@ static gmFunctionEntry s_schemaTypeLib[] =
 static gmFunctionEntry s_schemaElementTypeLib[] = 
 { 
 	{"Default", gmfSchemaElementDefault},
+	{"CheckCallback", gmfSchemaCheckCallback},
+	
 	{"Check", gmfSchemaElementCheck},
 	{"CheckPrintErrors", gmfSchemaElementCheckPrintErrors},
 };
