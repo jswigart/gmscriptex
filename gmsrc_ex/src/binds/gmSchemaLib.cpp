@@ -524,6 +524,50 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 		}
 		return true;
 	}
+	//////////////////////////////////////////////////////////////////////////
+	if(const char *VarTypeExpected = a_SchemaEl->Get(a_machine,"vartype").GetCStringSafe(0))
+	{
+		if(!_gmstricmp(VarTypeExpected,a_machine->GetTypeName(a_var.m_type)))
+		{
+
+		}
+		else
+		{
+			enum { BufferSize=256 };
+			char buffervar[BufferSize] = { " " };
+
+			a_errs.VA("'%s': expected %s, got %s",
+				a_field,
+				VarTypeExpected,
+				a_machine->GetTypeName(a_var.m_type));
+			return false;
+		}
+
+		if(CheckCallback)
+		{
+			gmCall call;
+			if(call.BeginFunction(a_machine,CheckCallback,a_this))
+			{
+				call.AddParam(a_var);
+				call.End();
+
+				int RetVal = 0;
+				const char *ErrorString = 0;
+				if(call.GetReturnedString(ErrorString) && ErrorString)
+				{
+					a_errs.VA(ErrorString);
+					return false;
+				}
+				if(!call.GetReturnedInt(RetVal) || RetVal==0)
+				{
+					a_errs.VA("CheckCallback '%s' failed with unknown error.",
+						CheckCallback->GetDebugName("<unknown>"));
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -707,6 +751,15 @@ static int gmfSchemaNumRange(gmThread *a_thread)
 	tbl->Set(a_thread->GetMachine(),"numrange",gmVariable(1));
 	tbl->Set(a_thread->GetMachine(),"range_min",gmVariable(n1));
 	tbl->Set(a_thread->GetMachine(),"range_max",gmVariable(n2));
+	a_thread->PushUser(obj);
+	return GM_OK;
+}
+
+static int gmfSchemaVarType(gmThread *a_thread)
+{
+	GM_CHECK_STRING_PARAM(vartype,0);
+	CREATE_ELEMENT();
+	tbl->Set(a_thread->GetMachine(),"vartype",a_thread->Param(0));
 	a_thread->PushUser(obj);
 	return GM_OK;
 }
@@ -910,6 +963,7 @@ static gmFunctionEntry s_createElementLib[] =
 	{"FloatRange", gmfSchemaFloatRange},
 	{"IntRange", gmfSchemaIntRange},
 	{"NumRange", gmfSchemaNumRange},
+	{"Type", gmfSchemaVarType},	
 };
 
 //////////////////////////////////////////////////////////////////////////
