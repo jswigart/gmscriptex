@@ -626,12 +626,9 @@ static int gmfSchemaNumRange(gmThread *a_thread)
 static int gmfSchemaVarType(gmThread *a_thread)
 {
 	GM_CHECK_STRING_PARAM(vartype,0); vartype;
-	GM_TABLE_PARAM(validatetable,1,0);
 	CREATE_ELEMENT();
 
 	tbl->Set(a_thread->GetMachine(),"vartype",a_thread->Param(0));
-	if(validatetable)
-		tbl->Set(a_thread->GetMachine(),"validatewith",a_thread->Param(1));
 	a_thread->PushUser(obj);
 	return GM_OK;
 }
