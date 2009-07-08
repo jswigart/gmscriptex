@@ -97,9 +97,82 @@ static bool CheckIfVarsAreEqual(const gmVariable &a, const gmVariable &b)
 	return false;
 }
 
-static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVariable &a_var, SchemaErrors &a_errs, const char *a_field, gmVariable a_this)
+static bool VerifyAgainstTable(gmMachine *a_machine, gmTableObject *a_SchemaEl, const gmVariable &a_var, SchemaErrors &a_errs, const char *a_field)
+{
+	enum { BuffSize=256 };
+	char buffer[BuffSize] = {};
+
+	gmTableObject *CheckKeyTable = a_SchemaEl->Get(a_machine,"checkkey").GetTableObjectSafe();
+	if(CheckKeyTable)
+	{
+		gmTableIterator valIt;
+		gmTableNode *pNode = CheckKeyTable->GetFirst(valIt);
+		while(pNode)
+		{
+			if(CheckIfVarsAreEqual(pNode->m_key,a_var))
+				return true;
+			pNode = CheckKeyTable->GetNext(valIt);
+		}
+
+		a_errs.VA("'%s': Failed Key validation against table, got %s",
+			a_field,
+			a_var.AsString(a_machine,buffer,BuffSize));
+
+		return false;
+	}
+	gmTableObject *CheckValTable = a_SchemaEl->Get(a_machine,"checkvalue").GetTableObjectSafe();
+	if(CheckValTable)
+	{
+		gmTableIterator valIt;
+		gmTableNode *pNode = CheckValTable->GetFirst(valIt);
+		while(pNode)
+		{
+			if(CheckIfVarsAreEqual(pNode->m_value,a_var))
+				return true;
+			pNode = CheckValTable->GetNext(valIt);
+		}
+
+		a_errs.VA("'%s': Failed Key validation against table, got %s",
+			a_field,
+			a_var.AsString(a_machine,buffer,BuffSize));
+
+		return false;
+	}
+	return true;
+}
+
+static bool VerifyCallback(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVariable &a_var, SchemaErrors &a_errs, const char *a_field, gmVariable a_this)
 {
 	gmFunctionObject *CheckCallback = a_SchemaEl->Get(a_machine,"checkcallback").GetFunctionObjectSafe();
+	if(CheckCallback)
+	{
+		gmCall call;
+		if(call.BeginFunction(a_machine,CheckCallback,a_this))
+		{
+			call.AddParam(a_var);
+			call.End();
+
+			int RetVal = 0;
+			const char *ErrorString = 0;
+			if(call.GetReturnedString(ErrorString) && ErrorString)
+			{
+				a_errs.VA(ErrorString);
+				return false;
+			}
+			if(!call.GetReturnedInt(RetVal) || RetVal==0)
+			{
+				a_errs.VA("CheckCallback '%s' failed with unknown error.",
+					CheckCallback->GetDebugName("<unknown>"));
+				return false;
+			}
+			return true;
+		}
+	}
+	return true;
+}
+
+static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVariable &a_var, SchemaErrors &a_errs, const char *a_field, gmVariable a_this)
+{
 	//////////////////////////////////////////////////////////////////////////
 	if(gmTableObject *EnumTbl = a_SchemaEl->Get(a_machine,"enum").GetTableObjectSafe())
 	{
@@ -124,74 +197,26 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			return false;
 		}
 
-		if(CheckCallback)
-		{
-			gmCall call;
-			if(call.BeginFunction(a_machine,CheckCallback,a_this))
-			{
-				call.AddParam(a_var);
-				call.End();
-
-				int RetVal = 0;
-				const char *ErrorString = 0;
-				if(call.GetReturnedString(ErrorString) && ErrorString)
-				{
-					a_errs.VA(ErrorString);
-					return false;
-				}
-				if(!call.GetReturnedInt(RetVal) || RetVal==0)
-				{
-					a_errs.VA("CheckCallback '%s' failed with unknown error.",
-						CheckCallback->GetDebugName("<unknown>"));
-					return false;
-				}
-			}
-		}
-
-		return Good;
+		return 
+			VerifyAgainstTable(a_machine,a_SchemaEl,a_var,a_errs,a_field) &&
+			VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
 	}
 	//////////////////////////////////////////////////////////////////////////
 	if(const char *tableof = a_SchemaEl->Get(a_machine,"table").GetCStringSafe(0))
 	{
-		if(a_var.GetTableObjectSafe()!=NULL)
-			return true;
-		else
+		if(!a_var.GetTableObjectSafe())
 		{
 			a_errs.VA("'%s': expected table, got %s",
 				a_field,
 				a_machine->GetTypeName(a_var.m_type));
 		}
-
-		if(CheckCallback)
-		{
-			gmCall call;
-			if(call.BeginFunction(a_machine,CheckCallback,a_this))
-			{
-				call.AddParam(a_var);
-				call.End();
-
-				int RetVal = 0;
-				const char *ErrorString = 0;
-				if(call.GetReturnedString(ErrorString) && ErrorString)
-				{
-					a_errs.VA(ErrorString);
-					return false;
-				}
-				if(!call.GetReturnedInt(RetVal) || RetVal==0)
-				{
-					a_errs.VA("CheckCallback '%s' failed with unknown error.",
-						CheckCallback->GetDebugName("<unknown>"));
-					return false;
-				}
-			}
-		}
-
-		return a_var.GetTableObjectSafe()!=NULL;
+		return 
+			VerifyAgainstTable(a_machine,a_SchemaEl,a_var,a_errs,a_field) &&
+			VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
 	}
 	//////////////////////////////////////////////////////////////////////////
-	const char *tableType = a_SchemaEl->Get(a_machine,"tableof").GetCStringSafe(0);
-	gmTableObject *tableCheck = a_SchemaEl->Get(a_machine,"validatewith").GetTableObjectSafe();
-	if(tableType || tableCheck)
+	const char *VarTypeExpected = a_SchemaEl->Get(a_machine,"tableof").GetCStringSafe(0);
+	if(VarTypeExpected)
 	{
 		gmTableObject *valTable = a_var.GetTableObjectSafe();
 		if(valTable)
@@ -202,106 +227,39 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			gmTableNode *tableNode = valTable->GetFirst(tIt);
 			while(tableNode)
 			{
-				if(tableType)
+				// verify type
+				const bool TypeMatch = !_gmstricmp(VarTypeExpected,a_machine->GetTypeName(tableNode->m_value.m_type));
+				if(!TypeMatch)
 				{
-					// verify type
-					if(!_gmstricmp(tableType,a_machine->GetTypeName(tableNode->m_value.m_type)))
-					{
-						// good!
-					}
-					else
-					{
-						Good = false;
+					Good = false;
 
-						enum { BufferSize=256 };
-						char buffervar[BufferSize] = { " " };
-						const char *KeyStr = tableNode->m_key.AsString(a_machine,buffervar,BufferSize);
+					enum { BufferSize=256 };
+					char buffervar[BufferSize] = { " " };
+					const char *KeyStr = tableNode->m_key.AsString(a_machine,buffervar,BufferSize);
 
-						a_errs.VA("'%s': expected table of %s, got %s at key %s",
-							a_field,
-							tableType,
-							a_machine->GetTypeName(tableNode->m_value.m_type),
-							KeyStr);
-					}
+					a_errs.VA("'%s': expected table of %s, got %s at key %s",
+						a_field,
+						VarTypeExpected,
+						a_machine->GetTypeName(tableNode->m_value.m_type),
+						KeyStr);
 				}
-				else if(tableCheck)
+
+				if(!VerifyAgainstTable(a_machine,a_SchemaEl,tableNode->m_value,a_errs,a_field))
 				{
-					Good = true;
-					
-					bool Validated = false;
-
-					gmTableIterator valIt;
-					gmTableNode *validateNode = tableCheck->GetFirst(valIt);
-					while(validateNode)
-					{
-						// compare key/vs values differently in certain cases?
-						if(CheckIfVarsAreEqual(validateNode->m_value,tableNode->m_key))
-						{
-							Validated = true;
-							break;
-						}
-						validateNode = tableCheck->GetNext(valIt);
-					}
-
-					if(!Validated)
-					{
-						Good = false;
-
-						enum { BufferSize=256 };
-						char buffervar[BufferSize] = { " " };
-						const char *KeyStr = tableNode->m_key.AsString(a_machine,buffervar,BufferSize);
-
-						a_errs.VA("'%s': expected table with validation, got %s at key %s",
-							a_field,
-							a_machine->GetTypeName(tableNode->m_value.m_type),
-							KeyStr);
-					}
+					Good = false;
 				}
-				
+
 				tableNode = valTable->GetNext(tIt);
 			}
 
-			if(CheckCallback)
-			{
-				gmCall call;
-				if(call.BeginFunction(a_machine,CheckCallback,a_this))
-				{
-					call.AddParam(a_var);
-					call.End();
-
-					int RetVal = 0;
-					const char *ErrorString = 0;
-					if(call.GetReturnedString(ErrorString) && ErrorString)
-					{
-						a_errs.VA(ErrorString);
-						return false;
-					}
-					if(!call.GetReturnedInt(RetVal) || RetVal==0)
-					{
-						a_errs.VA("CheckCallback '%s' failed with unknown error.",
-							CheckCallback->GetDebugName("<unknown>"));
-						return false;
-					}
-				}
-			}
-
-			return Good;
+			return Good && VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
 		}
 		else
 		{
-			if(tableType)
-			{
-				a_errs.VA("'%s': expected table of %s, got %s",
-					a_field,
-					tableType,
-					a_machine->GetTypeName(a_var.m_type));
-			}
-			else
-			{
-				a_errs.VA("'%s': expected table, got %s",
-					a_field,
-					a_machine->GetTypeName(a_var.m_type));
-			}
+			a_errs.VA("'%s': expected table of %s, got %s",
+				a_field,
+				VarTypeExpected,
+				a_machine->GetTypeName(a_var.m_type));
 		}
 		return false;
 	}	
@@ -353,30 +311,9 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			return false;
 		}
 	
-		if(CheckCallback)
-		{
-			gmCall call;
-			if(call.BeginFunction(a_machine,CheckCallback,a_this))
-			{
-				call.AddParam(a_var);
-				call.End();
-
-				int RetVal = 0;
-				const char *ErrorString = 0;
-				if(call.GetReturnedString(ErrorString) && ErrorString)
-				{
-					a_errs.VA(ErrorString);
-					return false;
-				}
-				if(!call.GetReturnedInt(RetVal) || RetVal==0)
-				{
-					a_errs.VA("CheckCallback '%s' failed with unknown error.",
-						CheckCallback->GetDebugName("<unknown>"));
-					return false;
-				}
-			}
-		}
-		return true;
+		return 
+			VerifyAgainstTable(a_machine,a_SchemaEl,a_var,a_errs,a_field) &&
+			VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
 	}
 	//////////////////////////////////////////////////////////////////////////
 	if(!a_SchemaEl->Get(a_machine,"intrange").IsNull())
@@ -426,30 +363,9 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			return false;
 		}
 
-		if(CheckCallback)
-		{
-			gmCall call;
-			if(call.BeginFunction(a_machine,CheckCallback,a_this))
-			{
-				call.AddParam(a_var);
-				call.End();
-
-				int RetVal = 0;
-				const char *ErrorString = 0;
-				if(call.GetReturnedString(ErrorString) && ErrorString)
-				{
-					a_errs.VA(ErrorString);
-					return false;
-				}
-				if(!call.GetReturnedInt(RetVal) || RetVal==0)
-				{
-					a_errs.VA("CheckCallback '%s' failed with unknown error.",
-						CheckCallback->GetDebugName("<unknown>"));
-					return false;
-				}
-			}
-		}
-		return true;
+		return 
+			VerifyAgainstTable(a_machine,a_SchemaEl,a_var,a_errs,a_field) &&
+			VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
 	}
 	//////////////////////////////////////////////////////////////////////////
 	if(!a_SchemaEl->Get(a_machine,"floatrange").IsNull())
@@ -499,43 +415,16 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			return false;
 		}
 
-		if(CheckCallback)
-		{
-			gmCall call;
-			if(call.BeginFunction(a_machine,CheckCallback,a_this))
-			{
-				call.AddParam(a_var);
-				call.End();
-
-				int RetVal = 0;
-				const char *ErrorString = 0;
-				if(call.GetReturnedString(ErrorString) && ErrorString)
-				{
-					a_errs.VA(ErrorString);
-					return false;
-				}
-				if(!call.GetReturnedInt(RetVal) || RetVal==0)
-				{
-					a_errs.VA("CheckCallback '%s' failed with unknown error.",
-						CheckCallback->GetDebugName("<unknown>"));
-					return false;
-				}
-			}
-		}
-		return true;
+		return 
+			VerifyAgainstTable(a_machine,a_SchemaEl,a_var,a_errs,a_field) &&
+			VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
 	}
 	//////////////////////////////////////////////////////////////////////////
 	if(const char *VarTypeExpected = a_SchemaEl->Get(a_machine,"vartype").GetCStringSafe(0))
 	{
-		if(!_gmstricmp(VarTypeExpected,a_machine->GetTypeName(a_var.m_type)))
+		const bool TypeMatch = !_gmstricmp(VarTypeExpected,a_machine->GetTypeName(a_var.m_type));
+		if(!TypeMatch)
 		{
-
-		}
-		else
-		{
-			enum { BufferSize=256 };
-			char buffervar[BufferSize] = { " " };
-
 			a_errs.VA("'%s': expected %s, got %s",
 				a_field,
 				VarTypeExpected,
@@ -543,30 +432,9 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			return false;
 		}
 
-		if(CheckCallback)
-		{
-			gmCall call;
-			if(call.BeginFunction(a_machine,CheckCallback,a_this))
-			{
-				call.AddParam(a_var);
-				call.End();
-
-				int RetVal = 0;
-				const char *ErrorString = 0;
-				if(call.GetReturnedString(ErrorString) && ErrorString)
-				{
-					a_errs.VA(ErrorString);
-					return false;
-				}
-				if(!call.GetReturnedInt(RetVal) || RetVal==0)
-				{
-					a_errs.VA("CheckCallback '%s' failed with unknown error.",
-						CheckCallback->GetDebugName("<unknown>"));
-					return false;
-				}
-			}
-		}
-		return true;
+		return 
+			VerifyAgainstTable(a_machine,a_SchemaEl,a_var,a_errs,a_field) &&
+			VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
 	}
 	return false;
 }
@@ -757,9 +625,13 @@ static int gmfSchemaNumRange(gmThread *a_thread)
 
 static int gmfSchemaVarType(gmThread *a_thread)
 {
-	GM_CHECK_STRING_PARAM(vartype,0);
+	GM_CHECK_STRING_PARAM(vartype,0); vartype;
+	GM_TABLE_PARAM(validatetable,1,0);
 	CREATE_ELEMENT();
+
 	tbl->Set(a_thread->GetMachine(),"vartype",a_thread->Param(0));
+	if(validatetable)
+		tbl->Set(a_thread->GetMachine(),"validatewith",a_thread->Param(1));
 	a_thread->PushUser(obj);
 	return GM_OK;
 }
@@ -776,17 +648,9 @@ static int gmfSchemaTable(gmThread *a_thread)
 static int gmfSchemaTableOf(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_STRING_PARAM(vartype,0); vartype;
 	CREATE_ELEMENT();
-
-	if(a_thread->ParamType(0)==GM_STRING)
-		tbl->Set(a_thread->GetMachine(),"tableof",a_thread->Param(0));
-	else if(a_thread->ParamType(0)==GM_TABLE)
-		tbl->Set(a_thread->GetMachine(),"validatewith",a_thread->Param(0));
-	else
-	{
-		GM_EXCEPTION_MSG("expected string or table for validation");
-		return GM_EXCEPTION;
-	}
+	tbl->Set(a_thread->GetMachine(),"tableof",a_thread->Param(0));
 	a_thread->PushUser(obj);
 	return GM_OK;
 }
@@ -810,6 +674,28 @@ static int gmfSchemaElementDefault(gmThread *a_thread)
 		errs.DumpToLog(a_thread->GetMachine()->GetLog());
 		return GM_EXCEPTION;
 	}	
+	return GM_OK;
+}
+
+static int gmfSchemaCheckValue(gmThread *a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_TABLE_PARAM(checktable,0); checktable;
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	GM_ASSERT(tbl);
+	tbl->Set(a_thread->GetMachine(),"checkvalue",a_thread->Param(0));
+	a_thread->PushUser(a_thread->ThisUserObject());
+	return GM_OK;
+}
+
+static int gmfSchemaCheckKey(gmThread *a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_TABLE_PARAM(checktable,0); checktable;
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	GM_ASSERT(tbl);
+	tbl->Set(a_thread->GetMachine(),"checkkey",a_thread->Param(0));
+	a_thread->PushUser(a_thread->ThisUserObject());
 	return GM_OK;
 }
 
@@ -948,6 +834,8 @@ static gmFunctionEntry s_schemaElementTypeLib[] =
 { 
 	{"Default", gmfSchemaElementDefault},
 	{"CheckCallback", gmfSchemaCheckCallback},
+	{"CheckValue", gmfSchemaCheckValue},
+	{"CheckKey", gmfSchemaCheckKey},
 	
 	{"Check", gmfSchemaElementCheck},
 	{"CheckPrintErrors", gmfSchemaElementCheckPrintErrors},
@@ -963,7 +851,8 @@ static gmFunctionEntry s_createElementLib[] =
 	{"FloatRange", gmfSchemaFloatRange},
 	{"IntRange", gmfSchemaIntRange},
 	{"NumRange", gmfSchemaNumRange},
-	{"Type", gmfSchemaVarType},	
+	{"Type", gmfSchemaVarType},
+	
 };
 
 //////////////////////////////////////////////////////////////////////////
