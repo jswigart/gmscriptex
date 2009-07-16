@@ -675,6 +675,17 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<>
+		static int Get<gmTableObject*>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		{
+			gmTableObject **var = a_static ? (gmTableObject**)a_offset : (gmTableObject**)((char*)p + a_offset);
+			if(*var)
+				a_operands[0].Set(a_thread->GetMachine(),*var);
+			else
+				a_operands[0].Nullify();
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		template<>
 		static int Get<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			const std::string *str = a_static ? (std::string*)a_offset : (const std::string*)((char*)p + a_offset);
@@ -702,6 +713,14 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<>
+		static int Set<gmTableObject*>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
+		{
+			gmTableObject **tbl = a_static ? (gmTableObject**)a_offset : (gmTableObject**)((char*)p + a_offset);
+			*tbl = a_operands[1].GetTableObjectSafe();
+			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		template<>
 		static int Set<std::string>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			std::string *str = a_static ? (std::string*)a_offset : (std::string *)((char*)p + a_offset);
@@ -715,6 +734,19 @@ namespace gmBind2
 			gmGCRoot<gmStringObject> *str = a_static ? (gmGCRoot<gmStringObject>*)a_offset : (gmGCRoot<gmStringObject> *)((char*)p + a_offset);
 			str->Set(a_operands[1].GetStringObjectSafe(),a_thread->GetMachine());
 			return 1;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		template<typename T>
+		static void TraceProperty(void *p, gmMachine *a_machine, gmGarbageCollector*a_gc, size_t a_offset, bool a_static) 
+		{
+		}
+		//////////////////////////////////////////////////////////////////////////
+		template<>
+		static void TraceProperty<gmTableObject*>(void *p, gmMachine *a_machine, gmGarbageCollector*a_gc, size_t a_offset, bool a_static) 
+		{
+			gmTableObject **var = a_static ? (gmTableObject**)a_offset : (gmTableObject**)((char*)p + a_offset);
+			if(*var)
+				a_gc->GetNextObject(*var);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		// Bitfield stuff.
