@@ -58,11 +58,6 @@ namespace gmBind2
 				m_ClassName = a_classname;
 				m_ClassType = a_machine->CreateUserType(a_classname);
 				m_Extensible = _extensible;
-
-				m_Machine->RegisterUserCallbacks(ClassType(), 
-					gmfTraceObject, 
-					gmfGarbageCollect, 
-					gmfAsStringCallback); 
 			}
 		}
 	protected:
@@ -90,6 +85,18 @@ namespace gmBind2
 			a_thread->PushNewUser(bo, ClassType());
 			return GM_OK;
 		}
+		static int gmfDefaultConstructorNative(gmThread *a_thread)
+		{
+			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT());
+			if(ClassBase<ClassT>::IsExtensible())
+			{
+				DisableGCInScope gcEn(a_thread->GetMachine());
+				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
+			}
+			bo->SetNative(true);
+			a_thread->PushNewUser(bo, ClassType());
+			return GM_OK;
+		}
 		static int gmfArgConstructor(gmThread *a_thread)
 		{
 			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT(a_thread));
@@ -98,6 +105,18 @@ namespace gmBind2
 				DisableGCInScope gcEn(a_thread->GetMachine());
 				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
 			}
+			a_thread->PushNewUser(bo, ClassType());
+			return GM_OK;
+		}
+		static int gmfArgConstructorNative(gmThread *a_thread)
+		{
+			BoundObject<ClassT> *bo = new BoundObject<ClassT>(new ClassT(a_thread));
+			if(ClassBase<ClassT>::IsExtensible())
+			{
+				DisableGCInScope gcEn(a_thread->GetMachine());
+				bo->m_Table = a_thread->GetMachine()->AllocTableObject();
+			}
+			bo->SetNative(true);
 			a_thread->PushNewUser(bo, ClassType());
 			return GM_OK;
 		}
@@ -112,19 +131,6 @@ namespace gmBind2
 			}
 			delete bo;
 			a_object->m_user = NULL;
-		}
-		static bool gmfTraceObject(gmMachine *a_machine, gmUserObject*a_object, gmGarbageCollector*a_gc, const int a_workLeftToGo, int& a_workDone)
-		{
-			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_object->m_user);
-			if(bo && bo->m_Table)
-				a_gc->GetNextObject(bo->m_Table);
-			if(bo && bo->m_NativeObj)
-			{
-				if(ClassBase<ClassT>::m_TraceCallback)
-					ClassBase<ClassT>::m_TraceCallback(bo->m_NativeObj, a_machine, a_gc, a_workLeftToGo, a_workDone);
-			}
-			a_workDone += 2;
-			return true;
 		}
 		static void gmfAsStringCallback(gmUserObject * a_object, char * a_buffer, int a_bufferSize)
 		{
@@ -247,6 +253,7 @@ namespace gmBind2
 			pr.m_Getter = GMProperty::Get<VarType>;
 			pr.m_Setter = GMProperty::Set<VarType>;
 			pr.m_PropertyOffset = (size_t)(*(VarType**)&cv);
+			pr.m_TraceObject = GMProperty::TraceProperty<VarType>;
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
@@ -265,6 +272,7 @@ namespace gmBind2
 			pr.m_Getter = GMProperty::Get<VarType>;
 			pr.m_Setter = GMProperty::Set<VarType>;
 			pr.m_PropertyOffset = (size_t)(_var);
+			pr.m_TraceObject = GMProperty::TraceProperty<VarType>;
 			pr.m_Static = true;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
@@ -286,6 +294,7 @@ namespace gmBind2
 			pr.m_Getter = GMProperty::Get<VarType>;
 			//pr.m_Setter = GMProperty::Get<VarType>;
 			pr.m_PropertyOffset = (size_t)(*(VarType**)&cv);
+			pr.m_TraceObject = GMProperty::TraceProperty<VarType>;
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
 			m_Properties.insert(std::make_pair(_name, pr));
@@ -365,11 +374,41 @@ namespace gmBind2
 			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
+		Class &constructorNativeOwned(const char *_name = 0, const char *_undertable = 0)
+		{
+			gmFunctionEntry fn = {0,0,0};
+			fn.m_name =  _name ? _name : ClassBase<ClassT>::ClassName();
+			fn.m_function = ClassBase<ClassT>::gmfDefaultConstructorNative;
+			fn.m_functor = 0;
+			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(fn.m_name,"<constructor>",0));
+#endif
+			//////////////////////////////////////////////////////////////////////////
+			return *this;
+		}
 		Class &constructorArgs(const char *_name = 0, const char *_undertable = 0)
 		{
 			gmFunctionEntry fn = {0,0,0};
 			fn.m_name =  _name ? _name : ClassBase<ClassT>::ClassName();
 			fn.m_function = ClassBase<ClassT>::gmfArgConstructor;
+			fn.m_functor = 0;
+			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
+
+			//////////////////////////////////////////////////////////////////////////
+#if(GMBIND2_DOCUMENT_SUPPORT)
+			m_Documentation.push_back(gmDoc(fn.m_name,"<constructor>",0));
+#endif
+			//////////////////////////////////////////////////////////////////////////
+			return *this;
+		}
+		Class &constructorArgsNativeOwned(const char *_name = 0, const char *_undertable = 0)
+		{
+			gmFunctionEntry fn = {0,0,0};
+			fn.m_name =  _name ? _name : ClassBase<ClassT>::ClassName();
+			fn.m_function = ClassBase<ClassT>::gmfArgConstructorNative;
 			fn.m_functor = 0;
 			ClassBase<ClassT>::m_Machine->RegisterLibrary(&fn, 1, _undertable, false);
 
@@ -643,6 +682,11 @@ namespace gmBind2
 		{
 			GM_ASSERT(m_ClassType!=GM_NULL);
 
+			m_Machine->RegisterUserCallbacks(ClassType(), 
+				gmfTraceObject, 
+				gmfGarbageCollect, 
+				gmfAsStringCallback); 
+
 			_machine->RegisterTypeOperator( ClassBase<ClassT>::ClassType(), O_GETDOT, NULL, gmBind2OpGetDot);
 			_machine->RegisterTypeOperator( ClassBase<ClassT>::ClassType(), O_SETDOT, NULL, gmBind2OpSetDot);
 #if GM_BOOL_OP
@@ -653,6 +697,8 @@ namespace gmBind2
 	private:
 		//////////////////////////////////////////////////////////////////////////
 		typedef int (*pfnBindProp)(void *p, gmThread * a_thread, gmVariable * a_operands, size_t a_offset, size_t a_bit, bool a_static);
+
+		typedef void (*pfnTraceProp)(void *p, gmMachine *a_machine, gmGarbageCollector*a_gc, size_t a_offset, bool a_static);
 		struct gmPropertyFunctionPair
 		{
 			pfnBindProp		m_Getter;
@@ -660,6 +706,8 @@ namespace gmBind2
 
 			pfnPropAccess	m_GetterRaw;
 			pfnPropAccess	m_SetterRaw;
+
+			pfnTraceProp	m_TraceObject;
 
 			size_t		m_PropertyOffset;
 			size_t		m_BitfieldOffset;
@@ -670,6 +718,7 @@ namespace gmBind2
 				, m_Setter(0)
 				, m_GetterRaw(0)
 				, m_SetterRaw(0)
+				, m_TraceObject(0)
 				, m_PropertyOffset(0)
 				, m_BitfieldOffset(0)
 			{}
@@ -713,6 +762,15 @@ namespace gmBind2
 				, m_Comment(_comment)
 				, m_Arguments(0)
 				, m_Op(_op)
+			{
+			}
+			gmDoc()
+				: m_DocType(Prop)
+				, m_Name(0)
+				, m_Type(0)
+				, m_Comment(0)
+				, m_Arguments(0)
+				, m_Op(O_MAXOPERATORS)
 			{
 			}
 		};
@@ -839,11 +897,46 @@ namespace gmBind2
 		{
 			a_operands[0].SetInt(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()) ? 1 : 0);
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		static bool gmfTraceObject(gmMachine *a_machine, gmUserObject*a_object, gmGarbageCollector*a_gc, const int a_workLeftToGo, int& a_workDone)
+		{
+			GM_ASSERT(a_object->m_userType == ClassBase<ClassT>::ClassType());
+
+			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_object->m_user);
+			if(bo && bo->m_Table)
+				a_gc->GetNextObject(bo->m_Table);
+
+			// attempt to trace all properties.
+			typename PropertyMap::iterator it = m_Properties.begin(),
+				itEnd = m_Properties.end();
+			for(; it != itEnd; ++it)
+			{
+				gmPropertyFunctionPair &propfuncs = (*it).second;
+				if(propfuncs.m_TraceObject)
+				{
+					propfuncs.m_TraceObject(
+						bo->m_NativeObj,
+						a_machine,
+						a_gc,
+						propfuncs.m_PropertyOffset,
+						propfuncs.m_Static);
+				}
+			}
+
+			if(bo && bo->m_NativeObj)
+			{
+				if(ClassBase<ClassT>::m_TraceCallback)
+					ClassBase<ClassT>::m_TraceCallback(bo->m_NativeObj, a_machine, a_gc, a_workLeftToGo, a_workDone);
+			}
+			a_workDone += 2;
+			return true;
+		}
 	};
 
 	template <typename ClassT>
 	typename Class<ClassT>::PropertyMap Class<ClassT>::m_Properties;
-
+	
 #if(GMBIND2_DOCUMENT_SUPPORT)
 	template <typename ClassT>
 	typename Class<ClassT>::DocumentationList Class<ClassT>::m_Documentation;
