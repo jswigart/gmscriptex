@@ -1086,6 +1086,31 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 					++param;
 					break;
 				}
+			case 'n' :
+			case 'N' :
+				{
+					//GM_FLOAT_PARAM(fval, param, 0);
+					if(a_thread->Param(param).IsFloat())
+					{
+						sprintf(buffer, "%g", a_thread->Param(param).GetFloat());
+						gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+						++param;
+					}
+					else if(a_thread->Param(param).IsInt())
+					{
+						sprintf(buffer, "%d", a_thread->Param(param).GetInt());
+						gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+						++param;
+					}
+					else
+					{
+						if(str)
+							a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected float as param %d",param);
+						return GM_EXCEPTION;
+					}					
+					break;
+				}
 			case '%' :
 				{
 					if(len + 2 < size)
