@@ -446,6 +446,12 @@ namespace gmBind2
 		{
 			GM_ASSERT(ClassBase<BaseClassT>::ClassType()!=GM_NULL);
 
+			// try a cast to allow the compiler to complain if BaseClassT
+			// isn't a real base of ClassT
+			ClassT *ClassPtr = 0;
+			BaseClassT *BaseClassPtr = static_cast<BaseClassT*>(ClassPtr);
+			BaseClassPtr;
+
 			ClassBase<ClassT>::m_Machine->SetBaseForType(
 				ClassBase<ClassT>::ClassType(), 
 				ClassBase<BaseClassT>::ClassType());
