@@ -72,7 +72,7 @@ gmOperator gmGetOperator(const char * a_operatorName); // return O_MAXOPERATORS 
 // collector can mark all objects properly.
 // Be careful using this style of operator and GC.
 //
-typedef void (GM_CDECL *gmOperatorFunction)(gmThread * a_thread, gmVariable * a_operands);
+typedef int (GM_CDECL *gmOperatorFunction)(gmThread * a_thread, gmVariable * a_operands);
 
 void gmInitBasicType(gmType a_type, gmOperatorFunction * a_operators);
 

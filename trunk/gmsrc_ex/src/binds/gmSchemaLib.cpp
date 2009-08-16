@@ -891,28 +891,30 @@ static bool gmfTraceSchemaElement(gmMachine *a_machine, gmUserObject*a_object, g
 
 //////////////////////////////////////////////////////////////////////////
 
-static void GM_CDECL gmSchemaGetDot(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmSchemaGetDot(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmTableObject *Tbl = static_cast<gmTableObject*>(a_operands[0].GetUserSafe(gmSchema::GM_SCHEMA));
 	GM_ASSERT(Tbl);
 	if(Tbl)
 	{
 		a_operands[0] = Tbl->Get(a_operands[1]);
-		return;
+		return GM_OK;
 	}
 	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
 
-static void GM_CDECL gmSchemaSetDot(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmSchemaSetDot(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmTableObject *Tbl = static_cast<gmTableObject*>(a_operands[0].GetUserSafe(gmSchema::GM_SCHEMA));
 	GM_ASSERT(Tbl);
 	if(Tbl)
 	{
 		Tbl->Set(a_thread->GetMachine(),a_operands[2],a_operands[1]);
-		return;
+		return GM_OK;
 	}
 	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
 
 //////////////////////////////////////////////////////////////////////////

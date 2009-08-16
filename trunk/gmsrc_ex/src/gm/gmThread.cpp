@@ -241,7 +241,16 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				gmOperatorFunction op = OPERATOR(operand->m_type, (gmOperator) instruction32[-1]); 
 				if(op) 
 				{ 
-					op(this, operand); 
+					register gmType t0 = operand[0].m_type;
+
+					const int res = op(this, operand); 
+					if(res==GM_EXCEPTION)
+					{
+						GMTHREAD_LOG("unary operator %s for type %s error", 
+							gmGetOperatorName((gmOperator) instruction32[-1]), 
+							m_machine->GetTypeName(t0)); 
+						goto LabelException;
+					}
 				} 
 				else if((fn = CALLOPERATOR(operand->m_type, (gmOperator) instruction32[-1]))) 
 				{ 
@@ -260,7 +269,9 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				} 
 				else 
 				{ 
-					GMTHREAD_LOG("unary operator %s undefined for type %s", gmGetOperatorName((gmOperator) instruction32[-1]), m_machine->GetTypeName(operand->m_type)); 
+					GMTHREAD_LOG("unary operator %s undefined for type %s", 
+						gmGetOperatorName((gmOperator) instruction32[-1]), 
+						m_machine->GetTypeName(operand->m_type)); 
 					goto LabelException; 
 				} 
 				break;
@@ -289,13 +300,23 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 			{
 				operand = top - 2; 
 				--top; 
+
+				register gmType t0 = operand[0].m_type;
 				register gmType t1 = operand[1].m_type;
 
 				if(operand->m_type > t1) t1 = operand->m_type; 
 				gmOperatorFunction op = OPERATOR(t1, (gmOperator) instruction32[-1]); 
 				if(op) 
 				{ 
-					op(this, operand); 
+					const int res = op(this, operand); 
+					if(res==GM_EXCEPTION)
+					{
+						GMTHREAD_LOG("operator %s bad operand %s for %s", 
+							gmGetOperatorName((gmOperator) instruction32[-1]), 
+							m_machine->GetTypeName(t1),
+							m_machine->GetTypeName(t0));
+						goto LabelException; 
+					}
 				} 
 				else if((fn = CALLOPERATOR(t1, (gmOperator) instruction32[-1]))) 
 				{ 
@@ -326,10 +347,21 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				operand = top - 2; 
 				--top; 
 
+				register gmType t0 = operand[0].m_type;
+				register gmType t1 = operand[1].m_type;
+
 				gmOperatorFunction op = OPERATOR(operand->m_type, (gmOperator) instruction32[-1]); 
 				if(op) 
 				{ 
-					op(this, operand); 
+					const int res = op(this, operand); 
+					if(res==GM_EXCEPTION)
+					{
+						GMTHREAD_LOG("operator %s bad operand %s for %s", 
+							gmGetOperatorName((gmOperator) instruction32[-1]), 
+							m_machine->GetTypeName(t1),
+							m_machine->GetTypeName(t0));
+						goto LabelException; 
+					}
 				} 
 				else if((fn = CALLOPERATOR(operand->m_type, (gmOperator) instruction32[-1]))) 
 				{ 
@@ -362,7 +394,18 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				gmOperatorFunction op = OPERATOR(operand->m_type, O_SETIND); 
 				if(op) 
 				{ 
-					op(this, operand); 
+					register gmType t0 = operand[0].m_type;
+					register gmType t1 = operand[1].m_type;
+
+					const int res = op(this, operand); 
+					if(res==GM_EXCEPTION)
+					{
+						GMTHREAD_LOG("operator %s bad operand %s for %s", 
+							gmGetOperatorName((gmOperator) instruction32[-1]), 
+							m_machine->GetTypeName(t1),
+							m_machine->GetTypeName(t0));
+						goto LabelException; 
+					}
 				} 
 				else if((fn = CALLOPERATOR(operand->m_type, O_SETIND))) 
 				{ 
@@ -418,7 +461,15 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				gmOperatorFunction op = OPERATOR(t1, O_GETDOT);
 				if(op)
 				{
-					op(this, operand);
+					const int res = op(this, operand); 
+					if(res==GM_EXCEPTION)
+					{
+						GMTHREAD_LOG("getdot failed on '%s.%s'", 
+							m_machine->GetTypeName(t1),
+							top->GetCStringSafe(""));
+						goto LabelException; 
+					}
+
 					if(operand->m_type) break;
 				}
 				if(t1 == GM_NULL)
@@ -436,10 +487,18 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				top->m_type = GM_STRING;
 				top->m_value.m_ref = member;
 				top -= 2;
-				gmOperatorFunction op = OPERATOR(operand->m_type, O_SETDOT);
+				gmType t1 = operand->m_type;
+				gmOperatorFunction op = OPERATOR(t1, O_SETDOT);
 				if(op)
 				{
-					op(this, operand);
+					const int res = op(this, operand); 
+					if(res==GM_EXCEPTION)
+					{
+						GMTHREAD_LOG("setdot failed on '%s.%s'", 
+							m_machine->GetTypeName(t1),
+							top->GetCStringSafe(""));
+						goto LabelException; 
+					}
 				}
 				else
 				{
@@ -465,7 +524,12 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 
 					if (op)
 					{
-						op(this, operand);
+						const int res = op(this, operand); 
+						if(res==GM_EXCEPTION)
+						{
+							GMTHREAD_LOG("operator %s failed");
+							goto LabelException; 
+						}
 					}
 					else if ((fn = CALLOPERATOR(operand->m_type, O_BOOL)))
 					{
@@ -513,7 +577,12 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 
 					if (op)
 					{
-						op(this, operand);
+						const int res = op(this, operand); 
+						if(res==GM_EXCEPTION)
+						{
+							GMTHREAD_LOG("operator %s failed");
+							goto LabelException; 
+						}
 					}
 					else if ((fn = CALLOPERATOR(operand->m_type, O_BOOL)))
 					{
@@ -560,7 +629,12 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 
 					if (op)
 					{
-						op(this, operand);
+						const int res = op(this, operand); 
+						if(res==GM_EXCEPTION)
+						{
+							GMTHREAD_LOG("operator %s failed");
+							goto LabelException; 
+						}
 					}
 					else if ((fn = CALLOPERATOR(operand->m_type, O_BOOL)))
 					{
@@ -606,7 +680,12 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 
 					if (op)
 					{
-						op(this, operand);
+						const int res = op(this, operand); 
+						if(res==GM_EXCEPTION)
+						{
+							GMTHREAD_LOG("operator %s failed");
+							goto LabelException; 
+						}
 					}
 					else if ((fn = CALLOPERATOR(operand->m_type, O_BOOL)))
 					{
