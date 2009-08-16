@@ -459,17 +459,11 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				top->m_value.m_ref = member;
 				gmType t1 = operand->m_type;
 				gmOperatorFunction op = OPERATOR(t1, O_GETDOT);
+
+				int res = GM_OK;
 				if(op)
 				{
-					const int res = op(this, operand); 
-					if(res==GM_EXCEPTION)
-					{
-						GMTHREAD_LOG("getdot failed on '%s.%s'", 
-							m_machine->GetTypeName(t1),
-							top->GetCStringSafe(""));
-						goto LabelException; 
-					}
-
+					res = op(this, operand); 
 					if(operand->m_type) break;
 				}
 				if(t1 == GM_NULL)
@@ -478,6 +472,14 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 					goto LabelException;
 				}
 				*operand = m_machine->GetTypeVariable(t1, gmVariable(GM_STRING, member));
+
+				if(operand->IsNull() && res==GM_EXCEPTION)
+				{
+					GMTHREAD_LOG("getdot failed on '%s.%s'", 
+						m_machine->GetTypeName(t1),
+						top->GetCStringSafe(""));
+					goto LabelException; 
+				}
 				break;
 			}
 		case BC_SETDOT :
