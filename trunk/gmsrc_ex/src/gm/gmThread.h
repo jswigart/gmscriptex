@@ -1043,6 +1043,12 @@ inline gmUserObject * gmThread::ThisUserObject()
 	} \
 	OBJECT VAR = (OBJECT) GM_THREAD_ARG->ParamUser_NoCheckTypeOrParam((PARAM));
 
+#define GM_CHECK_USER_PARAM_TYPE(TYPE, PARAM) \
+	if(GM_THREAD_ARG->ParamType((PARAM)) != (TYPE)) \
+	{ GM_EXCEPTION_MSG("expecting param %d as user type %d, got %s", (PARAM), (TYPE), GM_THREAD_ARG->ParamTypeName(PARAM)); \
+	return GM_EXCEPTION; \
+	}
+
 #if(GM_USE_VECTOR3_STACK)
 #define GM_CHECK_VECTOR_PARAM(VAR, PARAM) \
 	if(GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC3) \

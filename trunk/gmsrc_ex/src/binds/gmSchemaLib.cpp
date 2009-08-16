@@ -5,8 +5,11 @@
 #include "gmHelpers.h"
 #include "gmCall.h"
 
-gmType GM_SCHEMA = GM_NULL;
-gmType GM_SCHEMA_ELEMENT = GM_NULL;
+namespace gmSchema
+{
+	gmType GM_SCHEMA = GM_NULL;
+	gmType GM_SCHEMA_ELEMENT = GM_NULL;
+};
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -171,6 +174,8 @@ static bool VerifyCallback(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVa
 	return true;
 }
 
+//static bool 
+
 static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVariable &a_var, SchemaErrors &a_errs, const char *a_field, gmVariable a_this)
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -310,7 +315,7 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 				MaxStr?MaxStr:" ");
 			return false;
 		}
-	
+
 		return 
 			VerifyAgainstTable(a_machine,a_SchemaEl,a_var,a_errs,a_field) &&
 			VerifyCallback(a_machine,a_SchemaEl,a_var,a_errs,a_field,a_this);
@@ -441,6 +446,30 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 
 //////////////////////////////////////////////////////////////////////////
 
+gmVariable GetObjectValue(gmMachine *a_machine, gmVariable &a_obj, gmVariable &a_key)
+{
+	//gmTableObject *checktable = a_obj.GetTableObjectSafe();
+	//gmUserObject *checkUser = a_obj.GetUserObjectSafe();
+
+	//if(checktable)
+	//{
+	//	return checktable->Get(a_key);
+	//}
+	//else if(checkUser)
+	//{
+	//	gmOperatorFunction getdot = a_machine->GetTypeNativeOperator(checkUser->GetType(),O_GETDOT);
+	//	if(getdot)
+	//	{
+	//		bool SetDefaultValue = false;
+
+	//		// A bit hacky, but the only reliable way to support schema validation on user objects.
+	//		gmVariable vars[3] = { gmVariable(checkUser), pNode->m_key, gmVariable::s_null };
+	//		getdot(a_thread,vars);
+	//		return vars[0];
+	//}
+	return gmVariable::s_null;
+}
+
 static int GM_CDECL gmfSchemaCheck(gmThread * a_thread)
 {
 	GM_TABLE_PARAM(errortable,1,0);
@@ -453,13 +482,13 @@ static int GM_CDECL gmfSchemaCheck(gmThread * a_thread)
 	if(checktable || checkUser)
 	{
 		gmMachine *pM = a_thread->GetMachine();
-		gmTableObject *SchemaTable = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA));
+		gmTableObject *SchemaTable = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA));
 
 		gmTableIterator tIt;
 		gmTableNode *pNode = SchemaTable->GetFirst(tIt);
 		while(pNode)
 		{
-			gmTableObject *SchemaDef = static_cast<gmTableObject*>(pNode->m_value.GetUserSafe(GM_SCHEMA_ELEMENT));
+			gmTableObject *SchemaDef = static_cast<gmTableObject*>(pNode->m_value.GetUserSafe(gmSchema::GM_SCHEMA_ELEMENT));
 			gmVariable SchemaDefault = SchemaDef->Get(pM,"default");
 			GM_ASSERT(SchemaDef);
 
@@ -558,9 +587,30 @@ static int GM_CDECL gmfSchemaCheck(gmThread * a_thread)
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+//static int GM_CDECL gmfSchemaCreateGui(gmThread * a_thread) 
+//{
+//	gmMachine *pM = a_thread->GetMachine();
+//	gmTableObject *SchemaTable = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA));
+//
+//	gmTableIterator tIt;
+//	gmTableNode *pNode = SchemaTable->GetFirst(tIt);
+//	while(pNode)
+//	{
+//		gmTableObject *SchemaField = static_cast<gmTableObject*>(pNode->m_value.GetUserSafe(GM_SCHEMA_ELEMENT));
+//		GM_ASSERT(SchemaField);
+//		
+//
+//
+//		pNode = SchemaTable->GetNext(tIt);
+//	}
+//	return GM_OK;
+//}
+
+//////////////////////////////////////////////////////////////////////////
 #define CREATE_ELEMENT() \
 	gmTableObject *tbl = a_thread->GetMachine()->AllocTableObject(); \
-	gmUserObject *obj = a_thread->GetMachine()->AllocUserObject(tbl,GM_SCHEMA_ELEMENT);
+	gmUserObject *obj = a_thread->GetMachine()->AllocUserObject(tbl,gmSchema::GM_SCHEMA_ELEMENT);
 
 static int gmfSchemaEnum(gmThread *a_thread)
 {
@@ -637,7 +687,8 @@ static int gmfSchemaTable(gmThread *a_thread)
 {
 	CREATE_ELEMENT();
 
-	tbl->Set(a_thread->GetMachine(),"table",gmVariable(1));
+	//tbl->Set(a_thread->GetMachine(),"table",gmVariable(1));
+	tbl->Set(a_thread->GetMachine(),"vartype",gmVariable(a_thread->GetMachine()->AllocStringObject("table")));
 	a_thread->PushUser(obj);
 	return GM_OK;
 }
@@ -657,7 +708,7 @@ static int gmfSchemaTableOf(gmThread *a_thread)
 static int gmfSchemaElementDefault(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
-	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 
 	SchemaErrors errs(a_thread->GetMachine());
@@ -674,11 +725,52 @@ static int gmfSchemaElementDefault(gmThread *a_thread)
 	return GM_OK;
 }
 
+static int gmfSchemaReadOnly(gmThread *a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
+	GM_ASSERT(tbl);
+
+	SchemaErrors errs(a_thread->GetMachine());
+	if(VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(0),errs,0,gmVariable::s_null))
+	{
+		tbl->Set(a_thread->GetMachine(),"readonly",gmVariable(1));
+		a_thread->PushUser(a_thread->ThisUserObject());
+	}
+	else
+	{
+		errs.DumpToLog(a_thread->GetMachine()->GetLog());
+		return GM_EXCEPTION;
+	}	
+	return GM_OK;
+}
+
+
+//static int gmfSchemaElementEditType(gmThread *a_thread)
+//{
+//	GM_CHECK_NUM_PARAMS(1);
+//	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
+//	GM_ASSERT(tbl);
+//
+//	SchemaErrors errs(a_thread->GetMachine());
+//	if(VerifyValue(a_thread->GetMachine(),tbl,a_thread->Param(0),errs,0,gmVariable::s_null))
+//	{
+//		tbl->Set(a_thread->GetMachine(),"edittype",a_thread->Param(0));
+//		a_thread->PushUser(a_thread->ThisUserObject());
+//	}
+//	else
+//	{
+//		errs.DumpToLog(a_thread->GetMachine()->GetLog());
+//		return GM_EXCEPTION;
+//	}	
+//	return GM_OK;
+//}
+
 static int gmfSchemaCheckValue(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_TABLE_PARAM(checktable,0); checktable;
-	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 	tbl->Set(a_thread->GetMachine(),"checkvalue",a_thread->Param(0));
 	a_thread->PushUser(a_thread->ThisUserObject());
@@ -689,10 +781,22 @@ static int gmfSchemaCheckKey(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_TABLE_PARAM(checktable,0); checktable;
-	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 	tbl->Set(a_thread->GetMachine(),"checkkey",a_thread->Param(0));
 	a_thread->PushUser(a_thread->ThisUserObject());
+	return GM_OK;
+}
+
+static int gmfSchemaGetEnumOptions(gmThread *a_thread)
+{
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
+	GM_ASSERT(tbl);
+	gmTableObject *options = tbl->Get(a_thread->GetMachine(),"enum").GetTableObjectSafe();
+	if(options)
+		a_thread->PushTable(options);
+	else
+		a_thread->PushNull();
 	return GM_OK;
 }
 
@@ -700,7 +804,7 @@ static int gmfSchemaCheckCallback(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_FUNCTION_PARAM(cb,0);
-	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 
 	if(tbl)
@@ -712,7 +816,7 @@ static int gmfSchemaCheckCallback(gmThread *a_thread)
 static int gmfSchemaElementCheck(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(2);
-	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 
 	if(a_thread->ParamType(0)>=GM_USER || a_thread->ParamType(0)==GM_TABLE)
@@ -723,7 +827,7 @@ static int gmfSchemaElementCheck(gmThread *a_thread)
 		a_thread->PushInt(Verified?1:0);
 		return GM_OK;
 	}
-	
+
 	GM_EXCEPTION_MSG("expected user or table type as param 0");
 	return GM_EXCEPTION;
 }
@@ -731,7 +835,7 @@ static int gmfSchemaElementCheck(gmThread *a_thread)
 static int gmfSchemaElementCheckPrintErrors(gmThread *a_thread)
 {
 	GM_CHECK_NUM_PARAMS(2);
-	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(GM_SCHEMA_ELEMENT));
+	gmTableObject *tbl = static_cast<gmTableObject*>(a_thread->ThisUserCheckType(gmSchema::GM_SCHEMA_ELEMENT));
 	GM_ASSERT(tbl);
 
 	if(a_thread->ParamType(0)>=GM_USER || a_thread->ParamType(0)==GM_TABLE)
@@ -754,7 +858,7 @@ static int gmfSchemaElementCheckPrintErrors(gmThread *a_thread)
 int gmfCreateSchema(gmThread *a_thread)
 {
 	gmTableObject *SchemaTbl = a_thread->GetMachine()->AllocTableObject();
-	a_thread->PushNewUser(SchemaTbl,GM_SCHEMA);
+	a_thread->PushNewUser(SchemaTbl,gmSchema::GM_SCHEMA);
 	return GM_OK;
 }
 
@@ -763,7 +867,7 @@ int gmfCreateSchema(gmThread *a_thread)
 
 static bool gmfTraceSchema(gmMachine *a_machine, gmUserObject*a_object, gmGarbageCollector*a_gc, const int a_workLeftToGo, int& a_workDone)
 {
-	GM_ASSERT(a_object->GetType()==GM_SCHEMA);
+	GM_ASSERT(a_object->GetType()==gmSchema::GM_SCHEMA);
 	gmTableObject *Tbl = static_cast<gmTableObject*>(a_object->m_user);
 	if(Tbl)
 	{
@@ -775,7 +879,7 @@ static bool gmfTraceSchema(gmMachine *a_machine, gmUserObject*a_object, gmGarbag
 
 static bool gmfTraceSchemaElement(gmMachine *a_machine, gmUserObject*a_object, gmGarbageCollector*a_gc, const int a_workLeftToGo, int& a_workDone)
 {
-	GM_ASSERT(a_object->GetType()==GM_SCHEMA_ELEMENT);
+	GM_ASSERT(a_object->GetType()==gmSchema::GM_SCHEMA_ELEMENT);
 	gmTableObject *Tbl = static_cast<gmTableObject*>(a_object->m_user);
 	if(Tbl)
 	{
@@ -789,7 +893,7 @@ static bool gmfTraceSchemaElement(gmMachine *a_machine, gmUserObject*a_object, g
 
 static void GM_CDECL gmSchemaGetDot(gmThread * a_thread, gmVariable * a_operands)
 {
-	gmTableObject *Tbl = static_cast<gmTableObject*>(a_operands[0].GetUserSafe(GM_SCHEMA));
+	gmTableObject *Tbl = static_cast<gmTableObject*>(a_operands[0].GetUserSafe(gmSchema::GM_SCHEMA));
 	GM_ASSERT(Tbl);
 	if(Tbl)
 	{
@@ -801,7 +905,7 @@ static void GM_CDECL gmSchemaGetDot(gmThread * a_thread, gmVariable * a_operands
 
 static void GM_CDECL gmSchemaSetDot(gmThread * a_thread, gmVariable * a_operands)
 {
-	gmTableObject *Tbl = static_cast<gmTableObject*>(a_operands[0].GetUserSafe(GM_SCHEMA));
+	gmTableObject *Tbl = static_cast<gmTableObject*>(a_operands[0].GetUserSafe(gmSchema::GM_SCHEMA));
 	GM_ASSERT(Tbl);
 	if(Tbl)
 	{
@@ -823,6 +927,7 @@ static gmFunctionEntry s_schemaLib[] =
 static gmFunctionEntry s_schemaTypeLib[] = 
 { 
 	{"Check", gmfSchemaCheck},
+	//{"CreateGui", gmfSchemaCreateGui},
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -830,12 +935,17 @@ static gmFunctionEntry s_schemaTypeLib[] =
 static gmFunctionEntry s_schemaElementTypeLib[] = 
 { 
 	{"Default", gmfSchemaElementDefault},
+	{"ReadOnly", gmfSchemaReadOnly},
+	//{"EditType", gmfSchemaElementEditType},
 	{"CheckCallback", gmfSchemaCheckCallback},
 	{"CheckValue", gmfSchemaCheckValue},
 	{"CheckKey", gmfSchemaCheckKey},
-	
+
+	{"GetEnumOptions", gmfSchemaGetEnumOptions},
+
 	{"Check", gmfSchemaElementCheck},
 	{"CheckPrintErrors", gmfSchemaElementCheckPrintErrors},
+
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -849,25 +959,74 @@ static gmFunctionEntry s_createElementLib[] =
 	{"IntRange", gmfSchemaIntRange},
 	{"NumRange", gmfSchemaNumRange},
 	{"Type", gmfSchemaVarType},
-	
+
 };
 
 //////////////////////////////////////////////////////////////////////////
 
 #define array_size(ar) sizeof(ar)/sizeof(ar[0])
 
-void gmBindSchemaLib(gmMachine * a_machine)
+namespace gmSchema
 {
-	a_machine->RegisterLibrary(s_schemaLib,array_size(s_schemaLib));
-	a_machine->RegisterLibrary(s_createElementLib,array_size(s_createElementLib),"Validate");
+	void BindLib(gmMachine * a_machine)
+	{
+		a_machine->RegisterLibrary(s_schemaLib,array_size(s_schemaLib));
+		a_machine->RegisterLibrary(s_createElementLib,array_size(s_createElementLib),"Validate");
 
-	GM_SCHEMA = a_machine->CreateUserType("Schema");
-	a_machine->RegisterTypeLibrary(GM_SCHEMA, s_schemaTypeLib, array_size(s_schemaTypeLib));
-	a_machine->RegisterUserCallbacks(GM_SCHEMA,gmfTraceSchema,NULL,NULL,NULL);
-	a_machine->RegisterTypeOperator(GM_SCHEMA, O_GETDOT, NULL, gmSchemaGetDot);
-	a_machine->RegisterTypeOperator(GM_SCHEMA, O_SETDOT, NULL, gmSchemaSetDot);
+		GM_SCHEMA = a_machine->CreateUserType("Schema");
+		a_machine->RegisterTypeLibrary(GM_SCHEMA, s_schemaTypeLib, array_size(s_schemaTypeLib));
+		a_machine->RegisterUserCallbacks(GM_SCHEMA,gmfTraceSchema,NULL,NULL,NULL);
+		a_machine->RegisterTypeOperator(GM_SCHEMA, O_GETDOT, NULL, gmSchemaGetDot);
+		a_machine->RegisterTypeOperator(GM_SCHEMA, O_SETDOT, NULL, gmSchemaSetDot);
 
-	GM_SCHEMA_ELEMENT = a_machine->CreateUserType("SchemaElement");
-	a_machine->RegisterTypeLibrary(GM_SCHEMA_ELEMENT, s_schemaElementTypeLib, array_size(s_schemaElementTypeLib));
-	a_machine->RegisterUserCallbacks(GM_SCHEMA_ELEMENT,gmfTraceSchemaElement,NULL,NULL,NULL);
-}
+		GM_SCHEMA_ELEMENT = a_machine->CreateUserType("SchemaElement");
+		a_machine->RegisterTypeLibrary(GM_SCHEMA_ELEMENT, s_schemaElementTypeLib, array_size(s_schemaElementTypeLib));
+		a_machine->RegisterUserCallbacks(GM_SCHEMA_ELEMENT,gmfTraceSchemaElement,NULL,NULL,NULL);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	ElementType GetElementType(gmMachine *a_machine, gmVariable &a_schema)
+	{
+		gmTableObject *a_SchemaEl = static_cast<gmTableObject*>(a_schema.GetUserSafe(GM_SCHEMA_ELEMENT));
+		if(a_SchemaEl)
+		{
+			if(a_SchemaEl->Get(a_machine,"enum").GetTableObjectSafe())
+				return EL_ENUM;
+			if(a_SchemaEl->Get(a_machine,"vartype").GetCStringSafe(0))
+				return EL_VARTYPE;
+			if(a_SchemaEl->Get(a_machine,"tableof").GetCStringSafe(0))
+				return EL_TABLEOF;
+			if(a_SchemaEl->Get(a_machine,"floatrange").IsFloat())
+				return EL_FLOATRANGE;
+			if(a_SchemaEl->Get(a_machine,"intrange").IsInt())
+				return EL_INTRANGE;
+			if(a_SchemaEl->Get(a_machine,"numrange").IsNumber())
+				return EL_NUMRANGE;
+		}
+		return EL_NONE;
+	}
+	const gmTableObject *GetEnumOptions(gmMachine *a_machine, gmVariable &a_schema, gmVariable a_obj, gmVariable &a_current)
+	{
+		if(GetElementType(a_machine,a_schema) == EL_ENUM)
+		{
+			gmTableObject *a_SchemaEl = static_cast<gmTableObject*>(a_schema.GetUserSafe(GM_SCHEMA_ELEMENT));
+			return a_SchemaEl->Get(a_machine,"enum").GetTableObjectSafe();
+		}
+		return 0;
+	}
+
+	bool GetNumRange(gmMachine *a_machine, gmVariable &a_schema, gmVariable a_obj, gmVariable &a_current, float &a_min, float &a_max)
+	{
+		if(GetElementType(a_machine,a_schema) == EL_NUMRANGE)
+		{
+			gmTableObject *a_SchemaEl = static_cast<gmTableObject*>(a_schema.GetUserSafe(GM_SCHEMA_ELEMENT));
+
+			return 
+				a_SchemaEl->Get(a_machine,"numrange").IsInt() &&
+				a_SchemaEl->Get(a_machine,"range_min").GetFloatSafe(a_min,0.f) &&
+				a_SchemaEl->Get(a_machine,"range_max").GetFloatSafe(a_max,0.f);
+		}
+		return false;
+	}
+};
