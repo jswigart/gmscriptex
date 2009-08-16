@@ -786,7 +786,7 @@ namespace gmBind2
 		static DocumentationList m_Documentation;
 #endif
 
-		static void GM_CDECL gmBind2OpGetDot(gmThread * a_thread, gmVariable * a_operands)
+		static int GM_CDECL gmBind2OpGetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()));
@@ -794,7 +794,7 @@ namespace gmBind2
 			if(!bo || !bo->m_NativeObj)
 			{
 				a_operands[0].Nullify();
-				return;
+				return GM_EXCEPTION;
 			}
 
 			const char *pString = a_operands[1].GetCStringSafe();
@@ -804,7 +804,7 @@ namespace gmBind2
 				if(ClassBase<ClassT>::m_GetDotEx && 
 					ClassBase<ClassT>::m_GetDotEx(a_thread,bo->m_NativeObj,pString,a_operands))
 				{
-					return;
+					return GM_OK;
 				}
 
 				typename Class<ClassT>::PropertyMap::iterator it = m_Properties.find(pString);
@@ -813,22 +813,20 @@ namespace gmBind2
 					gmPropertyFunctionPair &propfuncs = it->second;
 					if(propfuncs.m_Getter)
 					{
-						propfuncs.m_Getter(
+						return propfuncs.m_Getter(
 							bo->m_NativeObj, 
 							a_thread, 
 							a_operands, 
 							propfuncs.m_PropertyOffset, 
 							propfuncs.m_BitfieldOffset,
 							propfuncs.m_Static);
-						return;
 					}
 					else if(propfuncs.m_GetterRaw)
 					{
-						propfuncs.m_GetterRaw(
+						return propfuncs.m_GetterRaw(
 							bo->m_NativeObj, 
 							a_thread, 
-							a_operands);
-						return;
+							a_operands);						
 					}
 				}
 				else
@@ -836,14 +834,15 @@ namespace gmBind2
 					if(bo->m_Table)
 					{
 						a_operands[0] = bo->m_Table->Get(a_thread->GetMachine(),pString);
-						return;
+						return GM_OK;
 					}
 				}
 			}
 			a_operands[0].Nullify();
+			return GM_EXCEPTION;
 		}
 
-		static void GM_CDECL gmBind2OpSetDot(gmThread * a_thread, gmVariable * a_operands)
+		static int GM_CDECL gmBind2OpSetDot(gmThread * a_thread, gmVariable * a_operands)
 		{
 			// Ensure the operation is being performed on our type
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()));
@@ -851,7 +850,7 @@ namespace gmBind2
 			if(!bo || !bo->m_NativeObj)
 			{
 				a_operands[0].Nullify();
-				return;
+				return GM_EXCEPTION;
 			}
 
 			const char *pString = a_operands[2].GetCStringSafe();
@@ -861,7 +860,7 @@ namespace gmBind2
 				if(ClassBase<ClassT>::m_SetDotEx && 
 					ClassBase<ClassT>::m_SetDotEx(a_thread,bo->m_NativeObj,pString,a_operands))
 				{
-					return;
+					return GM_OK;
 				}
 
 				typename Class<ClassT>::PropertyMap::iterator it = m_Properties.find(pString);
@@ -870,22 +869,20 @@ namespace gmBind2
 					gmPropertyFunctionPair &propfuncs = it->second;
 					if(propfuncs.m_Setter)
 					{
-						propfuncs.m_Setter(
+						return propfuncs.m_Setter(
 							bo->m_NativeObj, 
 							a_thread, 
 							a_operands, 
 							propfuncs.m_PropertyOffset, 
 							propfuncs.m_BitfieldOffset,
 							propfuncs.m_Static);
-						return;
 					}
 					else if(propfuncs.m_SetterRaw)
 					{
-						propfuncs.m_SetterRaw(
+						return propfuncs.m_SetterRaw(
 							bo->m_NativeObj, 
 							a_thread, 
 							a_operands);
-						return;
 					}
 				}
 				else
@@ -893,15 +890,17 @@ namespace gmBind2
 					if(bo->m_Table)
 					{
 						bo->m_Table->Set(a_thread->GetMachine(),pString,a_operands[1]);
-						return;
+						return GM_OK;
 					}
 				}
 			}
 			a_operands[0].Nullify();
+			return GM_EXCEPTION;
 		}
-		static void GM_CDECL gmBind2OpBool(gmThread * a_thread, gmVariable * a_operands)
+		static int GM_CDECL gmBind2OpBool(gmThread * a_thread, gmVariable * a_operands)
 		{
 			a_operands[0].SetInt(a_operands[0].GetUserSafe(ClassBase<ClassT>::ClassType()) ? 1 : 0);
+			return GM_OK;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

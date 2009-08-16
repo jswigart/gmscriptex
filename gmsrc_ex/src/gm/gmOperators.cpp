@@ -93,19 +93,22 @@ gmOperator gmGetOperator(const char * a_operatorName)
 // GM_INT
 //
 
-void GM_CDECL gmIntOpAdd(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpAdd(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int += a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpSub(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpSub(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int -= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpMul(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpMul(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int *= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpDiv(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpDiv(gmThread * a_thread, gmVariable * a_operands)
 {
 #if GMMACHINE_GMCHECKDIVBYZERO
 	if(a_operands[1].m_value.m_int != 0)
@@ -114,89 +117,107 @@ void GM_CDECL gmIntOpDiv(gmThread * a_thread, gmVariable * a_operands)
 	}
 	else
 	{
-		a_thread->GetMachine()->GetLog().LogEntry("Divide by zero.");
+		a_thread->GetMachine()->GetLog().LogEntry("divide by zero.");
 		a_operands[0].Nullify();
-		// NOTE: No proper way to signal exception from here at present
+		return GM_EXCEPTION;
 	}
 #else // GMMACHINE_GMCHECKDIVBYZERO
 	a_operands[0].SetFloat((float)a_operands[0].m_value.m_int / (float)a_operands[1].m_value.m_int);
 #endif // GMMACHINE_GMCHECKDIVBYZERO
+	return GM_OK;
 }
-void GM_CDECL gmIntOpRem(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpRem(gmThread * a_thread, gmVariable * a_operands)
 {
 #if GMMACHINE_GMCHECKDIVBYZERO
 	if(a_operands[1].m_value.m_int != 0)
 	{
 		a_operands[0].m_value.m_int %= a_operands[1].m_value.m_int;
+		return GM_OK;
 	}
 	else
 	{
-		a_thread->GetMachine()->GetLog().LogEntry("Divide by zero.");
+		a_thread->GetMachine()->GetLog().LogEntry("divide by zero.");
 		a_operands[0].Nullify();
-		// NOTE: No proper way to signal exception from here at present
+		return GM_EXCEPTION;
 	}
 #else // GMMACHINE_GMCHECKDIVBYZERO
 	a_operands[0].m_value.m_int %= a_operands[1].m_value.m_int;
 #endif // GMMACHINE_GMCHECKDIVBYZERO
+	return GM_OK;
 }
-void GM_CDECL gmIntOpBitOr(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpBitOr(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int |= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpBitXor(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpBitXor(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int ^= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpBitAnd(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpBitAnd(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int &= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpBitShiftLeft(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpBitShiftLeft(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int <<= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpBitShiftRight(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpBitShiftRight(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int >>= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpInv(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpInv(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = ~a_operands[0].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpLT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpLT(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = a_operands[0].m_value.m_int < a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpGT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpGT(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = a_operands[0].m_value.m_int > a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpLTE(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpLTE(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = a_operands[0].m_value.m_int <= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpGTE(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpGTE(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = a_operands[0].m_value.m_int >= a_operands[1].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = (a_operands[0].m_value.m_int == a_operands[1].m_value.m_int);
+	return GM_OK;
 }
-void GM_CDECL gmIntOpNEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = (a_operands[0].m_value.m_int != a_operands[1].m_value.m_int);
+	return GM_OK;
 }
-void GM_CDECL gmIntOpNEG(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpNEG(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = -a_operands[0].m_value.m_int;
+	return GM_OK;
 }
-void GM_CDECL gmIntOpPOS(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpPOS(gmThread * a_thread, gmVariable * a_operands)
 {
+	return GM_OK;
 }
-void GM_CDECL gmIntOpNOT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmIntOpNOT(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].m_value.m_int = !a_operands[0].m_value.m_int;
+	return GM_OK;
 }
 
 //
@@ -205,108 +226,125 @@ void GM_CDECL gmIntOpNOT(gmThread * a_thread, gmVariable * a_operands)
 
 #define INTTOFLOAT(A) (((A)->m_type == GM_FLOAT) ? (A)->m_value.m_float : (float) (A)->m_value.m_int)
 
-void GM_CDECL gmFloatOpAdd(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpAdd(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_float = INTTOFLOAT(a_operands) + INTTOFLOAT(a_operands + 1);
 	a_operands->m_type = GM_FLOAT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpSub(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpSub(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_float = INTTOFLOAT(a_operands) - INTTOFLOAT(a_operands + 1);
 	a_operands->m_type = GM_FLOAT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpMul(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpMul(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_float = INTTOFLOAT(a_operands) * INTTOFLOAT(a_operands + 1);
 	a_operands->m_type = GM_FLOAT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpDiv(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpDiv(gmThread * a_thread, gmVariable * a_operands)
 {
 #if GMMACHINE_GMCHECKDIVBYZERO
 	if(INTTOFLOAT(a_operands + 1) != 0)
 	{
 		a_operands->m_value.m_float = INTTOFLOAT(a_operands) / INTTOFLOAT(a_operands + 1);
 		a_operands->m_type = GM_FLOAT;
+		return GM_OK;
 	}
 	else
 	{
-		a_thread->GetMachine()->GetLog().LogEntry("Divide by zero.");
+		a_thread->GetMachine()->GetLog().LogEntry("divide by zero.");
 		a_operands->Nullify(); // NOTE: Should probably return +/- INF, not null
-		// NOTE: No proper way to signal exception from here at present
+		return GM_EXCEPTION;
 	}
 #else // GMMACHINE_GMCHECKDIVBYZERO
 	a_operands->m_value.m_float = INTTOFLOAT(a_operands) / INTTOFLOAT(a_operands + 1);
 	a_operands->m_type = GM_FLOAT;
 #endif // GMMACHINE_GMCHECKDIVBYZERO
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpRem(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpRem(gmThread * a_thread, gmVariable * a_operands)
 {
 #if GMMACHINE_GMCHECKDIVBYZERO
 	if(INTTOFLOAT(a_operands + 1) != 0)
 	{
 		a_operands->m_value.m_float = fmodf(INTTOFLOAT(a_operands), INTTOFLOAT(a_operands + 1));
 		a_operands->m_type = GM_FLOAT;
+		return GM_OK;
 	}
 	else
 	{
 		a_thread->GetMachine()->GetLog().LogEntry("Divide by zero.");
 		a_operands->Nullify();
-		// NOTE: No proper way to signal exception from here at present
+		return GM_EXCEPTION;
 	}
 #else // GMMACHINE_GMCHECKDIVBYZERO
 	a_operands->m_value.m_float = fmodf(INTTOFLOAT(a_operands), INTTOFLOAT(a_operands + 1));
 	a_operands->m_type = GM_FLOAT;
 #endif // GMMACHINE_GMCHECKDIVBYZERO
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpInc(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpInc(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_float = INTTOFLOAT(a_operands) + 1.0f;
 	a_operands->m_type = GM_FLOAT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpDec(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpDec(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_float = INTTOFLOAT(a_operands) - 1.0f;
 	a_operands->m_type = GM_FLOAT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpLT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpLT(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_int = (INTTOFLOAT(a_operands) < INTTOFLOAT(a_operands + 1));
 	a_operands->m_type = GM_INT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpGT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpGT(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_int = (INTTOFLOAT(a_operands) > INTTOFLOAT(a_operands + 1));
 	a_operands->m_type = GM_INT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpLTE(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpLTE(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_int = (INTTOFLOAT(a_operands) <= INTTOFLOAT(a_operands + 1));
 	a_operands->m_type = GM_INT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpGTE(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpGTE(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_int = (INTTOFLOAT(a_operands) >= INTTOFLOAT(a_operands + 1));
 	a_operands->m_type = GM_INT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_int = (INTTOFLOAT(a_operands) == INTTOFLOAT(a_operands + 1));
 	a_operands->m_type = GM_INT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpNEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_int = (INTTOFLOAT(a_operands) != INTTOFLOAT(a_operands + 1));
 	a_operands->m_type = GM_INT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpNEG(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpNEG(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_float = -INTTOFLOAT(a_operands);
 	a_operands->m_type = GM_FLOAT; 
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpPOS(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpPOS(gmThread * a_thread, gmVariable * a_operands)
 {
+	return GM_OK;
 }
-void GM_CDECL gmFloatOpNOT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmFloatOpNOT(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands->m_value.m_float == 0.0f)
 	{
@@ -316,6 +354,7 @@ void GM_CDECL gmFloatOpNOT(gmThread * a_thread, gmVariable * a_operands)
 	{
 		a_operands->m_value.m_int = 0; a_operands->m_type = GM_INT;
 	}
+	return GM_OK;
 }
 
 //
@@ -349,7 +388,7 @@ inline const char * gmUnknownToString(gmMachine * a_machine, gmVariable * a_unkn
 	if(a_len) { *a_len = strlen(a_buffer); }
 	return a_buffer;
 }
-void GM_CDECL gmStringOpAdd(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpAdd(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
@@ -363,8 +402,9 @@ void GM_CDECL gmStringOpAdd(gmThread * a_thread, gmVariable * a_operands)
 	a_thread->SetTop(a_operands); // so the garbage collector works
 	a_operands->m_type = GM_STRING;
 	a_operands->m_value.m_ref = (gmptr) machine->AllocStringObject(buffer, len1 + len2);
+	return GM_OK;
 }
-void GM_CDECL gmStringOpLT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpLT(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
@@ -374,8 +414,9 @@ void GM_CDECL gmStringOpLT(gmThread * a_thread, gmVariable * a_operands)
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == -1) ? 1 : 0;
+	return GM_OK;
 }
-void GM_CDECL gmStringOpGT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpGT(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
@@ -385,8 +426,9 @@ void GM_CDECL gmStringOpGT(gmThread * a_thread, gmVariable * a_operands)
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 1) ? 1 : 0;
+	return GM_OK;
 }
-void GM_CDECL gmStringOpLTE(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpLTE(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
@@ -396,8 +438,9 @@ void GM_CDECL gmStringOpLTE(gmThread * a_thread, gmVariable * a_operands)
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 1) ? 0 : 1;
+	return GM_OK;
 }
-void GM_CDECL gmStringOpGTE(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpGTE(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
@@ -407,8 +450,9 @@ void GM_CDECL gmStringOpGTE(gmThread * a_thread, gmVariable * a_operands)
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == -1) ? 0 : 1;
+	return GM_OK;
 }
-void GM_CDECL gmStringOpEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	//////////////////////////////////////////////////////////////////////////
@@ -417,7 +461,7 @@ void GM_CDECL gmStringOpEQ(gmThread * a_thread, gmVariable * a_operands)
 	{
 		a_operands->m_type = GM_INT;
 		a_operands->m_value.m_ref = a_operands[0].m_value.m_ref == a_operands[1].m_value.m_ref;
-		return;
+		return GM_OK;
 	}
 
 	char buffer1[GMSTRING_BUFFERSIZE];
@@ -427,8 +471,9 @@ void GM_CDECL gmStringOpEQ(gmThread * a_thread, gmVariable * a_operands)
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 0) ? 1 : 0;
+	return GM_OK;
 }
-void GM_CDECL gmStringOpNEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	//////////////////////////////////////////////////////////////////////////
@@ -437,7 +482,7 @@ void GM_CDECL gmStringOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 	{
 		a_operands->m_type = GM_INT;
 		a_operands->m_value.m_ref = a_operands[0].m_value.m_ref != a_operands[1].m_value.m_ref;
-		return;
+		return GM_OK;
 	}
 
 	char buffer1[GMSTRING_BUFFERSIZE];
@@ -447,38 +492,44 @@ void GM_CDECL gmStringOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 0) ? 0 : 1;
+	return GM_OK;
 }
 
-void GM_CDECL gmStringOpNOT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmStringOpNOT(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands->m_value.m_int = 0; a_operands->m_type = GM_INT;
+	return GM_OK;
 }
 
 //
 // GM_TABLE
 //
 
-void GM_CDECL gmTableGetDot(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmTableGetDot(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmTableObject * table = (gmTableObject *) GM_OBJECT(a_operands->m_value.m_ref);
 	*a_operands = table->Get(a_operands[1]);
+	return GM_OK;
 }
-void GM_CDECL gmTableSetDot(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmTableSetDot(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	gmTableObject * table = (gmTableObject *) GM_MOBJECT(machine, a_operands->m_value.m_ref);
 	table->Set(machine, a_operands[2], a_operands[1]);
+	return GM_OK;
 }
-void GM_CDECL gmTableGetInd(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmTableGetInd(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmTableObject * table = (gmTableObject *) GM_OBJECT(a_operands->m_value.m_ref);
 	*a_operands = table->Get(a_operands[1]);
+	return GM_OK;
 }
-void GM_CDECL gmTableSetInd(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmTableSetInd(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmMachine * machine = a_thread->GetMachine();
 	gmTableObject * table = (gmTableObject *) GM_MOBJECT(machine, a_operands->m_value.m_ref);
 	table->Set(machine, a_operands[1], a_operands[2]);
+	return GM_OK;
 }
 
 //
@@ -489,7 +540,7 @@ void GM_CDECL gmTableSetInd(gmThread * a_thread, gmVariable * a_operands)
 // MISC.
 //
 
-void GM_CDECL gmRefOpEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmRefOpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].m_type == a_operands[1].m_type && a_operands[0].m_value.m_ref == a_operands[1].m_value.m_ref)
 	{
@@ -501,8 +552,9 @@ void GM_CDECL gmRefOpEQ(gmThread * a_thread, gmVariable * a_operands)
 		a_operands->m_type = GM_INT;
 		a_operands->m_value.m_int = 0;
 	}
+	return GM_OK;
 }
-void GM_CDECL gmRefOpNEQ(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmRefOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].m_type == a_operands[1].m_type && a_operands[0].m_value.m_ref == a_operands[1].m_value.m_ref)
 	{
@@ -514,8 +566,9 @@ void GM_CDECL gmRefOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 		a_operands->m_type = GM_INT;
 		a_operands->m_value.m_int = 1;
 	}
+	return GM_OK;
 }
-void GM_CDECL gmRefOpNOT(gmThread * a_thread, gmVariable * a_operands)
+int GM_CDECL gmRefOpNOT(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands->m_type == GM_NULL)
 	{
@@ -527,6 +580,7 @@ void GM_CDECL gmRefOpNOT(gmThread * a_thread, gmVariable * a_operands)
 		a_operands->m_type = GM_INT;
 		a_operands->m_value.m_int = 0;
 	}
+	return GM_OK;
 }
 
 
@@ -537,9 +591,9 @@ void gmInitBasicType(gmType a_type, gmOperatorFunction * a_operators)
 
 	if(a_type == GM_NULL)
 	{
-		a_operators[O_EQ]     = gmRefOpEQ;
-		a_operators[O_NEQ]    = gmRefOpNEQ;
-		a_operators[O_NOT]    = gmRefOpNOT;
+		a_operators[O_EQ]			= gmRefOpEQ;
+		a_operators[O_NEQ]			= gmRefOpNEQ;
+		a_operators[O_NOT]			= gmRefOpNOT;
 	}
 	else if(a_type == GM_INT)
 	{

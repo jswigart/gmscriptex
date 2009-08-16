@@ -449,15 +449,15 @@ static int GM_CDECL gmfStringReplaceCharsInSet(gmThread * a_thread)
 // string.AppendPath(a_appendString, a_endWithSlash);
 // Append this string with another string, fixing for slashes
 // a_endWithSlash is optional, default is false, removing trailing slashes.
-static void GM_CDECL gmStringOpAppendPath(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmStringOpAppendPath(gmThread * a_thread, gmVariable * a_operands)
 {
 	// Both types must be strings
 	if(a_operands[0].m_type != GM_STRING ||
 		a_operands[1].m_type != GM_STRING)
 	{
-		a_operands[0].m_type = GM_NULL;
-		a_operands[0].m_value.m_ref = 0;
-		return;
+		a_operands[0].Nullify();
+		a_thread->GetMachine()->GetLog().LogEntry("expected 2 strings");		
+		return GM_EXCEPTION;
 	}
 
 	gmStringObject * strObjA = (gmStringObject *) GM_OBJECT(a_operands[0].m_value.m_ref);
@@ -480,7 +480,7 @@ static void GM_CDECL gmStringOpAppendPath(gmThread * a_thread, gmVariable * a_op
 
 	if(lenB <= 0)
 	{
-		return;
+		return GM_OK;
 	}
 
 	memcpy(buffer, cStrA, lenA);
@@ -510,6 +510,7 @@ static void GM_CDECL gmStringOpAppendPath(gmThread * a_thread, gmVariable * a_op
 
 	a_operands[0].m_type = GM_STRING;
 	a_operands[0].m_value.m_ref = a_thread->GetMachine()->AllocStringObject(buffer, newLength)->GetRef();
+	return GM_OK;
 }
 
 
@@ -669,13 +670,13 @@ static int GM_CDECL gmStringReverseFind(gmThread * a_thread)
 
 // int string[int index]
 // Note: Because strings are constant and in a table, it is impossible to implement SetInd.
-static void GM_CDECL gmStringOpGetInd(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmStringOpGetInd(gmThread * a_thread, gmVariable * a_operands)
 {
 	if( a_operands[0].m_type != GM_STRING ||
 		a_operands[1].m_type != GM_INT )
 	{
 		a_operands->Nullify();
-		return;
+		return GM_EXCEPTION;
 	}
 
 	gmStringObject * strObjA = (gmStringObject *) GM_OBJECT(a_operands[0].m_value.m_ref);
@@ -685,11 +686,13 @@ static void GM_CDECL gmStringOpGetInd(gmThread * a_thread, gmVariable * a_operan
 	if( index < 0 || index > strObjA->GetLength()-1 )
 	{
 		a_operands->Nullify();
+		return GM_EXCEPTION;
 	}
 	else
 	{
 		a_operands->SetInt( (int)cStrA[index] );
 	}
+	return GM_OK;
 }
 
 // int string.GetAt(int a_index);

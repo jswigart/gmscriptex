@@ -12,7 +12,7 @@ gmVec3Data ZERO_VEC3 = {};
 
 //////////////////////////////////////////////////////////////////////////
 // Operators
-static void GM_CDECL gmVector3OpAdd(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpAdd(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector() && a_operands[1].IsVector())
 	{
@@ -20,11 +20,13 @@ static void GM_CDECL gmVector3OpAdd(gmThread * a_thread, gmVariable * a_operands
 			a_operands[0].m_value.m_vec3.x + a_operands[1].m_value.m_vec3.x, 
 			a_operands[0].m_value.m_vec3.y + a_operands[1].m_value.m_vec3.y, 
 			a_operands[0].m_value.m_vec3.z + a_operands[1].m_value.m_vec3.z);
+		return GM_OK;
 	}
-	else
-		a_operands[0].Nullify();
+		
+	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
-static void GM_CDECL gmVector3OpSub(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpSub(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector() && a_operands[1].IsVector())
 	{
@@ -32,11 +34,13 @@ static void GM_CDECL gmVector3OpSub(gmThread * a_thread, gmVariable * a_operands
 			a_operands[0].m_value.m_vec3.x - a_operands[1].m_value.m_vec3.x, 
 			a_operands[0].m_value.m_vec3.y - a_operands[1].m_value.m_vec3.y, 
 			a_operands[0].m_value.m_vec3.z - a_operands[1].m_value.m_vec3.z);
+		return GM_OK;
 	}
-	else
-		a_operands[0].Nullify();
+	
+	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
-static void GM_CDECL gmVector3OpNEG(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpNEG(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector())
 	{
@@ -44,11 +48,13 @@ static void GM_CDECL gmVector3OpNEG(gmThread * a_thread, gmVariable * a_operands
 			-a_operands[0].m_value.m_vec3.x,
 			-a_operands[0].m_value.m_vec3.y,
 			-a_operands[0].m_value.m_vec3.z);
+		return GM_OK;
 	}
-	else
-		a_operands[0].Nullify();
+	
+	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
-static void GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands)
 {
 	float fScalar = 0.f;
 	if(a_operands[0].IsVector() && a_operands[1].GetFloatSafe(fScalar))
@@ -57,6 +63,7 @@ static void GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands
 			a_operands[0].m_value.m_vec3.x * fScalar, 
 			a_operands[0].m_value.m_vec3.y * fScalar, 
 			a_operands[0].m_value.m_vec3.z * fScalar);
+		return GM_OK;
 	}
 	else if(a_operands[1].IsVector() && a_operands[0].GetFloatSafe(fScalar))
 	{
@@ -64,6 +71,7 @@ static void GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands
 			a_operands[1].m_value.m_vec3.x * fScalar, 
 			a_operands[1].m_value.m_vec3.y * fScalar, 
 			a_operands[1].m_value.m_vec3.z * fScalar);
+		return GM_OK;
 	}
 	else if(a_operands[1].IsVector() && a_operands[0].IsVector())
 	{
@@ -71,17 +79,19 @@ static void GM_CDECL gmVector3OpMul(gmThread * a_thread, gmVariable * a_operands
 			a_operands[1].m_value.m_vec3.x * a_operands[0].m_value.m_vec3.x, 
 			a_operands[1].m_value.m_vec3.y * a_operands[0].m_value.m_vec3.y, 
 			a_operands[1].m_value.m_vec3.z * a_operands[0].m_value.m_vec3.z);
+		return GM_OK;
 	}
-	else
-		a_operands[0].Nullify();
+	
+	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
-static void GM_CDECL gmVector3OpDiv(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpDiv(gmThread * a_thread, gmVariable * a_operands)
 {
 #if GMMACHINE_GMCHECKDIVBYZERO
-	if(INTTOFLOAT(a_operands + 1) != 0)
+	if(a_operands[0].IsVector() && a_operands[1].IsNumber())
 	{
-		float fScalar = 0.f;
-		if(a_operands[0].IsVector() && a_operands[1].GetFloatSafe(fScalar))
+		const float fScalar = a_operands[1].GetFloatSafe();
+		if(fScalar != 0.f)
 		{
 			a_operands[0].SetVector(
 				a_operands[0].m_value.m_vec3.x / fScalar, 
@@ -89,13 +99,11 @@ static void GM_CDECL gmVector3OpDiv(gmThread * a_thread, gmVariable * a_operands
 				a_operands[0].m_value.m_vec3.z / fScalar);
 		}
 		else
-			a_operands[0].Nullify();
-	}
-	else
-	{
-		a_thread->GetMachine()->GetLog().LogEntry("Divide by zero.");
-		a_operands->Nullify(); // NOTE: Should probably return +/- INF, not null
-		// NOTE: No proper way to signal exception from here at present
+		{
+			a_thread->GetMachine()->GetLog().LogEntry("divide by zero.");
+			a_operands[0].Nullify(); // NOTE: Should probably return +/- INF, not null
+			return GM_EXCEPTION;
+		}
 	}
 #else // GMMACHINE_GMCHECKDIVBYZERO
 	float fScalar = 0.f;
@@ -105,12 +113,13 @@ static void GM_CDECL gmVector3OpDiv(gmThread * a_thread, gmVariable * a_operands
 			a_operands[0].m_value.m_vec3.x / fScalar, 
 			a_operands[0].m_value.m_vec3.y / fScalar, 
 			a_operands[0].m_value.m_vec3.z / fScalar);
+		return GM_OK;
 	}
-	else
-		a_operands[0].Nullify();
 #endif // GMMACHINE_GMCHECKDIVBYZERO
+	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
-static void GM_CDECL gmVector3OpEQ(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector())
 	{
@@ -120,18 +129,19 @@ static void GM_CDECL gmVector3OpEQ(gmThread * a_thread, gmVariable * a_operands)
 				(a_operands[0].m_value.m_vec3.x == a_operands[1].m_value.m_vec3.x && 
 				a_operands[0].m_value.m_vec3.y == a_operands[1].m_value.m_vec3.y && 
 				a_operands[0].m_value.m_vec3.z == a_operands[1].m_value.m_vec3.z) ? 1 : 0);
-			return;
+			return GM_OK;
 		}
 		else if(a_operands[1].IsNull())
 		{
 			a_operands[0].SetInt(0);
-			return;
+			return GM_OK;
 		}
 	}
 	
 	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
-static void GM_CDECL gmVector3OpNEQ(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands[0].IsVector())
 	{
@@ -141,46 +151,67 @@ static void GM_CDECL gmVector3OpNEQ(gmThread * a_thread, gmVariable * a_operands
 				(a_operands[0].m_value.m_vec3.x == a_operands[1].m_value.m_vec3.x && 
 				a_operands[0].m_value.m_vec3.y == a_operands[1].m_value.m_vec3.y && 
 				a_operands[0].m_value.m_vec3.z == a_operands[1].m_value.m_vec3.z) ? 0 : 1);
-			return;
+			return GM_OK;
 		}
 		else if(a_operands[1].IsNull())
 		{
 			a_operands[0].SetInt(1);
-			return;
+			return GM_OK;
 		}		
 	}
 	
 	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
 
-static void GM_CDECL gmVector3OpPOS(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpPOS(gmThread * a_thread, gmVariable * a_operands)
 {
+	return GM_EXCEPTION;
 }
 
-static void GM_CDECL gmVector3GetDot(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3GetDot(gmThread * a_thread, gmVariable * a_operands)
 {
 	gmStringObject *pStr = a_operands[1].GetStringObjectSafe();
 	if(pStr)
 	{
 		if(!_gmstricmp(pStr->GetString(), "x"))
+		{
 			a_operands[0].SetFloat(a_operands[0].m_value.m_vec3.x);
+			return GM_OK;
+		}
 		else if(!_gmstricmp(pStr->GetString(), "y"))
+		{
 			a_operands[0].SetFloat(a_operands[0].m_value.m_vec3.y);
+			return GM_OK;
+		}
 		else if(!_gmstricmp(pStr->GetString(), "z"))
+		{
 			a_operands[0].SetFloat(a_operands[0].m_value.m_vec3.z);
+			return GM_OK;
+		}
 		else if(!_gmstricmp(pStr->GetString(), "UNIT_X"))
+		{
 			a_operands[0].SetVector(1.f, 0.f, 0.f);
+			return GM_OK;
+		}
 		else if(!_gmstricmp(pStr->GetString(), "UNIT_Y"))
+		{
 			a_operands[0].SetVector(0.f, 1.f, 0.f);
+			return GM_OK;
+		}
 		else if(!_gmstricmp(pStr->GetString(), "UNIT_X"))
+		{
 			a_operands[0].SetVector(0.f, 0.f, 1.f);
+			return GM_OK;
+		}
 		else if(!_gmstricmp(pStr->GetString(), "ZERO"))
+		{
 			a_operands[0].SetVector(0.f, 0.f, 0.f);
-		else
-			a_operands[0].Nullify();
+			return GM_OK;
+		}
 	}
-	else
-		a_operands[0].Nullify();
+	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
 //static void GM_CDECL gmVector3SetDot(gmThread * a_thread, gmVariable * a_operands)
 //{
@@ -199,7 +230,7 @@ static void GM_CDECL gmVector3GetDot(gmThread * a_thread, gmVariable * a_operand
 //	else
 //		a_operands[0].Nullify();
 //}
-static void GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operands)
 {
 	int iIndex = 0;
 	if(a_operands[1].IsInt() && a_operands[1].GetIntSafe(iIndex,0) && iIndex >=0 && iIndex < 3)
@@ -208,17 +239,21 @@ static void GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operand
 		{
 		case 0:
 			a_operands[0].SetFloat(a_operands[0].m_value.m_vec3.x);
-			break;
+			return GM_OK;
 		case 1:
 			a_operands[0].SetFloat(a_operands[0].m_value.m_vec3.y);
-			break;
+			return GM_OK;
 		case 2:
 			a_operands[0].SetFloat(a_operands[0].m_value.m_vec3.z);
-			break;
+			return GM_OK;
+		default:
+			a_thread->GetMachine()->GetLog().LogEntry("index out of range %d",iIndex);
+			return GM_EXCEPTION;
 		}
 	}
-	else
-		a_operands[0].Nullify();
+	
+	a_operands[0].Nullify();
+	return GM_EXCEPTION;
 }
 //static void GM_CDECL gmVector3SetInd(gmThread * a_thread, gmVariable * a_operands)
 //{
@@ -245,17 +280,19 @@ static void GM_CDECL gmVector3GetInd(gmThread * a_thread, gmVariable * a_operand
 //	else
 //		a_operands[0].Nullify();
 //}
-static void GM_CDECL gmVector3OpNOT(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpNOT(gmThread * a_thread, gmVariable * a_operands)
 {
 	if(a_operands->m_type == GM_NULL)
 		a_operands[0].SetInt(1);
 	else
 		a_operands[0].SetInt(0);
 	a_operands->m_type = GM_INT;
+	return GM_OK;
 }
-static void GM_CDECL gmVector3OpBOOL(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmVector3OpBOOL(gmThread * a_thread, gmVariable * a_operands)
 {
 	a_operands[0].SetInt(1);
+	return GM_OK;
 }
 //////////////////////////////////////////////////////////////////////////
 

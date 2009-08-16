@@ -259,7 +259,7 @@ static int GM_CDECL gmfArrayMove(gmThread * a_thread) // dst, src, size
   return GM_OK;
 }
 
-static void GM_CDECL gmArrayGetInd(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmArrayGetInd(gmThread * a_thread, gmVariable * a_operands)
 {
   gmUserObject * arrayObject = (gmUserObject *) GM_OBJECT(a_operands->m_value.m_ref);
   GM_ASSERT(arrayObject->m_userType == GM_ARRAY);
@@ -268,12 +268,13 @@ static void GM_CDECL gmArrayGetInd(gmThread * a_thread, gmVariable * a_operands)
   {
     int index = a_operands[1].m_value.m_int;
     *a_operands = array->GetAt(index);
-    return;
+    return GM_OK;
   }
   a_operands->Nullify();
+  return GM_EXCEPTION;
 }
 
-static void GM_CDECL gmArraySetInd(gmThread * a_thread, gmVariable * a_operands)
+static int GM_CDECL gmArraySetInd(gmThread * a_thread, gmVariable * a_operands)
 {
   gmUserObject * arrayObject = (gmUserObject *) GM_OBJECT(a_operands->m_value.m_ref);
   GM_ASSERT(arrayObject->m_userType == GM_ARRAY);
@@ -293,6 +294,8 @@ static void GM_CDECL gmArraySetInd(gmThread * a_thread, gmVariable * a_operands)
 
     array->SetAt(index, a_operands[2]);
   }
+  a_operands->Nullify();
+  return GM_EXCEPTION;
 }
 
 #if GM_USE_INCGC
