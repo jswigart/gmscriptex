@@ -372,17 +372,13 @@ inline bool gmVariable::GetInt(int &_i, int _default)
 
 inline bool gmVariable::GetFloat(float &_i, float _default)
 {
-	_i = IsFloat() ? IsFloat() : _default; 
+	_i = IsFloat() ? GetFloat() : _default; 
 	return IsFloat();
 }
 
 inline int gmVariable::GetInt(int _default)
 {
-	if(IsInt())
-	{
-		return GetInt();
-	}
-	return _default;
+	return IsInt() ? GetInt() : _default;
 }
 
 inline int gmVariable::GetIntSafe(int _default) const
