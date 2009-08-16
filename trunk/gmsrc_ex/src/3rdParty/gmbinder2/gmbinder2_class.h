@@ -793,7 +793,8 @@ namespace gmBind2
 			GM_ASSERT(bo);
 			if(!bo || !bo->m_NativeObj)
 			{
-				a_operands[0].Nullify();
+				a_thread->GetMachine()->GetLog().LogEntry("getdot failed on null user type");
+				a_operands[0].Nullify();				
 				return GM_EXCEPTION;
 			}
 
@@ -849,6 +850,7 @@ namespace gmBind2
 			GM_ASSERT(bo);
 			if(!bo || !bo->m_NativeObj)
 			{
+				a_thread->GetMachine()->GetLog().LogEntry("getdot failed on null user type");
 				a_operands[0].Nullify();
 				return GM_EXCEPTION;
 			}
