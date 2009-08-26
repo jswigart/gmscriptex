@@ -805,19 +805,40 @@ class TableSorter
 public:
 	bool operator()(const gmVariable &_var1, const gmVariable &_var2)
 	{
-		enum { BufferSize = 256 };
-		char buffer1[BufferSize] = {};
-		char buffer2[BufferSize] = {};
+		if(m_SortFunc)
+		{
+			int retVal = 0;
 
-		const char *buf1 = _var1.AsString(m_Machine,buffer1,BufferSize);
-		const char *buf2 = _var2.AsString(m_Machine,buffer2,BufferSize);
+			gmCall call;
+			if(call.BeginFunction(m_Machine,m_SortFunc))
+			{
+				call.AddParam(_var1);
+				call.AddParam(_var2);
+				call.End();
 
-		return strcmp(buf1, buf2) < 0;
+				
+				call.GetReturnedInt(retVal);
+			}
+			return retVal < 0;
+		}
+		else
+		{
+			enum { BufferSize = 256 };
+			char buffer1[BufferSize] = {};
+			char buffer2[BufferSize] = {};
+
+			const char *buf1 = _var1.AsString(m_Machine,buffer1,BufferSize);
+			const char *buf2 = _var2.AsString(m_Machine,buffer2,BufferSize);
+
+			return strcmp(buf1, buf2) < 0;
+		}
 	}
 
-	TableSorter(gmMachine *_machine) : m_Machine(_machine) {}
+	TableSorter(gmMachine *_machine, gmFunctionObject *_sortfunc) 
+		: m_Machine(_machine), m_SortFunc(_sortfunc) {}
 private:
-	gmMachine *m_Machine;
+	gmMachine			*m_Machine;
+	gmFunctionObject	*m_SortFunc;
 
 	TableSorter();
 };
@@ -827,12 +848,13 @@ static int GM_CDECL gmTableSort(gmThread * a_thread)
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_TABLE_PARAM(table, 0);
 	GM_STRING_PARAM(sortby,1,"value");
+	GM_FUNCTION_PARAM(sortFunc,2,0);
 
 	typedef std::vector<gmVariable> Vars;
 
 	if(!_gmstricmp(sortby,"value") && !_gmstricmp(sortby,"key"))
 	{
-		GM_EXCEPTION_MSG("expected key or value as param 1");
+		GM_EXCEPTION_MSG("expected 'key' or 'value' or function as param 1");
 		return GM_EXCEPTION;
 	}
 
@@ -849,7 +871,7 @@ static int GM_CDECL gmTableSort(gmThread * a_thread)
 		pNode = table->GetNext(tIt);
 	}
 
-	std::sort(vars.begin(), vars.end(), TableSorter(a_thread->GetMachine()));
+	std::sort(vars.begin(), vars.end(), TableSorter(a_thread->GetMachine(),sortFunc));
 
 	gmTableObject *sorted = a_thread->GetMachine()->AllocTableObject();
 	for(int i = 0; i < (int)vars.size(); ++i)
