@@ -1092,7 +1092,7 @@ namespace gmBind2
 //////////////////////////////////////////////////////////////////////////
 // autoexp.dat - Copy and paste the following(minus the comment block its in),
 // under the [Visualizer] section of the file
-// C:\Program Files\Microsoft Visual Studio 8\Common7\Packages\Debugger\autoexp.datautoexp.dat
+// C:\Program Files\Microsoft Visual Studio 8\Common7\Packages\Debugger\autoexp.dat
 /*
 
 ;------------------------------------------------------------------------------
