@@ -40,6 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;&quot;..\3rdParty\enet-1.2\include&quot;;..\binds;..\gm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
@@ -103,6 +104,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				AdditionalIncludeDirectories="..\platform\win32msvc;..\3rdParty\mathlib;&quot;..\3rdParty\enet-1.2\include&quot;;..\binds;..\gm"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
