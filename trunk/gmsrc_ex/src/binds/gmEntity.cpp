@@ -10,30 +10,45 @@
 
 static int gmEntityOpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
-	if(a_operands[0].m_type == GM_ENTITY && a_operands[1].m_type == GM_ENTITY)
+	if(a_operands[0].m_type == GM_ENTITY)
 	{
-		a_operands[0].SetInt(a_operands[0].m_value.m_enthndl == a_operands[1].m_value.m_enthndl ? 1 : 0);
-		return GM_OK;
+		switch(a_operands[1].m_type)
+		{
+		case GM_ENTITY:
+			{
+				a_operands[0].SetInt(a_operands[0].m_value.m_enthndl == a_operands[1].m_value.m_enthndl ? 1 : 0);
+				return GM_OK;
+			}		
+		case GM_NULL:
+			{
+				a_operands[0].SetInt(0);
+				return GM_OK;
+			}
+		}
 	}
-	else
-	{
-		a_operands[0].Nullify();
-		return GM_EXCEPTION;
-	}
+
+	return GM_EXCEPTION;
 }
 
 static int gmEntityOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {
-	if(a_operands[0].m_type == GM_ENTITY && a_operands[1].m_type == GM_ENTITY)
+	if(a_operands[0].m_type == GM_ENTITY)
 	{
-		a_operands[0].SetInt(a_operands[0].m_value.m_enthndl != a_operands[1].m_value.m_enthndl ? 1 : 0);
-		return GM_OK;
+		switch(a_operands[1].m_type)
+		{
+		case GM_ENTITY:
+			{
+				a_operands[0].SetInt(a_operands[0].m_value.m_enthndl != a_operands[1].m_value.m_enthndl ? 1 : 0);
+				return GM_OK;
+			}		
+		case GM_NULL:
+			{
+				a_operands[0].SetInt(1);
+				return GM_OK;
+			}
+		}
 	}
-	else
-	{
-		a_operands[0].Nullify();
-		return GM_EXCEPTION;
-	}
+	return GM_EXCEPTION;
 }
 
 static int gmEntityOpNOT(gmThread * a_thread, gmVariable * a_operands)
@@ -48,7 +63,7 @@ static int gmEntityOpNOT(gmThread * a_thread, gmVariable * a_operands)
 
 static int gmEntityOpBOOL(gmThread * a_thread, gmVariable * a_operands)
 {
-	a_operands[0].SetInt(1);
+	a_operands[0].SetInt( !a_operands[0].IsNull() );
 	return GM_OK;
 }
 
