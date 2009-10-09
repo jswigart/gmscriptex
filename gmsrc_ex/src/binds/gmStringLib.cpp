@@ -243,7 +243,7 @@ static int GM_CDECL gmfStringUpper(gmThread * a_thread)
 
 	std::string s(str);
 
-	std::transform(s.begin(),s.end(),s.begin(),tolower);
+	std::transform(s.begin(),s.end(),s.begin(),toupper);
 	a_thread->PushNewString(s.c_str(), s.length());
 
 	return GM_OK;
