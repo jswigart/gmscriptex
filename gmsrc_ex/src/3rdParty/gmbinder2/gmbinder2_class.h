@@ -306,7 +306,7 @@ namespace gmBind2
 			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
-		Class &var(pfnPropAccess _getter, pfnPropAccess _setter, const char *_name, const char *_type, const char *_comment = 0)
+		Class &var(typename ClassBase<ClassT>::pfnPropAccess _getter, typename ClassBase<ClassT>::pfnPropAccess _setter, const char *_name, const char *_type, const char *_comment = 0)
 		{
 			gmPropertyFunctionPair pr;
 			pr.m_GetterRaw = _getter;
@@ -686,12 +686,12 @@ namespace gmBind2
 		//////////////////////////////////////////////////////////////////////////
 		Class(const char *_classname, gmMachine *_machine, bool _extensible = true) : ClassBase<ClassT>(_classname, _machine,_extensible)
 		{
-			GM_ASSERT(m_ClassType!=GM_NULL);
+			GM_ASSERT(ClassBase<ClassT>::ClassType()!=GM_NULL);
 
-			m_Machine->RegisterUserCallbacks(ClassType(), 
+			_machine->RegisterUserCallbacks(ClassBase<ClassT>::ClassType(), 
 				gmfTraceObject, 
-				gmfGarbageCollect, 
-				gmfAsStringCallback); 
+				ClassBase<ClassT>::gmfGarbageCollect, 
+				ClassBase<ClassT>::gmfAsStringCallback); 
 
 			_machine->RegisterTypeOperator( ClassBase<ClassT>::ClassType(), O_GETDOT, NULL, gmBind2OpGetDot);
 			_machine->RegisterTypeOperator( ClassBase<ClassT>::ClassType(), O_SETDOT, NULL, gmBind2OpSetDot);
@@ -710,8 +710,8 @@ namespace gmBind2
 			pfnBindProp		m_Getter;
 			pfnBindProp		m_Setter;
 
-			pfnPropAccess	m_GetterRaw;
-			pfnPropAccess	m_SetterRaw;
+			typename ClassBase<ClassT>::pfnPropAccess	m_GetterRaw;
+			typename ClassBase<ClassT>::pfnPropAccess	m_SetterRaw;
 
 			pfnTraceProp	m_TraceObject;
 
