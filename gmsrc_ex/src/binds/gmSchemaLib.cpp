@@ -5,6 +5,8 @@
 #include "gmHelpers.h"
 #include "gmCall.h"
 
+#include <float.h>
+
 namespace gmSchema
 {
 	gmType GM_SCHEMA = GM_NULL;
@@ -82,15 +84,19 @@ static bool CheckIfVarsAreEqual(const gmVariable &a, const gmVariable &b)
 			case GM_FLOAT:
 				return a.m_value.m_float == b.m_value.m_float;
 				break;
+#if(GM_USE_VECTOR3_STACK)
 			case GM_VEC3:
 				return 
 					a.m_value.m_vec3.x == b.m_value.m_vec3.x && 
 					a.m_value.m_vec3.y == b.m_value.m_vec3.y && 
 					a.m_value.m_vec3.z == b.m_value.m_vec3.z;
 				break;
+#endif
+#if(GM_USE_ENTITY_STACK)
 			case GM_ENTITY:
 				return a.m_value.m_enthndl == b.m_value.m_enthndl;
 				break;
+#endif
 			default:
 				GM_ASSERT(0);
 				break;
