@@ -811,7 +811,7 @@ namespace gmBind2
 	template <typename Fn>
 	void RegisterFunction(gmMachine *a_machine, Fn a_fn, const char *a_funcname, const char *a_asTable = NULL)
 	{
-		gmFunctionEntry fn = {0,0,0,0};
+		gmFunctionEntry fn = {0,0,0};
 		fn.m_name = a_funcname;
 		fn.m_function = 0;
 		fn.m_functor = new GMExportFunctor<Fn>(a_fn);
