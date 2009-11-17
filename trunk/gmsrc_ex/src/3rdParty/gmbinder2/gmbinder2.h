@@ -287,23 +287,25 @@ namespace gmBind2
 		return GM_OK;
 	}
 	template<>
-	inline int PushReturnToGM<float*>(gmThread *a_thread, float *arg)
-	{
-		a_thread->PushVector(arg);
-		return GM_OK;
-	}
-	template<>
 	inline int PushReturnToGM<std::string>(gmThread *a_thread, std::string arg)
 	{
 		a_thread->PushNewString(arg.c_str());
 		return GM_OK;
 	}
+#if(GM_USE_VECTOR3_STACK)
 	template<>
 	inline int PushReturnToGM<Vec3>(gmThread *a_thread, Vec3 arg)
 	{
 		a_thread->PushVector(arg);
 		return GM_OK;
 	}
+	template<>
+	inline int PushReturnToGM<float*>(gmThread *a_thread, float *arg)
+	{
+		a_thread->PushVector(arg);
+		return GM_OK;
+	}
+#endif
 	//////////////////////////////////////////////////////////////////////////
 	template<typename Fn, int>
 	struct GMExportStruct {};

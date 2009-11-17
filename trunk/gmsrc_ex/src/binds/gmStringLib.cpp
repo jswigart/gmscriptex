@@ -1024,6 +1024,7 @@ static int GM_CDECL gmfToFloat(gmThread * a_thread)
 	}	
 	return GM_OK;
 }
+#if(GM_USE_VECTOR3_STACK)
 static int GM_CDECL gmfToVector(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
@@ -1072,6 +1073,7 @@ static int GM_CDECL gmfToVector(gmThread * a_thread)
 	}	
 	return GM_OK;
 }
+#endif
 static int GM_CDECL gmfToString(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
@@ -1121,12 +1123,14 @@ static int GM_CDECL gmfIsFloatOrInt(gmThread * a_thread)
 	a_thread->PushInt(a_thread->ParamType(0)==GM_FLOAT || a_thread->ParamType(0)==GM_INT ? 1 : 0);
 	return GM_OK;
 }
+#if(GM_USE_VECTOR3_STACK)
 static int GM_CDECL gmfIsVec3(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 	a_thread->PushInt(a_thread->ParamType(0)==GM_VEC3 ? 1 : 0);
 	return GM_OK;
 }
+#endif
 static int GM_CDECL gmfIsString(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
@@ -1145,13 +1149,14 @@ static int GM_CDECL gmfIsFunction(gmThread * a_thread)
 	a_thread->PushInt(a_thread->ParamType(0)==GM_FUNCTION ? 1 : 0);
 	return GM_OK;
 }
+#if(GM_USE_ENTITY_STACK)
 static int GM_CDECL gmfIsEntity(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 	a_thread->PushInt(a_thread->ParamType(0)==GM_ENTITY ? 1 : 0);
 	return GM_OK;
 }
-
+#endif
 static gmFunctionEntry s_stringLib[] = 
 { 
 	/*gm
@@ -1225,12 +1230,14 @@ static gmFunctionEntry s_stringLib[] =
 	\return float value
 	*/
 	{"ToFloat", gmfToFloat},
+#if(GM_USE_VECTOR3_STACK)
 	/*gm
 	\function ToVector
 	\brief Float will return the float value of the string
 	\return float value
 	*/
 	{"ToVector", gmfToVector},
+#endif
 	/*gm
 	\function ToString
 	\return string
@@ -1378,12 +1385,14 @@ static gmFunctionEntry s_conversionLib[] =
 	\return float value
 	*/
 	{"ToFloat", gmfToFloat},
+#if(GM_USE_VECTOR3_STACK)
 	/*gm
 	\function ToVector
 	\brief Float will return the float value of the string
 	\return float value
 	*/
 	{"ToVector", gmfToVector},
+#endif
 	/*gm
 	\function ToString
 	\return string
@@ -1394,11 +1403,15 @@ static gmFunctionEntry s_conversionLib[] =
 	{"IsBool", gmfIsInt},
 	{"IsFloat", gmfIsFloat},
 	{"IsFloatOrInt", gmfIsFloatOrInt},
+#if(GM_USE_VECTOR3_STACK)
 	{"IsVec3", gmfIsVec3},
+#endif
 	{"IsString", gmfIsString},
 	{"IsTable", gmfIsTable},
 	{"IsFunction", gmfIsFunction},
+#if(GM_USE_ENTITY_STACK)
 	{"IsEntity", gmfIsEntity},
+#endif
 };
 
 void gmBindStringLib(gmMachine * a_machine)
