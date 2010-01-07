@@ -36,7 +36,7 @@
 #define GM_NL                 "\r\n" // "\n"
 #define GM_FORCEINLINE        inline  // inline
 #define GM_INLINE             inline
-#define _gmstricmp            stricmp // strcasecmp
+#define _gmstricmp            strcasecmp
 #define _gmsnprintf           snprintf // snprintf
 #define _gmvsnprintf          vsnprintf // vsnprintf
 #ifdef _DEBUG
