@@ -1079,29 +1079,18 @@ static int GM_CDECL gmfToString(gmThread * a_thread)
 	GM_CHECK_NUM_PARAMS(1);
 
 	char buffer[256] = {};
-	switch(a_thread->ParamType(0))
-	{
-	case GM_INT:
-		{
-			sprintf(buffer,"%d",a_thread->Param(0).GetInt());
-			a_thread->PushNewString(buffer);
-			break;
-		}
-	case GM_FLOAT:
-		{
-			sprintf(buffer,"%f",a_thread->Param(0).GetFloat());
-			a_thread->PushNewString(buffer);
-			break;
-		}
-	case GM_STRING:
-		{
-			a_thread->Push(a_thread->Param(0));
-			break;
-		}
-	default:
-		GM_EXCEPTION_MSG("can't convert type %s to string",a_thread->GetMachine()->GetTypeName(a_thread->ParamType(0)));
-		return GM_EXCEPTION;
-	}	
+	const char * str = a_thread->Param(0).AsString(a_thread->GetMachine(),buffer,256);
+	a_thread->PushNewString(str);
+	return GM_OK;
+}
+
+static int GM_CDECL gmfToStringWithType(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	char buffer[256] = {};
+	const char * str = a_thread->Param(0).AsStringWithType(a_thread->GetMachine(),buffer,256);
+	a_thread->PushNewString(str);
 	return GM_OK;
 }
 
@@ -1243,6 +1232,12 @@ static gmFunctionEntry s_stringLib[] =
 	\return string
 	*/
 	{"ToString", gmfToString},
+	{"String", gmfToString},
+	/*gm
+	\function ToString
+	\return string
+	*/
+	{"ToStringWithType", gmfToStringWithType},	
 	/*gm
 	\function Upper
 	\brief Upper will return the string as uppercase

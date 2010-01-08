@@ -365,28 +365,11 @@ int GM_CDECL gmFloatOpNOT(gmThread * a_thread, gmVariable * a_operands)
 
 // we could use gmVariable::AsString here, but this is for types <= string.... is a little more efficient.
 // a_buffer must be >= 64
-inline const char * gmUnknownToString(gmMachine * a_machine, gmVariable * a_unknown, char * a_buffer, int * a_len = NULL)
+inline const char * gmUnknownToString(gmMachine * a_machine, gmVariable * a_unknown, char * a_buffer, int a_bufferLen, int * a_len = NULL)
 {
-	if(a_unknown->m_type == GM_STRING)
-	{
-		gmStringObject * str = (gmStringObject *) GM_MOBJECT(a_machine, a_unknown->m_value.m_ref);
-		if(a_len) { *a_len = str->GetLength(); }
-		return (const char *) *str;
-	}
-	if(a_unknown->m_type == GM_INT)
-	{
-		sprintf(a_buffer, "%d", a_unknown->m_value.m_int); // this won't be > 64 chars
-	}
-	else if(a_unknown->m_type == GM_FLOAT)
-	{
-		sprintf(a_buffer, "%f", a_unknown->m_value.m_float); // this won't be > 64 chars
-	}
-	else
-	{
-		strcpy(a_buffer, "null");
-	}
-	if(a_len) { *a_len = strlen(a_buffer); }
-	return a_buffer;
+	const char * typeString = a_unknown->AsString(a_machine,a_buffer,a_bufferLen);
+	if(a_len) { *a_len = strlen(typeString); }
+	return typeString;
 }
 int GM_CDECL gmStringOpAdd(gmThread * a_thread, gmVariable * a_operands)
 {
@@ -394,8 +377,8 @@ int GM_CDECL gmStringOpAdd(gmThread * a_thread, gmVariable * a_operands)
 	char buffer1[GMSTRING_BUFFERSIZE];
 	char buffer2[GMSTRING_BUFFERSIZE];
 	int len1 = 0, len2 = 0;
-	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, &len1);
-	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, &len2);
+	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, GMSTRING_BUFFERSIZE, &len1);
+	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, GMSTRING_BUFFERSIZE, &len2);
 	char * buffer = (char *) alloca(len1 + len2 + 1);
 	memcpy(buffer, str1, len1);
 	memcpy(buffer + len1, str2, len2 + 1);
@@ -409,8 +392,8 @@ int GM_CDECL gmStringOpLT(gmThread * a_thread, gmVariable * a_operands)
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
 	char buffer2[GMSTRING_BUFFERSIZE];
-	const char * str1 = gmUnknownToString(machine, a_operands, buffer1);
-	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2);
+	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, GMSTRING_BUFFERSIZE);
+	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, GMSTRING_BUFFERSIZE);
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == -1) ? 1 : 0;
@@ -421,8 +404,8 @@ int GM_CDECL gmStringOpGT(gmThread * a_thread, gmVariable * a_operands)
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
 	char buffer2[GMSTRING_BUFFERSIZE];
-	const char * str1 = gmUnknownToString(machine, a_operands, buffer1);
-	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2);
+	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, GMSTRING_BUFFERSIZE);
+	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, GMSTRING_BUFFERSIZE);
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 1) ? 1 : 0;
@@ -433,8 +416,8 @@ int GM_CDECL gmStringOpLTE(gmThread * a_thread, gmVariable * a_operands)
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
 	char buffer2[GMSTRING_BUFFERSIZE];
-	const char * str1 = gmUnknownToString(machine, a_operands, buffer1);
-	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2);
+	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, GMSTRING_BUFFERSIZE);
+	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, GMSTRING_BUFFERSIZE);
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 1) ? 0 : 1;
@@ -445,8 +428,8 @@ int GM_CDECL gmStringOpGTE(gmThread * a_thread, gmVariable * a_operands)
 	gmMachine * machine = a_thread->GetMachine();
 	char buffer1[GMSTRING_BUFFERSIZE];
 	char buffer2[GMSTRING_BUFFERSIZE];
-	const char * str1 = gmUnknownToString(machine, a_operands, buffer1);
-	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2);
+	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, GMSTRING_BUFFERSIZE);
+	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, GMSTRING_BUFFERSIZE);
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == -1) ? 0 : 1;
@@ -466,8 +449,8 @@ int GM_CDECL gmStringOpEQ(gmThread * a_thread, gmVariable * a_operands)
 
 	char buffer1[GMSTRING_BUFFERSIZE];
 	char buffer2[GMSTRING_BUFFERSIZE];
-	const char * str1 = gmUnknownToString(machine, a_operands, buffer1);
-	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2);
+	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, GMSTRING_BUFFERSIZE);
+	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, GMSTRING_BUFFERSIZE);
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 0) ? 1 : 0;
@@ -487,8 +470,8 @@ int GM_CDECL gmStringOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 
 	char buffer1[GMSTRING_BUFFERSIZE];
 	char buffer2[GMSTRING_BUFFERSIZE];
-	const char * str1 = gmUnknownToString(machine, a_operands, buffer1);
-	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2);
+	const char * str1 = gmUnknownToString(machine, a_operands, buffer1, GMSTRING_BUFFERSIZE);
+	const char * str2 = gmUnknownToString(machine, a_operands + 1, buffer2, GMSTRING_BUFFERSIZE);
 	int res = strcmp(str1, str2);
 	a_operands->m_type = GM_INT;
 	a_operands->m_value.m_ref = (res == 0) ? 0 : 1;
