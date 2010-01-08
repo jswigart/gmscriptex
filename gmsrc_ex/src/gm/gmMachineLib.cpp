@@ -17,6 +17,7 @@ See Copyright Notice in gmMachine.h
 
 #include "gmCall.h"
 
+#include <string>
 #include <vector>
 #include <algorithm>
 
@@ -1211,7 +1212,7 @@ static int GM_CDECL gmfImport(gmThread * a_thread)
 		return GM_EXCEPTION;
 	}
 
-	std::string slower(var);
+	std::string slower = var;
 	std::transform(slower.begin(),slower.end(),slower.begin(),tolower);
 
 	// return it if it exists
