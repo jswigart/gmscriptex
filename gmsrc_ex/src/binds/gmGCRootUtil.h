@@ -95,6 +95,10 @@ public:
     return false;
   }
 
+  int GetSize() const
+  {
+	  return m_map.size();
+  }
 };
 
 
