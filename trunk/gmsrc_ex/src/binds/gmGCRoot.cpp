@@ -160,7 +160,7 @@ void gmGCRootManager::DestroyAllMachines()
 {
   while( m_machineHolderSet.GetSize() )
   {
-    DestroyMachine( m_machineHolderSet[m_machineHolderSet.GetLastIndex()].m_machine );
+	  DestroyMachine( m_machineHolderSet[m_machineHolderSet.GetLastIndex()].m_machine );
   }
 }
 

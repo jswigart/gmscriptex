@@ -272,8 +272,7 @@ void gmMachine::ResetAndFreeMemory()
 #endif //!GM_GC_KEEP_PERSISTANT_SEPARATE
 
 	m_global = NULL;
-	gmuint i;
-	for(i = 0; i < m_types.Count(); ++i)
+	for(gmuint i = 0; i < m_types.Count(); ++i)
 	{
 		m_types[i].m_variables = NULL;
 		m_types[i].m_name = NULL;
@@ -292,8 +291,7 @@ void gmMachine::ResetAndFreeMemory()
 	}
 	m_global = NULL; //Global was freed with the rest
 	// operators\types
-	gmuint i;
-	for(i = 0; i < m_types.Count(); ++i)
+	for(gmuint i = 0; i < m_types.Count(); ++i)
 	{
 		m_types[i].m_variables = NULL;
 		m_types[i].m_name = NULL;
