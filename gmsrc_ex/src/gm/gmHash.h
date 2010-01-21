@@ -33,6 +33,7 @@ public:
 	/// \brief Return whatever is the 'key' for this type.  Used by gmHash
 	//const KEY& GetKey() const = 0;
 
+	virtual ~gmHashNode() {}
 private:
 
 	T * m_next;
