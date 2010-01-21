@@ -43,6 +43,8 @@ public:
 
 	/// \brief Unlock() will reset the code generator.
 	virtual int Unlock() = 0;
+
+	virtual ~gmCodeGen() {}
 };
 
 
