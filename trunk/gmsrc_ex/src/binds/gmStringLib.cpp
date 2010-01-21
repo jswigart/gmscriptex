@@ -900,12 +900,18 @@ static int GM_CDECL gmStringSetExtension(gmThread * a_thread)
 	{
 		*lpsz = '\0';
 		if (extLength)
-			sprintf(buffer, "%s.%s", buffer, newExt);
+		{
+			char newExtension[256] = {};
+			sprintf(newExtension,".%s",newExt);
+			strcat(buffer,newExtension);
+		}
 
 	}
 	else if (extLength)
 	{
-		sprintf(buffer, "%s.%s", buffer, newExt);
+		char newExtension[256] = {};
+		sprintf(newExtension,".%s",newExt);
+		strcat(buffer,newExtension);
 	}
 
 	a_thread->PushNewString(buffer);
