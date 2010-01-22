@@ -28,7 +28,7 @@ template<class KEY, class T, class HASHER = gmDefaultHasher>
 class gmHashNode
 {
 public:
-	inline gmHashNode() {}
+	inline gmHashNode() : m_next(0) {}
 
 	/// \brief Return whatever is the 'key' for this type.  Used by gmHash
 	//const KEY& GetKey() const = 0;
