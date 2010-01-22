@@ -25,7 +25,7 @@ class gmListDoubleNode
 {
 public:
 
-	inline gmListDoubleNode() {}
+	inline gmListDoubleNode() : m_next(0), m_prev(0) {}
 
 	/// \brief Nullify()
 	inline void Nullify()
