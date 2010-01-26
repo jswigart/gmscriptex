@@ -693,8 +693,36 @@ static int GM_CDECL gmBlock(gmThread * a_thread) // var, ...
 	a_thread->Push(a_thread->Param(res));
 	return GM_OK;
 }
+#if(GM_USE_SYNC)
+static int GM_CDECL gmSyncThread(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_INT_PARAM(threadId,0);
+	if(threadId == a_thread->GetId())
+	{
+		return GM_OK;
+	}
+	gmThread * waitThread = a_thread->GetMachine()->GetThread(threadId);
+	if(waitThread)
+	{
+		switch(waitThread->GetState())
+		{
+		case gmThread::SLEEPING:
+		case gmThread::BLOCKED:
+			break;
+		default:
+			gmVariable blk((MC_SIGNAL_THREAD_DONE<<16)|threadId);
+			int res = a_thread->GetMachine()->Sys_Block(a_thread, 1, &blk);
+			if(res == -1)
+				return GM_SYS_BLOCK;
+			else if(res == -2)
+				return GM_SYS_YIELD;
 
-
+			return GM_OK;
+		}
+	}
+}
+#endif
 #if GM_USE_INCGC
 
 static void GM_CDECL gmGCDestructStateUserType(gmMachine * a_machine, gmUserObject* a_object)
@@ -1515,7 +1543,9 @@ static gmFunctionEntry s_binding[] =
 	\return the unblocking var
 	*/
 	{"block", gmBlock},
-
+#if(GM_USE_SYNC)
+	{"threadSync", gmSyncThread},
+#endif
 	/*gm
 	\function stateSet
 	\brief stateSet will collapse the stack to nothing, and push the passed functions.

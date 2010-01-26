@@ -73,6 +73,11 @@ class gmSourceEntry;
 class gmStream;
 class gmBlockList;
 
+enum gmMachineInternalSignals
+{
+	MC_SIGNAL_THREAD_DONE = 0xFFFF,
+};
+
 enum gmMachineCommand
 {
 	MC_COLLECT_GARBAGE = 0, // called when a gc cycle is run, a_context is the gc mark

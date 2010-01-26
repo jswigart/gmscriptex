@@ -57,6 +57,10 @@ enum
 	GM_ENTITY,
 #endif
 
+#if(GM_USE_ENUM_SUPPORT)
+	GM_ENUM,
+#endif
+
 	GM_STRING,
 	GM_TABLE,
 	GM_FUNCTION,
@@ -65,6 +69,13 @@ enum
 	GM_FORCEINT = GM_MAX_INT,
 };
 
+#if(GM_USE_ENUM_SUPPORT)
+struct gmEnumData
+{
+	gmint32		enumType;
+	gmint32		enumValue;
+};
+#endif
 
 /// \struct gmVariable
 /// \brief a variable is the basic type passed around on the stack, and used as storage in the symbol tables.
@@ -85,7 +96,10 @@ struct gmVariable
 #endif
 #if(GM_USE_ENTITY_STACK)
 		int m_enthndl;
-#endif		
+#endif
+#if(GM_USE_ENUM_SUPPORT)
+		gmEnumData m_enum;
+#endif
 	} m_value;
 
 	inline gmVariable() 
@@ -161,6 +175,17 @@ struct gmVariable
 	inline void SetEntity(int _hndl) { m_type = GM_ENTITY; m_value.m_enthndl = _hndl; }
 	inline int GetEntity() const { return m_value.m_enthndl; }
 	static gmVariable EntityVar(int _hndl) { gmVariable v; v.SetEntity(_hndl); return v; }
+#endif
+
+#if(GM_USE_ENUM_SUPPORT)
+	inline bool IsEnum() const { return m_type == GM_ENUM; }
+	inline void SetEnum(int enumType, int enumValue) 
+	{
+		m_value.m_enum.enumType = enumType; 
+		m_value.m_enum.enumValue = enumValue; 
+	}
+	inline int GetEnumType() const { return m_value.m_enum.enumType; }
+	inline int GetEnumValue() const { return m_value.m_enum.enumValue; }
 #endif
 
 	inline void SetInt(int a_value) { m_type = GM_INT; m_value.m_int = a_value; }

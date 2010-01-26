@@ -104,10 +104,12 @@ enum gmEndian
 
 #define GM_USE_VECTOR3_STACK	    1         // Support for stack based vector3 type
 #define GM_USE_ENTITY_STACK			1         // Support for stack based entity handle(as an int)
+#define GM_USE_ENUM_SUPPORT			0		  // Support for enumerations
 
 #define GM_BOOL_OP                  1         // Spport for a bool operator on user types for use in if statements. For full effect, users will want to implement operators [bool, ==, !=, !]
 #define GM_USE_FORK                 1         // Support fork instruction 
 #define GM_USER_FOREACH             1         // Support foreach for user types
 #define GM_USE_SWITCH				1	      // Support switch statements
+#define GM_USE_SYNC					1		  // Support for sync function
 
 #endif // _GMCONFIG_H_
