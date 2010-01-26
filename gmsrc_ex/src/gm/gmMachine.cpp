@@ -914,8 +914,7 @@ int gmMachine::Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable 
 	}
 
 	// add the blocks.
-	int i;
-	for(i = 0; i < m_numBlocks; ++i)
+	for(int i = 0; i < m_numBlocks; ++i)
 	{
 		gmBlockList * blockList = m_blocks.Find(a_blocks[i]);
 		if(blockList == NULL)
@@ -1047,6 +1046,11 @@ void gmMachine::Sys_SwitchState(gmThread * a_thread, int a_to)
 			{
 				s_machineCallback(this, MC_THREAD_DESTROY, a_thread);
 			}
+
+#if(GM_USE_SYNC)
+			gmVariable sig((MC_SIGNAL_THREAD_DONE<<16)|a_thread->GetId());
+			Signal(sig,GM_INVALID_THREAD,a_thread->GetId());
+#endif
 
 			m_threads.Remove(a_thread);
 			a_thread->Sys_Reset(0);

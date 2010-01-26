@@ -1063,6 +1063,11 @@ LabelException:
 	LogLineFile();
 	LogCallStack();
 
+#if(GM_USE_SYNC)
+	gmVariable sig((MC_SIGNAL_THREAD_DONE<<16)|GetId());
+	m_machine->Signal(sig,GM_INVALID_THREAD,GetId());
+#endif
+
 	// call machine exception handler
 	if(gmMachine::s_machineCallback)
 	{
