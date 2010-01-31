@@ -650,11 +650,32 @@ static int GM_CDECL gmBlock(gmThread * a_thread) // var, ...
   }
   else if(res == -2)
   {
-    return GM_SYS_YIELD;
+    // Failed to block, so exception to prevent undefined or unexpected behavior
+    GM_EXCEPTION_MSG("cannot block on null");
+    return GM_EXCEPTION;
   }
   a_thread->Push(a_thread->Param(res));
   return GM_OK;
 }
+
+#if GM_USE_ENDON
+static int GM_CDECL gmEndOn(gmThread * a_thread)
+{
+  GM_CHECK_NUM_PARAMS(1);
+
+  int res = a_thread->GetMachine()->Sys_Block(a_thread, a_thread->GetNumParams(), a_thread->GetBase(), true);
+  if(res == -1)
+  {
+    return GM_OK;
+  }
+  else if(res == -3)
+  {
+    return GM_EXCEPTION;
+  }
+  a_thread->Push(a_thread->Param(res));
+  return GM_OK;
+}
+#endif //GM_USE_ENDON
 
 
 #if GM_USE_INCGC
@@ -782,8 +803,8 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
   GM_CHECK_STRING_PARAM(format, 0);
   int param = 1;
   int len = 0, size = 0;
-  const int bufferSize = 128;
-  char * str = NULL, buffer[bufferSize];
+	const int bufferSize = 1024;
+	char * str = NULL, buffer[bufferSize] = {};
 
   while(*format)
   {
@@ -794,72 +815,136 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
         case 'S' : 
         case 's' : 
         {
-          GM_STRING_PARAM(pstr, param, "");
+					//GM_STRING_PARAM(pstr, param, "");
+					const char *pstr = a_thread->Param(param).GetCStringSafe();
+					if(!pstr)
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected string as param %d",param);
+						return GM_EXCEPTION;
+					}
+					gmConcat(a_thread->GetMachine(), str, len, size, pstr, 64);
           ++param;
-          gmConcat(a_thread->GetMachine(), str, len, size, pstr, 64);
           break;
         }
         case 'C' : 
         case 'c' : 
         {
-          GM_INT_PARAM(ival, param, 0);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%c", a_thread->Param(param).GetInt());
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           ++param;
-          sprintf(buffer, "%c", ival);
-          gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           break;
         }
         case 'D' :
         case 'd' :
         {
-          GM_INT_PARAM(ival, param, 0);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%d", a_thread->Param(param).GetInt());
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           ++param;
-          sprintf(buffer, "%d", ival);
-          gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           break;
         }
         case 'U' :
         case 'u' :
         {
-          GM_INT_PARAM(ival, param, 0);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%u", a_thread->Param(param).GetInt());
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           ++param;
-          sprintf(buffer, "%u", ival);
-          gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           break;
         }
         case 'B' :
         case 'b' :
         {
-          GM_INT_PARAM(ival, param, 0);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					gmItoa(a_thread->Param(param).GetInt(), buffer, 2);
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           ++param;
-          gmItoa(ival, buffer, 2);
-          gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           break;
         }
         case 'X' :
         case 'x' :
         {
-          GM_INT_PARAM(ival, param, 0);
+					//GM_INT_PARAM(ival, param, 0);
+					if(!a_thread->Param(param).IsInt())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected int as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%x", a_thread->Param(param).GetInt());
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           ++param;
-          sprintf(buffer, "%x", ival);
-          gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           break;
         }
         case 'F' :
         case 'f' :
         {
-          GM_FLOAT_PARAM(fval, param, 0);
+					//GM_FLOAT_PARAM(fval, param, 0);
+					if(!a_thread->Param(param).IsFloat())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected float as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%f", a_thread->Param(param).GetFloat());
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           ++param;
-          sprintf(buffer, "%f", fval);
+					break;
+				}
+			case 'G' :
+			case 'g' :
+				{
+					//GM_FLOAT_PARAM(fval, param, 0);
+					if(!a_thread->Param(param).IsFloat())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected float as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%g", a_thread->Param(param).GetFloat());
           gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
+					++param;
           break;
         }
         case 'e' :
         case 'E' :
         {
-          GM_FLOAT_PARAM(fval, param, 0);
+					//GM_FLOAT_PARAM(fval, param, 0);
+					if(!a_thread->Param(param).IsFloat())
+					{
+						a_thread->GetMachine()->Sys_Free(str);
+						GM_EXCEPTION_MSG("expected float as param %d",param);
+						return GM_EXCEPTION;
+					}
+					sprintf(buffer, "%e", a_thread->Param(param).GetFloat());
+					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           ++param;
-          sprintf(buffer, "%e", fval);
-          gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
           break;
         }
         case '%' :
@@ -1134,7 +1219,15 @@ static gmFunctionEntry s_binding[] =
     \return the unblocking var
   */
   {"block", gmBlock},
-
+#if GM_USE_ENDON
+  /*gm
+    \function endon
+    \brief endon will kill the thread when a signal is sent from those matching the list
+    \param ... vars
+    \return the killing var
+  */
+  {"endon", gmEndOn},
+#endif //GM_USE_ENDON
   /*gm
     \function stateSet
     \brief stateSet will collapse the stack to nothing, and push the passed functions.

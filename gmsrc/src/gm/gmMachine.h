@@ -60,7 +60,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #undef GetObject //Argh Windows defines this in WINGDI.H
 
-#define GM_VERSION "1.24"
+#define GM_VERSION "1.26"
 
 // fwd decls
 class gmStringObject;
@@ -152,6 +152,9 @@ public:
   gmVariable m_block; ///< the block object, this will be pushed on the stack if unblocked.
   gmThread * m_thread; ///< the thread this block belongs to
   gmBlock * m_nextBlock; ///< next block on this thread
+#if GM_USE_ENDON
+  bool m_endOn; ///< if set to true, the thread is killed when this signal is received
+#endif //GM_USE_ENDON
   class gmBlockList * m_list; ///< parent block list.
 };
 
@@ -249,6 +252,9 @@ public:
   /// \brief Access the table for a 'type', or return NULL.
   gmTableObject * GetTypeTable(gmType a_type);
 
+  /// \brief GetTypeId() will return the gmType for the specified type or GM_INVALID_TYPE if not found.
+  gmType GetTypeId(const char * a_typename) const;
+  
   //
   //
   // Thread Interface
@@ -323,7 +329,11 @@ public:
 
   /// \brief Sys_Block() will add a block to a thread.
   /// \return the index of the block that was signalled, or -1 if the blocks were added and the thread is to enter a blocked state.
+#if GM_USE_ENDON
+  int Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable * a_blocks, bool a_endon = false);
+#else //GM_USE_ENDON
   int Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable * a_blocks);
+#endif //GM_USE_ENDON
 
   /// \brief KillThread()
   void KillThread(int a_threadId);

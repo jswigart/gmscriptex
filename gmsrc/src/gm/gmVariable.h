@@ -33,6 +33,8 @@ typedef int gmType;
 
 enum
 {
+  GM_INVALID_TYPE = -1, // Represent invalid typeIds returned by a query, not stored or used otherwise.   
+
   GM_NULL = 0, // GM_NULL must be 0 as i have relied on this in expression testing.
   GM_INT,
   GM_FLOAT,
@@ -88,9 +90,17 @@ struct gmVariable
   void SetUser(gmMachine * a_machine, void * a_userPtr, int a_userType);
   
 
-  inline bool IsReference() const { return m_type > GM_FLOAT; }
   inline void Nullify() { m_type = GM_NULL; m_value.m_int = 0; }
-  inline bool IsNull() { return m_type == GM_NULL; }
+  inline bool IsNull() const { return m_type == GM_NULL; }
+  inline bool IsReference() const { return m_type > GM_FLOAT; }
+	inline bool IsInt() const { return m_type == GM_INT; }
+  inline bool IsFloat() const { return m_type == GM_FLOAT; }
+  inline bool IsNumber() const { return IsInt() || IsFloat(); }
+
+  // GetInt and GetFloat are not protected. User should verify the type before calling this.
+  inline int GetInt() const  { return m_value.m_int; }
+  inline float GetFloat() const { return m_value.m_float; }
+
 
   /// \brief AsString will get this gm variable as a string if possible.  AsString is used for the gm "print" and system.Exec function bindings.
   /// \param a_buffer is a buffer you must provide for the function to write into.  this buffer needs only be 256 characters long as it is stated that
