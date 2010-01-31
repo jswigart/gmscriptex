@@ -434,8 +434,7 @@ void gmMachine::RegisterLibrary(gmFunctionEntry * a_functions, int a_numFunction
 		strcpy(funcNameLower, a_functions[index].m_name);
 		_strlwr(funcNameLower);
 
-		m_cFuncUserData
-			table->Set(this, funcNameLower, gmVariable(GM_FUNCTION, (gmptr)funcObj));
+		table->Set(this, funcNameLower, gmVariable(GM_FUNCTION, (gmptr)funcObj));
 
 #else // !GM_CASE_INSENSITIVE
 
@@ -858,24 +857,38 @@ bool gmMachine::Signal(const gmVariable &a_signal, int a_dstThreadId, int a_srcT
 				gmSignal * signal = NULL;
 				used = true;
 
-				// allocate a signal
-				if(thread->GetState() == gmThread::SYS_PENDING)
-				{
-					signal = (gmSignal *) Sys_Alloc(sizeof(gmSignal));
-					signal->m_signal = a_signal;
-					signal->m_srcThreadId = a_srcThreadId;
-					signal->m_dstThreadId = a_dstThreadId;
-					signal->m_nextSignal = thread->Sys_GetSignals();
-					thread->Sys_SetSignals(signal);
-				}
-				else
+#if GM_USE_ENDON
+				if(block->m_endOn == true)
 				{
 					block->m_signalled = true;
 					block->m_srcThreadId = a_srcThreadId;
-					thread->Sys_SetState(gmThread::SYS_PENDING);
-				}
 
-				if(a_dstThreadId != GM_INVALID_THREAD) break;
+					Sys_SwitchState(thread, gmThread::KILLED);
+				}
+				else
+#endif //GM_USE_ENDON
+				{
+					// allocate a signal
+					if(thread->GetState() == gmThread::SYS_PENDING)
+					{
+						signal = (gmSignal *) Sys_Alloc(sizeof(gmSignal));
+						signal->m_signal = a_signal;
+						signal->m_srcThreadId = a_srcThreadId;
+						signal->m_dstThreadId = a_dstThreadId;
+						signal->m_nextSignal = thread->Sys_GetSignals();
+						thread->Sys_SetSignals(signal);
+					}
+					else
+					{
+						block->m_signalled = true;
+						block->m_srcThreadId = a_srcThreadId;
+						thread->Sys_SetState(gmThread::SYS_PENDING);
+					}
+				}
+				if(a_dstThreadId != GM_INVALID_THREAD)
+				{
+					break;
+				}
 			}
 			block = blockList->m_blocks.GetNext(block);
 		}
@@ -884,8 +897,11 @@ bool gmMachine::Signal(const gmVariable &a_signal, int a_dstThreadId, int a_srcT
 }
 
 
-
+#if GM_USE_ENDON
+int gmMachine::Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable * a_blocks, bool a_endon)
+#else //GM_USE_ENDON
 int gmMachine::Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable * a_blocks)
+#endif //GM_USE_ENDON
 {
 	// use up our signals.
 	gmSignal * signal = a_thread->Sys_GetSignals(), * next;
@@ -900,7 +916,14 @@ int gmMachine::Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable 
 				// remove the signal
 				a_thread->Sys_SetSignals(signal->m_nextSignal);
 				Sys_Free(signal);
-
+#if GM_USE_ENDON // NOTE: Not sure if this can ever occur
+				if (a_endon)
+				{
+					// If this is set to end the thread and we've already got the signal
+					// kill the thread now
+					Sys_SwitchState(a_thread, gmThread::KILLED);
+				}
+#endif //GM_USE_ENDON
 				// return the block
 				return i;
 			}
@@ -908,14 +931,43 @@ int gmMachine::Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable 
 
 		// we didnt fire on the signal, so remove it.
 		next = signal->m_nextSignal;
-		a_thread->Sys_SetSignals(next);
-		Sys_Free(signal);
+#if GM_USE_ENDON
+		if (a_endon == false) //only remove signals if we're running normal block logic, we don't want to gobble up signals!
+#endif //GM_USE_ENDON
+		{
+			a_thread->Sys_SetSignals(next);
+			Sys_Free(signal);
+		}
 		signal = next;
 	}
 
 	// add the blocks.
-	for(int i = 0; i < m_numBlocks; ++i)
+	int i;
+	for(i = 0; i < m_numBlocks; ++i)
 	{
+		// Catch attempts to block on null
+		if( a_blocks[i].IsNull() )
+		{
+			return -2;
+		}
+
+#if GM_USE_ENDON
+		// hunt for an existing block on the thread
+		gmBlock * block = a_thread->Sys_GetBlocks();
+		while(block)
+		{
+			if (gmVariable::Compare(block->m_block, a_blocks[i]) == 0)
+			{
+				// found, error - can't block on this again
+				GetLog().LogEntry("block or endon already set for thread");
+				Sys_SwitchState(a_thread, gmThread::KILLED);
+				return -3;
+			}
+			block = block->m_nextBlock;
+		}
+#else //GM_USE_ENDON
+		gmBlock * block;
+#endif //GM_USE_ENDON
 		gmBlockList * blockList = m_blocks.Find(a_blocks[i]);
 		if(blockList == NULL)
 		{
@@ -925,10 +977,13 @@ int gmMachine::Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable 
 			m_blocks.Insert(blockList);
 		}
 
-		gmBlock * block = (gmBlock *) Sys_Alloc(sizeof(gmBlock));
+		block = (gmBlock *) Sys_Alloc(sizeof(gmBlock));
 		block->m_list = blockList;
 		block->m_block = a_blocks[i];
 		block->m_signalled = false;
+#if GM_USE_ENDON
+		block->m_endOn = a_endon;
+#endif //GM_USE_ENDON
 		block->m_thread = a_thread;
 		block->m_nextBlock = a_thread->Sys_GetBlocks();
 		a_thread->Sys_SetBlocks(block);
@@ -1003,6 +1058,7 @@ void gmMachine::Sys_SwitchState(gmThread * a_thread, int a_to)
 	case gmThread::SYS_PENDING :
 		{
 			// remove and clean up the blocks.
+			Sys_RemoveSignals(a_thread); // Prevent signals from accumulating
 			Sys_RemoveBlocks(a_thread);
 			m_blockedThreads.Remove(a_thread);
 			break;
@@ -1669,7 +1725,7 @@ void gmMachine::Type::Init()
 	m_gc = NULL;
 #endif	  
 #if GM_USER_FOREACH
-  m_itrFunc = NULL;
+	m_itrFunc = NULL;
 #endif //GM_USER_FOREACH
 }
 
@@ -1901,6 +1957,18 @@ gmTableObject * gmMachine::GetTypeTable(gmType a_type)
 		return m_types[a_type].m_variables;
 	}
 	return NULL; 
+}
+
+gmType gmMachine::GetTypeId(const char * a_typename) const
+{
+	for(gmuint id = GM_NULL; id < m_types.Count(); ++id)
+	{
+		if( strcmp((const char *)m_types[id].m_name, a_typename) == 0 )
+		{
+			return id;
+		}
+	}
+	return GM_INVALID_TYPE;
 }
 
 gmType gmMachine::GetTypeParent(gmType a_type)

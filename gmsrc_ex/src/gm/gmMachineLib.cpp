@@ -688,11 +688,16 @@ static int GM_CDECL gmBlock(gmThread * a_thread) // var, ...
 	}
 	else if(res == -2)
 	{
-		return GM_SYS_YIELD;
+		// Failed to block, so exception to prevent undefined or unexpected behavior
+		GM_EXCEPTION_MSG("cannot block on null");
+		return GM_EXCEPTION;
 	}
 	a_thread->Push(a_thread->Param(res));
 	return GM_OK;
 }
+
+
+
 #if(GM_USE_SYNC)
 static int GM_CDECL gmSyncThread(gmThread * a_thread)
 {
@@ -722,6 +727,26 @@ static int GM_CDECL gmSyncThread(gmThread * a_thread)
 	return GM_OK;
 }
 #endif
+
+#if GM_USE_ENDON
+static int GM_CDECL gmEndOn(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+
+	int res = a_thread->GetMachine()->Sys_Block(a_thread, a_thread->GetNumParams(), a_thread->GetBase(), true);
+	if(res == -1)
+	{
+		return GM_OK;
+	}
+	else if(res == -3)
+	{
+		return GM_EXCEPTION;
+	}
+	a_thread->Push(a_thread->Param(res));
+	return GM_OK;
+}
+#endif //GM_USE_ENDON
+
 #if GM_USE_INCGC
 
 static void GM_CDECL gmGCDestructStateUserType(gmMachine * a_machine, gmUserObject* a_object)
@@ -776,7 +801,7 @@ static int GM_CDECL gmTableClear(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_TABLE_PARAM(table, 0);
-		
+
 	table->RemoveAndDeleteAll(a_thread->GetMachine());
 	return GM_OK;
 }
@@ -844,7 +869,7 @@ public:
 				call.AddParam(_var2);
 				call.End();
 
-				
+
 				call.GetReturnedInt(retVal);
 			}
 			return retVal < 0;
@@ -1257,7 +1282,7 @@ static int GM_CDECL gmfImport(gmThread * a_thread)
 		GM_EXCEPTION_MSG("No Callback provided for executing files!");
 		return GM_EXCEPTION;
 	}
-	
+
 	// TODO: search path support?
 
 	gmTableObject *NewModule = pM->AllocTableObject();
@@ -1543,8 +1568,22 @@ static gmFunctionEntry s_binding[] =
 	*/
 	{"block", gmBlock},
 #if(GM_USE_SYNC)
+	/*gm
+	\function threadSync
+	\brief blocks current thread until a specified thread completes
+	\param threadId
+	*/
 	{"threadSync", gmSyncThread},
 #endif
+#if GM_USE_ENDON
+	/*gm
+	\function endon
+	\brief endon will kill the thread when a signal is sent from those matching the list
+	\param ... vars
+	\return the killing var
+	*/
+	{"endon", gmEndOn},
+#endif //GM_USE_ENDON
 	/*gm
 	\function stateSet
 	\brief stateSet will collapse the stack to nothing, and push the passed functions.
@@ -1596,7 +1635,7 @@ static gmFunctionEntry s_binding[] =
 	\param table
 	*/
 	{"tableClear", gmTableClear},
-	
+
 	/*gm
 	\function tableDuplicate
 	\brief tableDuplicate will duplicate the passed table object
