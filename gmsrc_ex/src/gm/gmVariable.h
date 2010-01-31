@@ -203,6 +203,7 @@ struct gmVariable
 	inline bool IsInt() const { return m_type == GM_INT; }
 	inline bool IsFloat() const { return m_type == GM_FLOAT; }
 	inline bool IsNumber() const { return IsInt() || IsFloat(); }
+	inline bool IsString() const { return m_type == GM_STRING; }
 
 	// GetInt and GetFloat are not protected. User should verify the type before calling this.
 	inline int GetInt() const  { return m_value.m_int; }

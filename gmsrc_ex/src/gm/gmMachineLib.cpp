@@ -717,10 +717,9 @@ static int GM_CDECL gmSyncThread(gmThread * a_thread)
 				return GM_SYS_BLOCK;
 			else if(res == -2)
 				return GM_SYS_YIELD;
-
-			return GM_OK;
 		}
 	}
+	return GM_OK;
 }
 #endif
 #if GM_USE_INCGC
