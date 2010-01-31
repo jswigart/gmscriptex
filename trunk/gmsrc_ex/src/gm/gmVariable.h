@@ -44,6 +44,8 @@ typedef int gmType;
 
 enum
 {
+  GM_INVALID_TYPE = -1, // Represent invalid typeIds returned by a query, not stored or used otherwise.   
+
 	GM_NULL = 0, // GM_NULL must be 0 as i have relied on this in expression testing.
 	GM_INT,
 	GM_FLOAT,
