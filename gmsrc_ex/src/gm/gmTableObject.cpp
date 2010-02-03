@@ -277,8 +277,6 @@ void gmTableObject::Set(gmMachine * a_machine, const gmVariable &a_key, const gm
 	Resize(a_machine);
 }
 
-
-
 void gmTableObject::Set(gmMachine * a_machine, const char * a_key, const gmVariable &a_value)
 {
 	DisableGCInScope gcEn(a_machine);
@@ -301,6 +299,16 @@ void gmTableObject::Set(gmMachine * a_machine, const gmVariable &a_key, const ch
 	Set(a_machine,
 		a_key, 
 		gmVariable(a_machine->AllocStringObject(a_value)));
+}
+
+void gmTableObject::Set(gmMachine * a_machine, int a_index, const gmVariable &a_value)
+{
+	Set(a_machine, gmVariable(GM_INT, (gmptr)a_index), a_value);
+}
+
+void gmTableObject::Set(gmMachine * a_machine, int a_index, const char *a_value)
+{
+	Set(a_machine, gmVariable(GM_INT, (gmptr)a_index), a_value);
 }
 
 gmTableObject * gmTableObject::Duplicate(gmMachine * a_machine)

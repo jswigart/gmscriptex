@@ -69,10 +69,8 @@ public:
 	void Set(gmMachine * a_machine, const char * a_key, const gmVariable &a_value);
 	void Set(gmMachine * a_machine, const char * a_key, const char *a_value);
 	void Set(gmMachine * a_machine, const gmVariable &a_key, const char *a_value);
-	inline void Set(gmMachine * a_machine, int a_index, const gmVariable &a_value)
-	{
-		Set(a_machine, gmVariable(GM_INT, (gmptr)a_index), a_value);
-	}
+	void Set(gmMachine * a_machine, int a_index, const gmVariable &a_value);
+	void Set(gmMachine * a_machine, int a_index, const char *a_value);
 
 	inline int Count() const { return m_slotsUsed; }
 	gmTableObject * Duplicate(gmMachine * a_machine);
