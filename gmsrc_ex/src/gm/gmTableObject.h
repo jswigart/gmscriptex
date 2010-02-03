@@ -61,6 +61,9 @@ public:
 	// Get by c string (uses linear search)
 	gmVariable GetLinearSearch(const char * a_key) const;
 
+	gmTableNode * GetTableNode(const gmVariable &a_key) const;
+	gmTableNode * GetTableNode(gmMachine * a_machine, const gmVariable & a_key, bool a_caseSense = true);
+
 #if GM_USE_INCGC  
 	void Set(gmMachine * a_machine, const gmVariable &a_key, const gmVariable &a_value, bool a_disableWriteBarrier = false);  
 #else //GM_USE_INCGC

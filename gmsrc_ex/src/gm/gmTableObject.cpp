@@ -125,6 +125,27 @@ gmVariable gmTableObject::Get(const gmVariable &a_key) const
 	return gmVariable::s_null;
 }
 
+gmTableNode * gmTableObject::GetTableNode(const gmVariable &a_key) const
+{
+	gmTableNode* foundNode = NULL;
+
+	if(m_nodes && a_key.m_type != GM_NULL)
+	{
+		foundNode = GetAtHashPos(&a_key);
+
+		do
+		{
+			if(a_key.m_value.m_ref == foundNode->m_key.m_value.m_ref &&
+				a_key.m_type == foundNode->m_key.m_type)
+			{
+				return foundNode;
+			}
+			foundNode = foundNode->m_nextInHashTable;
+		} while (foundNode);
+	}  
+
+	return NULL;
+}
 
 gmVariable gmTableObject::Get(gmMachine * a_machine, const char * a_key) const
 {
@@ -460,6 +481,32 @@ gmVariable gmTableObject::GetLinearSearch(const char * a_key) const
 		}
 	}
 	return gmVariable::s_null;
+}
+
+gmTableNode * gmTableObject::GetTableNode(gmMachine * a_machine, const gmVariable  & a_key, bool a_caseSense) 
+{
+	const char * a_keyString = a_key.GetCStringSafe(0);
+
+	gmTableIterator it;
+	for( gmTableNode * node = GetFirst(it);
+		!IsNull(it);
+		node = GetNext(it) )
+	{
+		const char * keyStr = node->m_key.GetCStringSafe(0);
+		if( !a_caseSense && keyStr && a_keyString )
+		{
+			if( stricmp(keyStr, a_keyString) == 0 )
+			{
+				return node;
+			}
+		}
+		else
+		{
+			// is this correct?
+			return GetTableNode(a_key);
+		}
+	}
+	return NULL;
 }
 
 void gmTableObject::RemoveAndDeleteAll(gmMachine * a_machine)
