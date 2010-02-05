@@ -495,7 +495,7 @@ gmTableNode * gmTableObject::GetTableNode(gmMachine * a_machine, const gmVariabl
 		const char * keyStr = node->m_key.GetCStringSafe(0);
 		if( !a_caseSense && keyStr && a_keyString )
 		{
-			if( stricmp(keyStr, a_keyString) == 0 )
+			if( _gmstricmp(keyStr, a_keyString) == 0 )
 			{
 				return node;
 			}
