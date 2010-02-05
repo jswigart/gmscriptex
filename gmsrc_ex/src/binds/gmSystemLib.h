@@ -16,7 +16,7 @@
 
 class gmMachine;
 
-#define GM_SYSTEM_LIB 0
+#define GM_SYSTEM_LIB 1
 #define GM_SYSTEM_LIB_MAX_LINE    1024      // maximum file line length
 
 #if GM_SYSTEM_LIB

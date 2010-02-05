@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GMDebugger", "GMDebugger\GMDebugger.vcproj", "{A1676E26-147D-4E06-AEB2-5375DADFF4AE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GMDebuggerServer", "GMDebuggerServer\GMDebuggerServer.vcproj", "{AF504D48-0789-4643-9E6A-F31728216CE3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GMDebuggerServerCB", "GMDebuggerServerCB\GMDebuggerServerCB.vcproj", "{B812046E-EBF0-48DB-93BE-781BE02ABCAA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1676E26-147D-4E06-AEB2-5375DADFF4AE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A1676E26-147D-4E06-AEB2-5375DADFF4AE}.Debug|Win32.Build.0 = Debug|Win32
+		{A1676E26-147D-4E06-AEB2-5375DADFF4AE}.Release|Win32.ActiveCfg = Release|Win32
+		{A1676E26-147D-4E06-AEB2-5375DADFF4AE}.Release|Win32.Build.0 = Release|Win32
+		{AF504D48-0789-4643-9E6A-F31728216CE3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AF504D48-0789-4643-9E6A-F31728216CE3}.Debug|Win32.Build.0 = Debug|Win32
+		{AF504D48-0789-4643-9E6A-F31728216CE3}.Release|Win32.ActiveCfg = Release|Win32
+		{AF504D48-0789-4643-9E6A-F31728216CE3}.Release|Win32.Build.0 = Release|Win32
+		{B812046E-EBF0-48DB-93BE-781BE02ABCAA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B812046E-EBF0-48DB-93BE-781BE02ABCAA}.Debug|Win32.Build.0 = Debug|Win32
+		{B812046E-EBF0-48DB-93BE-781BE02ABCAA}.Release|Win32.ActiveCfg = Release|Win32
+		{B812046E-EBF0-48DB-93BE-781BE02ABCAA}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
