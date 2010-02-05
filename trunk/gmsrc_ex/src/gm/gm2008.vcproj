@@ -21,7 +21,7 @@
 			OutputDirectory="build/$(ConfigurationName)"
 			IntermediateDirectory="build/$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -85,7 +85,7 @@
 			OutputDirectory="build/$(ConfigurationName)"
 			IntermediateDirectory="build/$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -824,6 +824,22 @@
 			</File>
 			<File
 				RelativePath="..\binds\gmGCRootUtil.h"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmHelpers.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmHelpers.h"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmMathLib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\binds\gmMathLib.h"
 				>
 			</File>
 			<File
