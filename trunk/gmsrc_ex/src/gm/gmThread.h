@@ -304,6 +304,19 @@ public:
 #endif // GMDEBUG_SUPPORT
 	mutable int m_user;
 
+
+#if(GM_USE_THREAD_TIMERS)
+	struct gmThreadTime {
+		float	LastExecTime;
+		float	PeakTime;
+
+		void Reset() { LastExecTime = 0.f; PeakTime = 0.f; }
+		gmThreadTime() : LastExecTime(0.f), PeakTime(0.f) {}
+	} threadTime;
+
+	const gmThreadTime & GetRealThreadTime() const { return threadTime; }
+	void UpdateThreadTime(float a_time);
+#endif
 private:
 
 	/// \brief Sys_PopStackFrame() will pop a frame off the stack.

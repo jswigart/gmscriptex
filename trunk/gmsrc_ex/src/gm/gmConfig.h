@@ -113,4 +113,6 @@ enum gmEndian
 #define GM_USE_SYNC					1		  // Support for sync function
 #define GM_USE_ENDON                1         // Support endon() to kill thread when signalled
 
+#define GM_USE_THREAD_TIMERS		1			// enable thread timers
+
 #endif // _GMCONFIG_H_
