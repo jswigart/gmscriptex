@@ -171,9 +171,39 @@ void gmThread::Mark(gmuint32 a_mark)
 }
 #endif //GM_USE_INCGC
 
+#if(GM_USE_THREAD_TIMERS)
+extern void gmPlatformTimerStart();
+extern double gmPlatformTimerGetElapsedSecs();
+
+class gmScopedThreadRun
+{
+public:
+	gmScopedThreadRun(gmThread * a_thread) : m_thread(a_thread)
+	{
+		gmPlatformTimerStart();
+	}
+	~gmScopedThreadRun()
+	{
+		m_thread->UpdateThreadTime( (float)gmPlatformTimerGetElapsedSecs() );		
+	}
+private:
+	gmThread * m_thread;
+};
+void gmThread::UpdateThreadTime(float a_time)
+{
+	threadTime.LastExecTime = a_time;
+	if(threadTime.PeakTime < a_time)
+		threadTime.PeakTime = a_time;
+}
+#endif
+
 // RAGE AGAINST THE VIRTUAL MACHINE =)
 gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 {
+#if(GM_USE_THREAD_TIMERS)
+	gmScopedThreadRun scope(this);
+#endif
+
 	register union
 	{
 		const gmuint8 * instruction;
@@ -1125,6 +1155,10 @@ gmThread::State gmThread::PushStackFrame(int a_numParameters, const gmuint8 ** a
 		// This may not be the best place to signal, but we at least want a valid 'this'
 		m_base = base; // Init so some thread queries work
 		m_machine->Sys_SignalCreateThread(this);
+
+#if(GM_USE_THREAD_TIMERS)
+		threadTime.Reset();
+#endif
 	}
 
 	gmVariable * fnVar = &m_stack[base - 1];

@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\platform\win32msvc\gmPlatformTimer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\gmScanner.cpp"
 				>
 			</File>
