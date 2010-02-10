@@ -1963,7 +1963,8 @@ gmType gmMachine::GetTypeId(const char * a_typename) const
 {
 	for(gmuint id = GM_NULL; id < m_types.Count(); ++id)
 	{
-		if( strcmp((const char *)m_types[id].m_name, a_typename) == 0 )
+		gmStringObject* pObject = m_types[id].m_name;
+		if( strcmp(pObject->GetString(), a_typename) == 0 )
 		{
 			return id;
 		}
