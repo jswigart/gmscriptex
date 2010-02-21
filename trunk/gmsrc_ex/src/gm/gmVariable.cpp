@@ -25,16 +25,34 @@ const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_
 	switch(m_type)
 	{
 	case GM_NULL : 
-		_gmsnprintf(a_buffer, a_len, "null");
-		break;
+		{
+			_gmsnprintf(a_buffer, a_len, "null");
+			break;
+		}
 	case GM_INT :
-		_gmsnprintf(a_buffer, a_len, "%d", m_value.m_int);
-		break;
+		{
+			_gmsnprintf(a_buffer, a_len, "%d", m_value.m_int);
+			break;
+		}
 	case GM_FLOAT :
-		_gmsnprintf(a_buffer, a_len, "%g", m_value.m_float);
-		break;
+		{
+			_gmsnprintf(a_buffer, a_len, "%g", m_value.m_float);
+			break;
+		}
 	case GM_STRING :
-		return ((gmStringObject *) GM_MOBJECT(a_machine, m_value.m_ref))->GetString();
+		{
+			return ((gmStringObject *) GM_MOBJECT(a_machine, m_value.m_ref))->GetString();
+		}
+	case GM_FUNCTION:
+		{
+			const char *source = 0, *fileName = 0;
+			if(a_machine->GetSourceCode(GetFunctionObjectSafe()->GetSourceId(), source, fileName) && fileName) {
+				_gmsnprintf(a_buffer, a_len, "%s (%s)", GetFunctionObjectSafe()->GetDebugName(), fileName);
+			} else {
+				_gmsnprintf(a_buffer, a_len, "%s", GetFunctionObjectSafe()->GetDebugName());
+			}
+			break;
+		}
 #if(GM_USE_VECTOR3_STACK)
 	case GM_VEC3:
 		{
@@ -71,11 +89,6 @@ void gmVariable::DebugInfo(gmMachine * a_machine, gmChildInfoCallback a_cb) cons
 #if(GM_USE_VECTOR3_STACK)
 	case GM_VEC3:
 		{
-			_gmsnprintf(buffVal, buffSize, "(%.3f, %.3f, %.3f)",
-				m_value.m_vec3.x,
-				m_value.m_vec3.y,
-				m_value.m_vec3.z);
-			a_cb("Vector3", buffVal, GM_INT, 0);
 			break;
 		}
 #endif
@@ -92,10 +105,17 @@ void gmVariable::DebugInfo(gmMachine * a_machine, gmChildInfoCallback a_cb) cons
 			{
 				const char *pVar = pNode->m_key.AsString(a_machine, buffVar, buffSize);
 				const char *pVal = pNode->m_value.AsString(a_machine, buffVal, buffSize);
+
+				const int varId = 
+					pNode->m_value.IsReference() && !pNode->m_value.IsFunction() ? 
+					pNode->m_value.m_value.m_ref : 
+				0;
+				
 				a_cb(
 					pVar,
-					pVal, pNode->m_value.m_type, 
-					pNode->m_value.IsReference() ? pNode->m_value.m_value.m_ref : 0);
+					pVal, 
+					a_machine->GetTypeName(pNode->m_value.m_type), 
+					varId);
 
 				pNode = pTable->GetNext(tIt);
 			}
@@ -103,10 +123,6 @@ void gmVariable::DebugInfo(gmMachine * a_machine, gmChildInfoCallback a_cb) cons
 		}
 	case GM_FUNCTION:
 		{
-			gmFunctionObject *pFunc = GetFunctionObjectSafe();
-			const char *pDbName = pFunc->GetDebugName();
-			_gmsnprintf(buffVal, buffSize, pDbName ? pDbName : "<Unknown>");
-			a_cb("Function Name", buffVal, GM_STRING, pFunc->GetRef());
 			break;
 		}
 	default:
@@ -114,10 +130,6 @@ void gmVariable::DebugInfo(gmMachine * a_machine, gmChildInfoCallback a_cb) cons
 		if(dbg_cb)
 		{
 			dbg_cb((gmUserObject*)GM_MOBJECT(a_machine, m_value.m_ref), a_machine, a_cb);
-		}
-		else
-		{
-			//_gmsnprintf(a_buffer, a_len, "%s:0x%x", a_machine->GetTypeName(m_type), m_value.m_ref);
 		}
 	}
 }
