@@ -110,7 +110,8 @@ void GMDebuggerQt::gmDebuggerEndContext()
 
 void GMDebuggerQt::gmDebuggerBeginThreadInfo()
 {
-	ui.threadTable->clear();
+	while(ui.threadTable->rowCount())
+		ui.threadTable->removeRow(0);
 	threadRowMap.clear();
 }
 
