@@ -28,8 +28,10 @@ void GMDebuggerQt::gmDebuggerSource(int a_sourceId, const char * a_sourceName, c
 	sourceMap.insert(a_sourceId,info);
 
 	if ( currentSourceId == a_sourceId ) {
-		ui.scriptEdit->setPlainText(a_source);
-		ui.scriptEdit->setDocumentTitle(a_sourceName);
+		ui.scriptEdit->SetSource( a_sourceName, a_source );
+		if ( currentLineOnSrcRecieved != -1 ) {
+			ui.scriptEdit->SetLineSelected( currentLineOnSrcRecieved );
+		}
 	}
 }
 
@@ -42,15 +44,9 @@ void GMDebuggerQt::gmDebuggerBeginContext(int a_threadId, int a_callFrame)
 {
 	while(ui.callStack->rowCount())
 		ui.callStack->removeRow(0);
-	//ui.callStack->clear();
 	while(ui.context->rowCount())
 		ui.context->removeRow(0);
-	//ui.context->clear();
-	/*GMDebuggerFrame *pApp = static_cast<GMDebuggerFrame*>(a_session->m_user);
-	pApp->m_currentDebugThread = a_threadId;
-	pApp->FindAddThread(a_threadId, 4, true);
-	pApp->ClearCallstack();
-	pApp->BeginContext(0);*/
+
 	currentThreadId = a_threadId;
 	currentCallFrame = a_callFrame;
 }
@@ -80,14 +76,13 @@ void GMDebuggerQt::gmDebuggerContextCallFrame(int a_callFrame, const char * a_fu
 		}
 
 		// do we have the source code?
-		//pApp->m_lineNumberOnSourceRcv = -1;
+		currentLineOnSrcRecieved = -1;
 		QMap<int,SourceInfo>::iterator it = sourceMap.find( a_sourceId );
 		if ( it == sourceMap.end() ) {
 			gmMachineGetSource( a_sourceId );
-			//pApp->m_lineNumberOnSourceRcv = a_lineNumber;
+			currentLineOnSrcRecieved = a_lineNumber;
 		} else {
-			ui.scriptEdit->setPlainText( it.value().sourceData );
-			ui.scriptEdit->setDocumentTitle( it.value().sourceFile );
+			ui.scriptEdit->SetSource( it.value().sourceFile, it.value().sourceData );
 			ui.scriptEdit->SetLineSelected( a_lineNumber );
 		}
 	}
@@ -104,8 +99,6 @@ void GMDebuggerQt::gmDebuggerContextVariable(const char * a_varSymbol, const cha
 
 void GMDebuggerQt::gmDebuggerEndContext()
 {
-	//GMDebuggerFrame *pApp = static_cast<GMDebuggerFrame*>(a_session->m_user);
-	//pApp->EndContext();
 }
 
 void GMDebuggerQt::gmDebuggerBeginThreadInfo()
@@ -142,6 +135,7 @@ void GMDebuggerQt::gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum)
 
 void GMDebuggerQt::gmDebuggerQuit()
 {
+	statusBar()->showMessage("Debug Session Closed...", 5000);
 	//GMDebuggerNet::Disconnect();
 }
 

@@ -291,3 +291,9 @@ void CodeEditor::SetLineSelected( int line )
 	setTextCursor( cursor );
 	//ensureCursorVisible();	
 }
+
+void CodeEditor::SetSource( const QString & a_file, const QString & a_source )
+{
+	setPlainText( a_source );
+	setDocumentTitle( a_file );
+}

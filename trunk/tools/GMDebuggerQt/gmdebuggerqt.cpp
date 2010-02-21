@@ -9,6 +9,7 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	ackResponseId = 0;
 	currentSourceId = 0;
 	currentThreadId = 0;
+	currentLineOnSrcRecieved = -1;
 	
 	ui.setupUi(this);
 
@@ -49,17 +50,6 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	parentGlobals = new QTreeWidgetItem( ui.globalsTable );
 	parentGlobals->setText(TreeColumn_Name, "globals");
 	parentCurrent = 0;
-
-	statusBarWidget = NULL;
-	/*statusBarWidget = new QLCDNumber( this );
-	statusBarWidget->setSegmentStyle(QLCDNumber::Flat);
-	statusBarWidget->setDigitCount(9);
-	statusBarWidget->display(0);
-	statusBarWidget->resize( QSize(200,20) );
-	statusBar()->addWidget(statusBarWidget);*/
-	
-	/*statusBarWidget->setPlainText( "Fuck" );
-	statusBarWidget->setReadOnly(true);*/
 
 	// TEMP
 	//OnActionScriptOpen("D:/CVS/Omnibot/head/Installer/Files/et/scripts/goals/goal_checkstuck.gm");
@@ -132,9 +122,6 @@ void GMDebuggerQt::SocketReadyToRead()
 	QDataStream in(tcpSocket);
 	const int sizeBefore = socketData.size();
 	socketData.append(tcpSocket->readAll());
-	if ( statusBarWidget ) {
-		statusBarWidget->display( statusBarWidget->intValue() + socketData.size()-sizeBefore );
-	}	
 	UpdateDebugSession();
 }
 

@@ -94,7 +94,7 @@ public:
 	int lineNumberAreaWidth();
 
 	void SetLineSelected( int line );
-
+	void SetSource( const QString & a_file, const QString & a_source );
 protected:
 	void resizeEvent(QResizeEvent *event);
 	bool viewportEvent( QEvent * event );
