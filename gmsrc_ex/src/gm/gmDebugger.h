@@ -28,23 +28,26 @@ typedef const void * (*gmPumpMachineMessage)(gmDebuggerSession * a_session, int 
 /// \class gmDebuggerSession
 class gmDebuggerSession
 {
-public:
+protected:
 
   gmDebuggerSession();
-  ~gmDebuggerSession();
+  virtual ~gmDebuggerSession();
 
   /// \brief Update() must be called to pump messages
-  void Update();
+  void UpdateDebugSession();
 
-  /// \brief Open() will start debugging
-  bool Open();
+  /// \brief OpenDebugSession() will start debugging
+  bool OpenDebugSession();
   
-  /// \brief Close() will stop debugging
-  bool Close();
+  /// \brief CloseDebugSession() will stop debugging
+  bool CloseDebugSession();
 
-  gmSendMachineMessage m_sendMessage;
-  gmPumpMachineMessage m_pumpMessage;
-  void * m_user; // hook to your debugger
+  virtual void DebuggerSendMessage(const void * a_command, int a_len) = 0;
+  virtual const void * DebuggerPumpMessage(int &a_len) = 0;
+
+  //gmSendMachineMessage m_sendMessage;
+  //gmPumpMachineMessage m_pumpMessage;
+  //void * m_user; // hook to your debugger
 
   // send message helpers
   gmDebuggerSession &Pack(int a_val);
@@ -55,6 +58,58 @@ public:
   gmDebuggerSession &Unpack(int &a_val);
   gmDebuggerSession &Unpack(const char * &a_val);
 
+protected:
+
+	//
+	// the debugger must implement the following functions
+	//
+
+	virtual void gmDebuggerBreak(int a_threadId, int a_sourceId, int a_lineNumber) = 0;
+	virtual void gmDebuggerRun(int a_threadId, int a_lineNum, const char *a_func, const char *a_file) = 0;
+	virtual void gmDebuggerStop(int a_threadId) = 0;
+	virtual void gmDebuggerSource(int a_sourceId, const char * a_sourceName, const char * a_source) = 0;
+	virtual void gmDebuggerException(int a_threadId) = 0;
+
+	virtual void gmDebuggerBeginContext(int a_threadId, int a_callFrame) = 0;
+	virtual void gmDebuggerContextCallFrame(int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, const char * a_thisType, int a_thisId) = 0;
+	virtual void gmDebuggerContextVariable(const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId) = 0;
+	virtual void gmDebuggerEndContext() = 0;
+
+	virtual void gmDebuggerBeginThreadInfo() = 0;
+	virtual void gmDebuggerThreadInfo(int a_threadId, const char * a_threadState, int a_lineNum, const char * a_func, const char * a_file) = 0;
+	virtual void gmDebuggerEndThreadInfo() = 0;
+
+	virtual void gmDebuggerError(const char * a_error) = 0;
+	virtual void gmDebuggerMessage(const char * a_message) = 0;
+	virtual void gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum) = 0;
+
+	virtual void gmDebuggerBeginGlobals(int a_VarId) = 0;
+	virtual void gmDebuggerGlobal(const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId) = 0;
+	virtual void gmDebuggerEndGlobals() = 0;
+
+	virtual void gmDebuggerQuit() = 0;
+
+	//
+	// the debugger can use the following functions to send messages to the machine
+	//
+
+	void gmMachineRun(int a_threadId);
+	void gmMachineStepInto(int a_threadId);
+	void gmMachineStepOver(int a_threadId);
+	void gmMachineStepOut(int a_threadId);
+	void gmMachineGetContext(int a_threadId, int a_callframe);
+	void gmMachineGetSource(int a_sourceId);
+	void gmMachineGetSourceInfo();
+	void gmMachineGetThreadInfo();
+	void gmMachineGetGlobalsInfo(int a_tableRef);
+	void gmMachineGetVariableInfo(int a_variableId);
+	void gmMachineSetBreakPoint(int a_responseId, int a_sourceId, int a_lineNumber, int a_threadId, int a_enabled);
+	void gmMachineBreak(int a_threadId);
+	void gmMachineBreakAll();
+	void gmMachineKill(int a_threadId);
+	void gmMachineKillAll();
+	void gmMachineQuit();
+	void gmMachineRunScript(const char *_script);
 private:
 
   void * m_out;
@@ -65,50 +120,6 @@ private:
   int m_inCursor, m_inSize;
 };
 
-//
-// the debugger must implement the following functions
-//
-
-extern void gmDebuggerBreak(gmDebuggerSession * a_session, int a_threadId, int a_sourceId, int a_lineNumber);
-extern void gmDebuggerRun(gmDebuggerSession * a_session, int a_threadId);
-extern void gmDebuggerStop(gmDebuggerSession * a_session, int a_threadId);
-extern void gmDebuggerSource(gmDebuggerSession * a_session, int a_sourceId, const char * a_sourceName, const char * a_source);
-extern void gmDebuggerException(gmDebuggerSession * a_session, int a_threadId);
-
-extern void gmDebuggerBeginContext(gmDebuggerSession * a_session, int a_threadId, int a_callFrame);
-extern void gmDebuggerContextCallFrame(gmDebuggerSession * a_session, int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, int a_thisId);
-extern void gmDebuggerContextVariable(gmDebuggerSession * a_session, const char * a_varSymbol, const char * a_varValue, int a_varId);
-extern void gmDebuggerEndContext(gmDebuggerSession * a_session);
-
-extern void gmDebuggerBeginSourceInfo(gmDebuggerSession * a_session);
-extern void gmDebuggerSourceInfo(gmDebuggerSession * a_session, int a_sourceId, const char * a_sourceName);
-extern void gmDebuggerEndSourceInfo(gmDebuggerSession * a_session);
-
-extern void gmDebuggerBeginThreadInfo(gmDebuggerSession * a_session);
-extern void gmDebuggerThreadInfo(gmDebuggerSession * a_session, int a_threadId, int a_threadState);
-extern void gmDebuggerEndThreadInfo(gmDebuggerSession * a_session);
-
-extern void gmDebuggerError(gmDebuggerSession * a_session, const char * a_error);
-extern void gmDebuggerMessage(gmDebuggerSession * a_session, const char * a_message);
-extern void gmDebuggerAck(gmDebuggerSession * a_session, int a_response, int a_posNeg);
-extern void gmDebuggerQuit(gmDebuggerSession * a_session);
-
-//
-// the debugger can use the following functions to send messages to the machine
-//
-
-void gmMachineRun(gmDebuggerSession * a_session, int a_threadId);
-void gmMachineStepInto(gmDebuggerSession * a_session, int a_threadId);
-void gmMachineStepOver(gmDebuggerSession * a_session, int a_threadId);
-void gmMachineStepOut(gmDebuggerSession * a_session, int a_threadId);
-void gmMachineGetContext(gmDebuggerSession * a_session, int a_threadId, int a_callframe);
-void gmMachineGetSource(gmDebuggerSession * a_session, int a_sourceId);
-void gmMachineGetSourceInfo(gmDebuggerSession * a_session);
-void gmMachineGetThreadInfo(gmDebuggerSession * a_session);
-void gmMachineGetVariableInfo(gmDebuggerSession * a_session, int a_variableId);
-void gmMachineSetBreakPoint(gmDebuggerSession * a_session, int a_responseId, int a_sourceId, int a_lineNumber, int a_threadId, int a_enabled);
-void gmMachineBreak(gmDebuggerSession * a_session, int a_threadId);
-void gmMachineQuit(gmDebuggerSession * a_session);
 
 #endif
 
