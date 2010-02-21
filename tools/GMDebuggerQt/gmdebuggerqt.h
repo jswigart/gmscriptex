@@ -77,8 +77,6 @@ protected:
 	QTreeWidgetItem * parentGlobals;
 	QTreeWidgetItem * parentCurrent;
 
-	QLCDNumber	*	statusBarWidget;
-
 	enum ThreadColumns {
 		Thread_Id,
 		Thread_Status,
@@ -108,6 +106,7 @@ protected:
 	int					currentThreadId;
 	int					currentSourceId;
 	int					currentCallFrame;
+	int					currentLineOnSrcRecieved;
 private slots:
 
 	void SocketConnected();
