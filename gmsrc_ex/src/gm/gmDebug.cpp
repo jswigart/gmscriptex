@@ -47,8 +47,8 @@ See Copyright Notice in gmMachine.h
 #define ID_done GM_MAKE_ID32('d','o','n','e')
 #define ID_derr GM_MAKE_ID32('d','e','r','r')
 #define ID_dmsg GM_MAKE_ID32('d','m','s','g')
-#define ID_dack GM_MAKE_ID32('d','a','c','k')
 #define ID_dend GM_MAKE_ID32('d','e','n','d')
+#define ID_dbps GM_MAKE_ID32('d','b','p','s')
 
 // my new fns
 #define ID_gbeg GM_MAKE_ID32('g','b','e','g') // begin globals
@@ -92,8 +92,8 @@ void gmDebuggerSource(gmDebugSession * a_session, int a_sourceId, const char * a
 void gmDebuggerException(gmDebugSession * a_session, int a_threadId);
 
 void gmDebuggerBeginContext(gmDebugSession * a_session, int a_threadId, int a_callFrame);
-void gmDebuggerContextCallFrame(gmDebugSession * a_session, int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, int a_thisType, int a_thisId);
-void gmDebuggerContextVariable(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, int a_varType, int a_varId);
+void gmDebuggerContextCallFrame(gmDebugSession * a_session, int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, const char * a_thisType, int a_thisId);
+void gmDebuggerContextVariable(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId);
 void gmDebuggerEndContext(gmDebugSession * a_session);
 
 void gmDebuggerBeginSourceInfo(gmDebugSession * a_session);
@@ -101,16 +101,16 @@ void gmDebuggerSourceInfo(gmDebugSession * a_session, int a_sourceId, const char
 void gmDebuggerEndSourceInfo(gmDebugSession * a_session);
 
 void gmDebuggerBeginThreadInfo(gmDebugSession * a_session);
-void gmDebuggerThreadInfo(gmDebugSession * a_session, int a_threadId, int a_threadState);
+void gmDebuggerThreadInfo(gmDebugSession * a_session, int a_threadId, const char * a_threadState, int a_lineNum, const char * a_func, const char * a_file);
 void gmDebuggerEndThreadInfo(gmDebugSession * a_session);
 
 void gmDebuggerError(gmDebugSession * a_session, const char * a_error);
 void gmDebuggerMessage(gmDebugSession * a_session, const char * a_message);
-void gmDebuggerAck(gmDebugSession * a_session, int a_response, int a_posNeg);
+void gmDebuggerBreakpointSet(gmDebugSession * a_session, int a_sourceId, int a_lineNum);
 void gmDebuggerQuit(gmDebugSession * a_session);
 
 void gmDebuggerBeginGlobals(gmDebugSession * a_session, int a_VarId);
-void gmDebuggerGlobal(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, int a_varType, int a_VarId);
+void gmDebuggerGlobal(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId);
 void gmDebuggerEndGlobals(gmDebugSession * a_session);
 
 //
@@ -366,8 +366,9 @@ bool gmDebugSession::Open(gmMachine * a_machine)
 	m_machine->m_isBroken = IsBrokenCallback;
 	m_machine->m_return = RetCallback;
 	s_prevMachineCallback = a_machine->s_machineCallback;
-	a_machine->s_machineCallback = gmdMachineCallback;
 	s_prevPrintCallback = a_machine->s_printCallback;
+
+	a_machine->s_machineCallback = gmdMachineCallback;	
 	a_machine->s_printCallback = gmdPrintCallback;
 	return true;
 }
@@ -570,8 +571,9 @@ void gmMachineGetContext(gmDebugSession * a_session, int a_threadId, int a_callf
 					gmFunctionObject * fn = (gmFunctionObject *) GM_MOBJECT(thread->GetMachine(), fnVar->m_value.m_ref);
 
 					// this
+					const char * thisType = thread->GetMachine()->GetTypeName(base[-2].m_type);
 					base[-2].AsStringWithType(thread->GetMachine(), buff, buffSize);
-					gmDebuggerContextCallFrame(a_session, numFrames, fn->GetDebugName(), fn->GetSourceId(), fn->GetLine(ip), "this", buff, base[-2].m_type, (base[-2].IsReference()) ? base[-2].m_value.m_ref : 0);
+					gmDebuggerContextCallFrame(a_session, numFrames, fn->GetDebugName(), fn->GetSourceId(), fn->GetLine(ip), "this", buff, thisType, (base[-2].IsReference()) ? base[-2].m_value.m_ref : 0);
 
 					if(numFrames == a_callframe)
 					{
@@ -579,15 +581,17 @@ void gmMachineGetContext(gmDebugSession * a_session, int a_threadId, int a_callf
 						int i;
 						for(i = 0; i < fn->GetNumParamsLocals(); ++i)
 						{
-							base[i].AsStringWithType(thread->GetMachine(), buff, buffSize);
-							gmDebuggerContextVariable(a_session, fn->GetSymbol(i), buff, base[i].m_type, (base[i].IsReference()) ? base[i].m_value.m_ref : 0);
+							const char * typeName = thread->GetMachine()->GetTypeName(base[i].m_type);
+							base[i].AsString(thread->GetMachine(), buff, buffSize);
+							gmDebuggerContextVariable(a_session, fn->GetSymbol(i), buff, typeName, (base[i].IsReference()) ? base[i].m_value.m_ref : 0);
 						}
 					}
 				}
 				else
 				{
-					base[-2].AsStringWithType(thread->GetMachine(), buff, buffSize);
-					gmDebuggerContextCallFrame(a_session, numFrames, "unknown", 0, 0, "this", buff, base[-2].m_type, (base[-2].IsReference()) ? base[-2].m_value.m_ref : 0);
+					const char * typeName = thread->GetMachine()->GetTypeName(base[-2].m_type);
+					base[-2].AsString(thread->GetMachine(), buff, buffSize);
+					gmDebuggerContextCallFrame(a_session, numFrames, "unknown", 0, 0, "this", buff, typeName, (base[-2].IsReference()) ? base[-2].m_value.m_ref : 0);
 				}
 
 				// next call frame
@@ -621,20 +625,31 @@ void gmMachineGetSourceInfo(gmDebugSession * a_session)
 static bool threadIter(gmThread * a_thread, void * a_context)
 {
 	gmDebugSession * session = (gmDebugSession *) a_context;
-	int state = 0; // 0 - running, 1 - blocked, 2 - sleeping, 3 - exception, 4 - debug
+	const char * state = "exception";
 	if(a_thread->m_debugFlags)
-		state = 4;
+		state = "debug";
 	else if(a_thread->GetState() == gmThread::EXCEPTION)
-		state = 3;
+		state = "exception";
 	else if(a_thread->GetState() == gmThread::RUNNING)
-		state = 0;
+		state = "running";
 	else if(a_thread->GetState() == gmThread::BLOCKED)
-		state = 1;
+		state = "blocked";
 	else if(a_thread->GetState() == gmThread::SLEEPING)
-		state = 2;
-	else
-		state = 3;
-	gmDebuggerThreadInfo(session, a_thread->GetId(), state);
+		state = "sleeping";
+
+	int lineNum = -1;
+	const char *funcName = 0;
+	const char *source = 0;
+	const char *sourceFile = 0;
+	const gmFunctionObject *fn = a_thread->GetFunctionObject();
+	if(fn)
+	{
+		lineNum = fn->GetLine(a_thread->GetInstruction());
+		funcName = fn->GetDebugName();
+		a_thread->GetMachine()->GetSourceCode(fn->GetSourceId(), source, sourceFile);
+	}
+
+	gmDebuggerThreadInfo(session, a_thread->GetId(), state, lineNum, funcName, sourceFile);
 	return true;
 }
 
@@ -654,41 +669,40 @@ void gmMachineGetVariableInfo(gmDebugSession * a_session, int a_variableId)
 namespace DebugChild
 {
 	gmDebugSession *Session = 0;
-	void _gmChildInfoCallback(const char * a_symbol, const char * a_value, int a_valuetype, int a_VarId)
+	void _gmChildInfoCallback(const char * a_symbol, const char * a_value, const char * a_valuetype, int a_varId)
 	{
-		gmDebuggerGlobal(Session, a_symbol, a_value, a_valuetype, a_VarId);
+		gmDebuggerGlobal(Session, a_symbol, a_value, a_valuetype, a_varId);
 	}
 };
 
-void gmMachineGetGlobalInfo(gmDebugSession * a_session, int a_VarId)
+void gmMachineGetGlobalInfo(gmDebugSession * a_session, int a_varId)
 {
 	gmObject *pObj = a_session->GetMachine()->GetGlobals();
-	if(a_VarId != 0)
-		pObj = a_session->GetMachine()->GetObject(a_VarId);
+	if(a_varId != 0) {
+		pObj = a_session->GetMachine()->GetGC()->CheckReference(a_varId);
+	}
 
 	if(!pObj)
 		return;
 
-	gmDebuggerBeginGlobals(a_session, a_VarId);
+	gmDebuggerBeginGlobals(a_session, a_varId);
+
 	gmVariable v(pObj->GetType(), pObj->GetRef());
 	DebugChild::Session = a_session;
 	v.DebugInfo(a_session->GetMachine(), DebugChild::_gmChildInfoCallback);
 
 	// Send type table if we're sending the globals
-	if(a_VarId==0)
+	/*if(a_varId==0)
 	{
 		int iType = 1;
 		gmTableObject *pTbl = 0;
 		while(pTbl = a_session->GetMachine()->GetTypeTable(iType))
 		{
-			int iVarId = pTbl->GetRef();
-			const char *pType = a_session->GetMachine()->GetTypeName(iType);
-			char buffer[256];
-			_gmsnprintf(buffer, 256, "<%s>", pType);
-			gmDebuggerGlobal(a_session, buffer, "", GM_TABLE, iVarId);
+			gmVariable typeVar(pTbl);
+			typeVar.DebugInfo(a_session->GetMachine(), DebugChild::_gmChildInfoCallback);
 			++iType;
 		}	
-	}
+	}*/
 	gmDebuggerEndGlobals(a_session);
 }
 
@@ -722,9 +736,7 @@ void gmMachineSetBreakPoint(gmDebugSession * a_session, int a_responseId, int a_
 	}
 
 	if(sendAck)
-		gmDebuggerAck(a_session, a_responseId, 1);
-	else
-		gmDebuggerAck(a_session, a_responseId, 0);
+		gmDebuggerBreakpointSet(a_session, a_sourceId, a_lineNumber);
 }
 
 void gmMachineBreak(gmDebugSession * a_session, int a_threadId)
@@ -789,10 +801,10 @@ void gmDebuggerSource(gmDebugSession * a_session, int a_sourceId, const char * a
 void gmDebuggerBeginContext(gmDebugSession * a_session, int a_threadId, int a_callFrame) {
 	a_session->Pack(ID_dctx).Pack(a_threadId).Pack(a_callFrame);
 }
-void gmDebuggerContextCallFrame(gmDebugSession * a_session, int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, int a_thisType, int a_thisId) {
+void gmDebuggerContextCallFrame(gmDebugSession * a_session, int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, const char * a_thisType, int a_thisId) {
 	a_session->Pack(ID_call).Pack(a_callFrame).Pack(a_functionName).Pack(a_sourceId).Pack(a_lineNumber).Pack(a_thisSymbol).Pack(a_thisValue).Pack(a_thisType).Pack(a_thisId);
 }
-void gmDebuggerContextVariable(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, int a_varType, int a_varId) {
+void gmDebuggerContextVariable(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId) {
 	a_session->Pack(ID_vari).Pack(a_varSymbol).Pack(a_varValue).Pack(a_varType).Pack(a_varId);
 }
 void gmDebuggerEndContext(gmDebugSession * a_session) {
@@ -810,8 +822,8 @@ void gmDebuggerEndSourceInfo(gmDebugSession * a_session) {
 void gmDebuggerBeginThreadInfo(gmDebugSession * a_session) {
 	a_session->Pack(ID_dthi);
 }
-void gmDebuggerThreadInfo(gmDebugSession * a_session, int a_threadId, int a_threadState) {
-	a_session->Pack(ID_thri).Pack(a_threadId).Pack(a_threadState);
+void gmDebuggerThreadInfo(gmDebugSession * a_session, int a_threadId, const char * a_threadState, int a_lineNum, const char * a_func, const char * a_file) {
+	a_session->Pack(ID_thri).Pack(a_threadId).Pack(a_threadState).Pack(a_lineNum).Pack(a_func).Pack(a_file);
 }
 void gmDebuggerEndThreadInfo(gmDebugSession * a_session) {
 	a_session->Pack(ID_done).Send();
@@ -822,8 +834,8 @@ void gmDebuggerError(gmDebugSession * a_session, const char * a_error) {
 void gmDebuggerMessage(gmDebugSession * a_session, const char * a_message) {
 	a_session->Pack(ID_dmsg).Pack(a_message).Send();
 }
-void gmDebuggerAck(gmDebugSession * a_session, int a_response, int a_posNeg) {
-	a_session->Pack(ID_dack).Pack(a_response).Pack(a_posNeg).Send();
+void gmDebuggerBreakpointSet(gmDebugSession * a_session, int a_sourceId, int a_lineNum) {
+	a_session->Pack(ID_dbps).Pack(a_sourceId).Pack(a_lineNum).Send();
 }
 void gmDebuggerQuit(gmDebugSession * a_session) {
 	a_session->Pack(ID_dend).Send();
@@ -831,8 +843,8 @@ void gmDebuggerQuit(gmDebugSession * a_session) {
 void gmDebuggerBeginGlobals(gmDebugSession * a_session, int a_VarId) {
 	a_session->Pack(ID_gbeg).Pack(a_VarId);
 }
-void gmDebuggerGlobal(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, int a_varType, int a_VarId) {
-	a_session->Pack(ID_glob).Pack(a_varSymbol).Pack(a_varValue).Pack(a_varType).Pack(a_VarId);
+void gmDebuggerGlobal(gmDebugSession * a_session, const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId) {
+	a_session->Pack(ID_glob).Pack(a_varSymbol).Pack(a_varValue).Pack(a_varType).Pack(a_varId);
 }
 void gmDebuggerEndGlobals(gmDebugSession * a_session) {
 	a_session->Pack(ID_gend).Send();

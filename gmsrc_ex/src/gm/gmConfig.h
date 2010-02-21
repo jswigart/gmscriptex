@@ -24,7 +24,7 @@ See Copyright Notice in gmMachine.h
 #include <math.h> // floorf, fmodf
 
 
-typedef void (GM_CDECL *gmChildInfoCallback)(const char * a_symbol, const char * a_value, int a_valuetype, int a_VarId);
+typedef void (GM_CDECL *gmChildInfoCallback)(const char * a_symbol, const char * a_value, const char * a_valuetype, int a_varId);
 
 /// \enum gmEndian Endian byte order
 enum gmEndian
