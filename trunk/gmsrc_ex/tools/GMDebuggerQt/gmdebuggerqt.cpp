@@ -6,6 +6,12 @@
 GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 : QMainWindow(parent, flags)
 {
+	QCoreApplication::setOrganizationName("JSwigart");
+	QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/gmscriptex/");
+	QCoreApplication::setApplicationName("GM Debugger");
+
+	SetCurrentStyle( Style_WindowsVista );
+
 	ackResponseId = 0;
 	currentSourceId = 0;
 	currentThreadId = 0;
@@ -53,12 +59,90 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 
 	// TEMP
 	//OnActionScriptOpen("D:/CVS/Omnibot/head/Installer/Files/et/scripts/goals/goal_checkstuck.gm");
+	readSettings();
 }
 
 GMDebuggerQt::~GMDebuggerQt()
 {
 }
 
+void GMDebuggerQt::SetCurrentStyle( StyleType newStyle )
+{
+	switch( newStyle )
+	{
+	case Style_Windows:
+		QApplication::setStyle(new QWindowsStyle);
+		break;
+	case Style_WindowsXP:
+		QApplication::setStyle(new QWindowsXPStyle);
+		break;
+	case Style_WindowsVista:
+		QApplication::setStyle(new QWindowsVistaStyle);
+		break;
+	case Style_Motif:
+		QApplication::setStyle(new QMotifStyle);
+		break;
+	case Style_CDE:
+		QApplication::setStyle(new QCDEStyle);
+		break;
+	case Style_Plastique:
+		QApplication::setStyle(new QPlastiqueStyle);
+		break;
+	case Style_CleanLooks:
+		QApplication::setStyle(new QCleanlooksStyle);
+		break;
+	default:
+		return;
+	}
+	currentStyle = newStyle;
+}
+
+void GMDebuggerQt::closeEvent(QCloseEvent *event)
+{
+	if(tcpSocket->state() != QAbstractSocket::UnconnectedState)
+	{
+		QMessageBox msgBox(this);
+		msgBox.setText("You are connected to a debug session.");
+		msgBox.setInformativeText("Do you really want to close the debugger?");
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::No);
+		switch( msgBox.exec() )
+		{
+		case QMessageBox::Yes:
+			writeSettings();
+			event->accept();
+			return;
+		case QMessageBox::No:
+			event->ignore();
+			return;
+		}
+	}
+	
+	writeSettings();
+	event->accept();
+}
+
+void GMDebuggerQt::writeSettings()
+{
+	QSettings settings("settings.ini", QSettings::IniFormat);
+
+	settings.beginGroup("LayOut");
+		settings.setValue("geometry", saveGeometry());
+		settings.setValue("windowState", saveState());
+		settings.setValue("style", currentStyle);
+	settings.endGroup();
+}
+
+void GMDebuggerQt::readSettings()
+{
+	QSettings settings("settings.ini", QSettings::IniFormat);
+
+	settings.beginGroup("LayOut");
+		restoreGeometry(settings.value("geometry").toByteArray());
+		restoreState(settings.value("windowState").toByteArray());
+		SetCurrentStyle((StyleType)settings.value("style",currentStyle).toInt());
+	settings.endGroup();
+}
 struct PacketHeader {
 	static const quint32 MAGIC_NUM = 0xDEADB33F;
 
