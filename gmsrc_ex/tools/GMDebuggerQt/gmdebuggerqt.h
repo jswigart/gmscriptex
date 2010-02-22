@@ -17,19 +17,30 @@ public:
 	GMDebuggerQt(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~GMDebuggerQt();
 
-public slots:
-	void OnActionScriptOpen(const QString &path = QString());
-	void OnActionConnect();
-	void OnActionDisConnect();
-	void OnActionRunAll();
-	void OnActionBreakAll();
-	void OnActionKillAll();
-	void OnActionStepIn();
-	void OnActionStepOut();
-	void OnActionStepOver();
-	void OnActionRunThread();
-	void OnActionStopThread();
-	void OnActionSetBreakpoint();
+	enum StyleType {
+		Style_Windows,
+		Style_WindowsXP,
+		Style_WindowsVista,
+		Style_Motif,
+		Style_CDE,
+		Style_Plastique,
+		Style_CleanLooks,
+	};
+
+	void closeEvent(QCloseEvent *event);
+	public slots:
+		void OnActionScriptOpen(const QString &path = QString());
+		void OnActionConnect();
+		void OnActionDisConnect();
+		void OnActionRunAll();
+		void OnActionBreakAll();
+		void OnActionKillAll();
+		void OnActionStepIn();
+		void OnActionStepOut();
+		void OnActionStepOver();
+		void OnActionRunThread();
+		void OnActionStopThread();
+		void OnActionSetBreakpoint();
 private:
 	Ui::GMDebuggerQtClass ui;
 
@@ -37,8 +48,15 @@ private:
 	QByteArray	socketData;
 	QByteArray	pumpData;
 
-	 QTimer *removeThreadTimer;
+	QTimer *removeThreadTimer;
 
+	
+
+	void writeSettings();
+	void readSettings();
+
+	void SetCurrentStyle( StyleType newStyle );
+	StyleType	currentStyle;
 protected:
 	virtual void DebuggerSendMessage(const void * a_command, int a_len);
 	virtual const void * DebuggerPumpMessage(int &a_len);
@@ -107,17 +125,17 @@ protected:
 	int					currentSourceId;
 	int					currentCallFrame;
 	int					currentLineOnSrcRecieved;
-private slots:
+	private slots:
 
-	void SocketConnected();
-	void SocketDisconnected();
-	void SocketReadyToRead();
-	void SocketDisplayError(QAbstractSocket::SocketError socketError);
+		void SocketConnected();
+		void SocketDisconnected();
+		void SocketReadyToRead();
+		void SocketDisplayError(QAbstractSocket::SocketError socketError);
 
-	int AddUniqueThread( int a_threadId, const char * a_status, const char * a_func, const char * a_file );
-	void RemoveThread( int a_threadId );
-	void RemoveExpiredThreads();
-	void ThreadSelectionChanged();
+		int AddUniqueThread( int a_threadId, const char * a_status, const char * a_func, const char * a_file );
+		void RemoveThread( int a_threadId );
+		void RemoveExpiredThreads();
+		void ThreadSelectionChanged();
 };
 
 #endif // GMDEBUGGERQT_H

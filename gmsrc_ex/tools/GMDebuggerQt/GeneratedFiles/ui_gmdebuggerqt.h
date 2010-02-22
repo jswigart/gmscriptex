@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'gmdebuggerqt.ui'
 **
-** Created: Sun Feb 21 15:18:40 2010
+** Created: Sun Feb 21 22:52:52 2010
 **      by: Qt User Interface Compiler version 4.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -53,23 +53,23 @@ public:
     QMenu *menuEdit;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
-    QDockWidget *dockWidget;
+    QDockWidget *dockThreads;
     QWidget *dockWidgetContents_3;
     QHBoxLayout *horizontalLayout_3;
     QTableWidget *threadTable;
-    QDockWidget *dockWidget_2;
+    QDockWidget *dockCallstack;
     QWidget *dockWidgetContents_4;
     QHBoxLayout *horizontalLayout_2;
     QTableWidget *callStack;
-    QDockWidget *dockWidget_3;
+    QDockWidget *dockContext;
     QWidget *dockWidgetContents_5;
     QHBoxLayout *horizontalLayout;
     QTableWidget *context;
-    QDockWidget *dockWidget_4;
+    QDockWidget *dockGlobals;
     QWidget *dockWidgetContents_6;
     QHBoxLayout *horizontalLayout_6;
     QTreeWidget *globalsTable;
-    QDockWidget *dockWidget_5;
+    QDockWidget *dockOutput;
     QWidget *dockWidgetContents;
     QHBoxLayout *horizontalLayout_5;
     QTextEdit *outputWindow;
@@ -179,10 +179,10 @@ public:
         statusBar->setEnabled(true);
         statusBar->setSizeGripEnabled(true);
         GMDebuggerQtClass->setStatusBar(statusBar);
-        dockWidget = new QDockWidget(GMDebuggerQtClass);
-        dockWidget->setObjectName(QString::fromUtf8("dockWidget"));
-        dockWidget->setFloating(false);
-        dockWidget->setFeatures(QDockWidget::AllDockWidgetFeatures);
+        dockThreads = new QDockWidget(GMDebuggerQtClass);
+        dockThreads->setObjectName(QString::fromUtf8("dockThreads"));
+        dockThreads->setFloating(false);
+        dockThreads->setFeatures(QDockWidget::AllDockWidgetFeatures);
         dockWidgetContents_3 = new QWidget();
         dockWidgetContents_3->setObjectName(QString::fromUtf8("dockWidgetContents_3"));
         horizontalLayout_3 = new QHBoxLayout(dockWidgetContents_3);
@@ -219,11 +219,11 @@ public:
 
         horizontalLayout_3->addWidget(threadTable);
 
-        dockWidget->setWidget(dockWidgetContents_3);
-        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget);
-        dockWidget_2 = new QDockWidget(GMDebuggerQtClass);
-        dockWidget_2->setObjectName(QString::fromUtf8("dockWidget_2"));
-        dockWidget_2->setFeatures(QDockWidget::AllDockWidgetFeatures);
+        dockThreads->setWidget(dockWidgetContents_3);
+        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockThreads);
+        dockCallstack = new QDockWidget(GMDebuggerQtClass);
+        dockCallstack->setObjectName(QString::fromUtf8("dockCallstack"));
+        dockCallstack->setFeatures(QDockWidget::AllDockWidgetFeatures);
         dockWidgetContents_4 = new QWidget();
         dockWidgetContents_4->setObjectName(QString::fromUtf8("dockWidgetContents_4"));
         horizontalLayout_2 = new QHBoxLayout(dockWidgetContents_4);
@@ -250,10 +250,10 @@ public:
 
         horizontalLayout_2->addWidget(callStack);
 
-        dockWidget_2->setWidget(dockWidgetContents_4);
-        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget_2);
-        dockWidget_3 = new QDockWidget(GMDebuggerQtClass);
-        dockWidget_3->setObjectName(QString::fromUtf8("dockWidget_3"));
+        dockCallstack->setWidget(dockWidgetContents_4);
+        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockCallstack);
+        dockContext = new QDockWidget(GMDebuggerQtClass);
+        dockContext->setObjectName(QString::fromUtf8("dockContext"));
         dockWidgetContents_5 = new QWidget();
         dockWidgetContents_5->setObjectName(QString::fromUtf8("dockWidgetContents_5"));
         horizontalLayout = new QHBoxLayout(dockWidgetContents_5);
@@ -284,11 +284,11 @@ public:
 
         horizontalLayout->addWidget(context);
 
-        dockWidget_3->setWidget(dockWidgetContents_5);
-        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget_3);
-        dockWidget_4 = new QDockWidget(GMDebuggerQtClass);
-        dockWidget_4->setObjectName(QString::fromUtf8("dockWidget_4"));
-        dockWidget_4->setLayoutDirection(Qt::LeftToRight);
+        dockContext->setWidget(dockWidgetContents_5);
+        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockContext);
+        dockGlobals = new QDockWidget(GMDebuggerQtClass);
+        dockGlobals->setObjectName(QString::fromUtf8("dockGlobals"));
+        dockGlobals->setLayoutDirection(Qt::LeftToRight);
         dockWidgetContents_6 = new QWidget();
         dockWidgetContents_6->setObjectName(QString::fromUtf8("dockWidgetContents_6"));
         horizontalLayout_6 = new QHBoxLayout(dockWidgetContents_6);
@@ -303,12 +303,12 @@ public:
 
         horizontalLayout_6->addWidget(globalsTable);
 
-        dockWidget_4->setWidget(dockWidgetContents_6);
-        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_4);
-        dockWidget_5 = new QDockWidget(GMDebuggerQtClass);
-        dockWidget_5->setObjectName(QString::fromUtf8("dockWidget_5"));
-        dockWidget_5->setFloating(true);
-        dockWidget_5->setFeatures(QDockWidget::AllDockWidgetFeatures);
+        dockGlobals->setWidget(dockWidgetContents_6);
+        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockGlobals);
+        dockOutput = new QDockWidget(GMDebuggerQtClass);
+        dockOutput->setObjectName(QString::fromUtf8("dockOutput"));
+        dockOutput->setFloating(false);
+        dockOutput->setFeatures(QDockWidget::AllDockWidgetFeatures);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         horizontalLayout_5 = new QHBoxLayout(dockWidgetContents);
@@ -327,8 +327,8 @@ public:
 
         horizontalLayout_5->addWidget(outputWindow);
 
-        dockWidget_5->setWidget(dockWidgetContents);
-        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget_5);
+        dockOutput->setWidget(dockWidgetContents);
+        GMDebuggerQtClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockOutput);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
@@ -377,7 +377,7 @@ public:
         actionOpen_Script->setText(QApplication::translate("GMDebuggerQtClass", "Open Script", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("GMDebuggerQtClass", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("GMDebuggerQtClass", "Edit", 0, QApplication::UnicodeUTF8));
-        dockWidget->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Threads", 0, QApplication::UnicodeUTF8));
+        dockThreads->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Threads", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem = threadTable->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("GMDebuggerQtClass", "Thread", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem1 = threadTable->horizontalHeaderItem(1);
@@ -386,22 +386,22 @@ public:
         ___qtablewidgetitem2->setText(QApplication::translate("GMDebuggerQtClass", "Function", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem3 = threadTable->horizontalHeaderItem(3);
         ___qtablewidgetitem3->setText(QApplication::translate("GMDebuggerQtClass", "Script", 0, QApplication::UnicodeUTF8));
-        dockWidget_2->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Callstack", 0, QApplication::UnicodeUTF8));
+        dockCallstack->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Callstack", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem4 = callStack->horizontalHeaderItem(0);
         ___qtablewidgetitem4->setText(QApplication::translate("GMDebuggerQtClass", "Function", 0, QApplication::UnicodeUTF8));
-        dockWidget_3->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Locals", 0, QApplication::UnicodeUTF8));
+        dockContext->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Locals", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem5 = context->horizontalHeaderItem(0);
         ___qtablewidgetitem5->setText(QApplication::translate("GMDebuggerQtClass", "Name", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem6 = context->horizontalHeaderItem(1);
         ___qtablewidgetitem6->setText(QApplication::translate("GMDebuggerQtClass", "Type", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem7 = context->horizontalHeaderItem(2);
         ___qtablewidgetitem7->setText(QApplication::translate("GMDebuggerQtClass", "Value", 0, QApplication::UnicodeUTF8));
-        dockWidget_4->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Globals", 0, QApplication::UnicodeUTF8));
+        dockGlobals->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Globals", 0, QApplication::UnicodeUTF8));
         QTreeWidgetItem *___qtreewidgetitem = globalsTable->headerItem();
         ___qtreewidgetitem->setText(2, QApplication::translate("GMDebuggerQtClass", "Value", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(1, QApplication::translate("GMDebuggerQtClass", "Type", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(0, QApplication::translate("GMDebuggerQtClass", "Name", 0, QApplication::UnicodeUTF8));
-        dockWidget_5->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Output", 0, QApplication::UnicodeUTF8));
+        dockOutput->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Output", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };
