@@ -120,7 +120,7 @@ protected:
 		void SocketReadyToRead();
 		void SocketDisplayError(QAbstractSocket::SocketError socketError);
 
-		int AddUniqueThread( int a_threadId, const char * a_status, const char * a_func, const char * a_file );
+		int AddUniqueThread( int a_threadId, const char * a_status, int a_line, const char * a_func, const char * a_file );
 		void RemoveThread( int a_threadId );
 		void RemoveExpiredThreads();
 		void ThreadSelectionChanged();

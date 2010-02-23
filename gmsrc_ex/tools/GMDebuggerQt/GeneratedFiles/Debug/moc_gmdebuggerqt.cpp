@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'gmdebuggerqt.h'
 **
-** Created: Mon Feb 22 00:31:59 2010
+** Created: Mon Feb 22 23:47:00 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -49,11 +49,11 @@ static const uint qt_meta_data_GMDebuggerQt[] = {
      317,   13,   13,   13, 0x08,
      338,   13,   13,   13, 0x08,
      370,  358,   13,   13, 0x08,
-     457,  423,  419,   13, 0x08,
-     525,  514,   13,   13, 0x08,
-     543,   13,   13,   13, 0x08,
-     566,   13,   13,   13, 0x08,
-     596,  591,   13,   13, 0x08,
+     464,  423,  419,   13, 0x08,
+     536,  525,   13,   13, 0x08,
+     554,   13,   13,   13, 0x08,
+     577,   13,   13,   13, 0x08,
+     607,  602,   13,   13, 0x08,
 
        0        // eod
 };
@@ -70,8 +70,8 @@ static const char qt_meta_stringdata_GMDebuggerQt[] = {
     "SocketDisconnected()\0SocketReadyToRead()\0"
     "socketError\0"
     "SocketDisplayError(QAbstractSocket::SocketError)\0"
-    "int\0a_threadId,a_status,a_func,a_file\0"
-    "AddUniqueThread(int,const char*,const char*,const char*)\0"
+    "int\0a_threadId,a_status,a_line,a_func,a_file\0"
+    "AddUniqueThread(int,const char*,int,const char*,const char*)\0"
     "a_threadId\0RemoveThread(int)\0"
     "RemoveExpiredThreads()\0ThreadSelectionChanged()\0"
     "item\0GlobalExpanded(QTreeWidgetItem*)\0"
@@ -126,7 +126,7 @@ int GMDebuggerQt::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 15: SocketDisconnected(); break;
         case 16: SocketReadyToRead(); break;
         case 17: SocketDisplayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
-        case 18: { int _r = AddUniqueThread((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const char*(*)>(_a[2])),(*reinterpret_cast< const char*(*)>(_a[3])),(*reinterpret_cast< const char*(*)>(_a[4])));
+        case 18: { int _r = AddUniqueThread((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const char*(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< const char*(*)>(_a[4])),(*reinterpret_cast< const char*(*)>(_a[5])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
         case 19: RemoveThread((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 20: RemoveExpiredThreads(); break;
