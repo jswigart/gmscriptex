@@ -11,7 +11,7 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/gmscriptex/");
 	QCoreApplication::setApplicationName("GM Debugger");
 
-	QFont defaultFont( "Consolas" );
+	QFont defaultFont( "Consolas", 8 );
 	QApplication::setFont( defaultFont );
 
 	ackResponseId = 0;
