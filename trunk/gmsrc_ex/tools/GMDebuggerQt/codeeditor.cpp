@@ -50,63 +50,47 @@ Highlighter::Highlighter(QTextDocument *parent)
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
-    keywordPatterns << "\\bchar\\b" << "\\bclass\\b" << "\\bconst\\b"
-                    << "\\bdouble\\b" << "\\benum\\b" << "\\bexplicit\\b"
-                    << "\\bfriend\\b" << "\\binline\\b" << "\\bint\\b"
-                    << "\\blong\\b" << "\\bnamespace\\b" << "\\boperator\\b"
-                    << "\\bprivate\\b" << "\\bprotected\\b" << "\\bpublic\\b"
-                    << "\\bshort\\b" << "\\bsignals\\b" << "\\bsigned\\b"
-                    << "\\bslots\\b" << "\\bstatic\\b" << "\\bstruct\\b"
-                    << "\\btemplate\\b" << "\\btypedef\\b" << "\\btypename\\b"
-                    << "\\bunion\\b" << "\\bunsigned\\b" << "\\bvirtual\\b"
-                    << "\\bvoid\\b" << "\\bvolatile\\b";
+    keywordPatterns << "\\bif\\b" << "\\belse\\b" << "\\bfor\\b"
+                    << "\\bforeach\\b" << "\\bin\\b" << "\\band\\b"
+                    << "\\bor\\b" << "\\bwhile\\b" << "\\bdowhile\\b"
+                    << "\\bfunction\\b" << "\\breturn\\b" << "\\bcontinue\\b"
+                    << "\\bbreak\\b" << "\\bnull\\b" << "\\bglobal\\b"
+                    << "\\blocal\\b" << "\\bmember\\b" << "\\btable\\b"
+                    << "\\btrue\\b" << "\\bfalse\\b" << "\\bthis\\b";
     foreach (const QString &pattern, keywordPatterns) {
         rule.pattern = QRegExp(pattern);
         rule.format = keywordFormat;
         highlightingRules.append(rule);
-//! [0] //! [1]
     }
-//! [1]
 
-//! [2]
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::darkMagenta);
     rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
     rule.format = classFormat;
     highlightingRules.append(rule);
-//! [2]
 
-//! [3]
     singleLineCommentFormat.setForeground(Qt::red);
     rule.pattern = QRegExp("//[^\n]*");
     rule.format = singleLineCommentFormat;
     highlightingRules.append(rule);
 
     multiLineCommentFormat.setForeground(Qt::red);
-//! [3]
 
-//! [4]
     quotationFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegExp("\".*\"");
     rule.format = quotationFormat;
     highlightingRules.append(rule);
-//! [4]
 
-//! [5]
     functionFormat.setFontItalic(true);
     functionFormat.setForeground(Qt::blue);
     rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
     rule.format = functionFormat;
     highlightingRules.append(rule);
-//! [5]
 
-//! [6]
     commentStartExpression = QRegExp("/\\*");
     commentEndExpression = QRegExp("\\*/");
 }
-//! [6]
 
-//! [7]
 void Highlighter::highlightBlock(const QString &text)
 {
     foreach (const HighlightingRule &rule, highlightingRules) {
@@ -118,18 +102,13 @@ void Highlighter::highlightBlock(const QString &text)
             index = expression.indexIn(text, index + length);
         }
     }
-//! [7] //! [8]
     setCurrentBlockState(0);
-//! [8]
 
-//! [9]
     int startIndex = 0;
     if (previousBlockState() != 1)
         startIndex = commentStartExpression.indexIn(text);
 
-//! [9] //! [10]
     while (startIndex >= 0) {
-//! [10] //! [11]
         int endIndex = commentEndExpression.indexIn(text, startIndex);
         int commentLength;
         if (endIndex == -1) {
@@ -143,9 +122,6 @@ void Highlighter::highlightBlock(const QString &text)
         startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
     }
 }
-//! [11]
-
-//![constructor]
 
 CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 {
@@ -159,10 +135,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 	updateLineNumberAreaWidth(0);
 	highlightCurrentLine();
 }
-
-//![constructor]
-
-//![extraAreaWidth]
 
 int CodeEditor::lineNumberAreaWidth()
 {
@@ -178,18 +150,10 @@ int CodeEditor::lineNumberAreaWidth()
 	return space;
 }
 
-//![extraAreaWidth]
-
-//![slotUpdateExtraAreaWidth]
-
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
 { 
 	setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
-
-//![slotUpdateExtraAreaWidth]
-
-//![slotUpdateRequest]
 
 void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 {
@@ -202,10 +166,6 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 		updateLineNumberAreaWidth(0);
 }
 
-//![slotUpdateRequest]
-
-//![resizeEvent]
-
 void CodeEditor::resizeEvent(QResizeEvent *e)
 {
 	QTextEdit::resizeEvent(e);
@@ -213,10 +173,6 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 	QRect cr = contentsRect();
 	lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
-
-//![resizeEvent]
-
-//![cursorPositionChanged]
 
 void CodeEditor::highlightCurrentLine()
 {
@@ -236,10 +192,6 @@ void CodeEditor::highlightCurrentLine()
 
 	setExtraSelections(extraSelections);
 }
-
-//![cursorPositionChanged]
-
-//![extraAreaPaintEvent_0]
 
 void CodeEditor::paintEvent(QPaintEvent *event) 
 {
@@ -279,7 +231,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 	// why is this necessary?
 	update();
 }
-//![extraAreaPaintEvent_2]
+
 bool CodeEditor::viewportEvent( QEvent * event )
 {
 	return QTextEdit::viewportEvent( event );

@@ -171,10 +171,10 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 
 	varIdTreeMap.insert( a_varId, newItem );
 
-	if ( QString(a_varType) == "table" ) {
+	/*if ( QString(a_varType) == "table" ) {
 		newItem->setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
 		return;
-	}
+	}*/
 
 	if(a_varId != 0)
 		gmMachineGetGlobalsInfo(a_varId);
