@@ -45,8 +45,8 @@
   <widget class="QPushButton" name="buttonSetFont">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>140</y>
+     <x>160</x>
+     <y>60</y>
      <width>75</width>
      <height>23</height>
     </rect>
