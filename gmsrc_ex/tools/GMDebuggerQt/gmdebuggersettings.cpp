@@ -1,4 +1,5 @@
 #include "gmdebuggersettings.h"
+#include <QFontDialog>
 
 GMDebuggerSettings::GMDebuggerSettings(QWidget *parent)
 	: QDialog(parent)
@@ -18,14 +19,9 @@ GMDebuggerSettings::GMDebuggerSettings(QWidget *parent)
 	const int i = ui.comboStyles->findData( oldStyleName );
 	ui.comboStyles->setCurrentIndex( i );
 
-	ui.comboFonts->setCurrentFont( QApplication::font() );
-
 	// slots
 	connect(ui.comboStyles, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged()));
-	connect(ui.comboFonts, 
-		SIGNAL(currentFontChanged(const QFont &)), 
-		this, 
-		SLOT(FontChanged(const QFont &)));
+	connect(ui.buttonSetFont, SIGNAL(clicked()), this, SLOT(SelectFont()));
 }
 
 GMDebuggerSettings::~GMDebuggerSettings()
@@ -39,8 +35,11 @@ void GMDebuggerSettings::StyleChanged()
 	QApplication::setStyle( styleName );
 }
 
-void GMDebuggerSettings::FontChanged(const QFont & newFont)
+void GMDebuggerSettings::SelectFont()
 {
-	QApplication::setFont( newFont );
-
+	bool ok = false;
+	QFont newFont = QFontDialog::getFont(&ok, QApplication::font(), this);
+	if ( ok ) {
+		QApplication::setFont( newFont );
+	}
 }

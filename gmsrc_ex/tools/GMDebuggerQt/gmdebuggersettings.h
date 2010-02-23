@@ -18,7 +18,7 @@ private:
 
 private slots:
 	void StyleChanged();
-	void FontChanged(const QFont & newFont);
+	void SelectFont();
 };
 
 #endif // GMDEBUGGERSETTINGS_H
