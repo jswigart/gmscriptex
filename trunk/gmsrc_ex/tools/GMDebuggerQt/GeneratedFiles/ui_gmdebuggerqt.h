@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'gmdebuggerqt.ui'
 **
-** Created: Sun Feb 21 22:52:52 2010
+** Created: Sun Feb 21 23:28:03 2010
 **      by: Qt User Interface Compiler version 4.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -45,6 +45,7 @@ public:
     QAction *actionSet_Break_Point;
     QAction *actionDisconnect;
     QAction *actionOpen_Script;
+    QAction *actionSettings;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout_4;
     CodeEditor *scriptEdit;
@@ -136,6 +137,9 @@ public:
         QIcon icon10;
         icon10.addFile(QString::fromUtf8(":/GMDebuggerQt/Resources/script_open.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionOpen_Script->setIcon(icon10);
+        actionSettings = new QAction(GMDebuggerQtClass);
+        actionSettings->setObjectName(QString::fromUtf8("actionSettings"));
+        actionSettings->setCheckable(false);
         centralWidget = new QWidget(GMDebuggerQtClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         centralWidget->setEnabled(true);
@@ -334,6 +338,7 @@ public:
         menuBar->addAction(menuEdit->menuAction());
         menuFile->addAction(actionConnect);
         menuFile->addAction(actionExit);
+        menuEdit->addAction(actionSettings);
         mainToolBar->addAction(actionOpen_Script);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionConnect);
@@ -375,6 +380,7 @@ public:
         actionSet_Break_Point->setShortcut(QApplication::translate("GMDebuggerQtClass", "F9", 0, QApplication::UnicodeUTF8));
         actionDisconnect->setText(QApplication::translate("GMDebuggerQtClass", "Disconnect", 0, QApplication::UnicodeUTF8));
         actionOpen_Script->setText(QApplication::translate("GMDebuggerQtClass", "Open Script", 0, QApplication::UnicodeUTF8));
+        actionSettings->setText(QApplication::translate("GMDebuggerQtClass", "Settings", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("GMDebuggerQtClass", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("GMDebuggerQtClass", "Edit", 0, QApplication::UnicodeUTF8));
         dockThreads->setWindowTitle(QApplication::translate("GMDebuggerQtClass", "Threads", 0, QApplication::UnicodeUTF8));
