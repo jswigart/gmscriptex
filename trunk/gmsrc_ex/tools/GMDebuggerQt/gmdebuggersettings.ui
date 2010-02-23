@@ -32,7 +32,7 @@
   <widget class="QLabel" name="Styles">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>50</x>
      <y>40</y>
      <width>46</width>
      <height>13</height>
@@ -40,6 +40,24 @@
    </property>
    <property name="text">
     <string>Styles</string>
+   </property>
+  </widget>
+  <widget class="QFontComboBox" name="comboFonts">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>60</y>
+     <width>140</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="currentFont">
+    <font>
+     <family>Consolas</family>
+    </font>
    </property>
   </widget>
  </widget>

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'gmdebuggersettings.ui'
 **
-** Created: Mon Feb 22 23:01:13 2010
+** Created: Tue Feb 23 00:03:03 2010
 **      by: Qt User Interface Compiler version 4.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -16,6 +16,7 @@
 #include <QtGui/QButtonGroup>
 #include <QtGui/QComboBox>
 #include <QtGui/QDialog>
+#include <QtGui/QFontComboBox>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 
@@ -26,6 +27,7 @@ class Ui_GMDebuggerSettingsClass
 public:
     QComboBox *comboStyles;
     QLabel *Styles;
+    QFontComboBox *comboFonts;
 
     void setupUi(QDialog *GMDebuggerSettingsClass)
     {
@@ -39,7 +41,14 @@ public:
         comboStyles->setGeometry(QRect(100, 30, 201, 22));
         Styles = new QLabel(GMDebuggerSettingsClass);
         Styles->setObjectName(QString::fromUtf8("Styles"));
-        Styles->setGeometry(QRect(40, 40, 46, 13));
+        Styles->setGeometry(QRect(50, 40, 46, 13));
+        comboFonts = new QFontComboBox(GMDebuggerSettingsClass);
+        comboFonts->setObjectName(QString::fromUtf8("comboFonts"));
+        comboFonts->setGeometry(QRect(160, 60, 140, 22));
+        comboFonts->setAcceptDrops(false);
+        QFont font;
+        font.setFamily(QString::fromUtf8("Consolas"));
+        comboFonts->setCurrentFont(font);
 
         retranslateUi(GMDebuggerSettingsClass);
 

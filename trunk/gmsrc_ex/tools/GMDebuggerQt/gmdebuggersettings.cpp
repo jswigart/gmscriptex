@@ -17,11 +17,15 @@ GMDebuggerSettings::GMDebuggerSettings(QWidget *parent)
 	QString oldStyleName = QApplication::style()->objectName();
 	const int i = ui.comboStyles->findData( oldStyleName );
 	ui.comboStyles->setCurrentIndex( i );
-	
+
+	ui.comboFonts->setCurrentFont( QApplication::font() );
+
 	// slots
 	connect(ui.comboStyles, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged()));
-
-	
+	connect(ui.comboFonts, 
+		SIGNAL(currentFontChanged(const QFont &)), 
+		this, 
+		SLOT(FontChanged(const QFont &)));
 }
 
 GMDebuggerSettings::~GMDebuggerSettings()
@@ -33,4 +37,10 @@ void GMDebuggerSettings::StyleChanged()
 	const int i = ui.comboStyles->currentIndex();
 	QString styleName = ui.comboStyles->itemData( i ).toString();
 	QApplication::setStyle( styleName );
+}
+
+void GMDebuggerSettings::FontChanged(const QFont & newFont)
+{
+	QApplication::setFont( newFont );
+
 }
