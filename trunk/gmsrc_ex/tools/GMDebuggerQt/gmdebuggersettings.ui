@@ -42,22 +42,17 @@
     <string>Styles</string>
    </property>
   </widget>
-  <widget class="QFontComboBox" name="comboFonts">
+  <widget class="QPushButton" name="buttonSetFont">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>60</y>
-     <width>140</width>
-     <height>22</height>
+     <x>190</x>
+     <y>140</y>
+     <width>75</width>
+     <height>23</height>
     </rect>
    </property>
-   <property name="acceptDrops">
-    <bool>false</bool>
-   </property>
-   <property name="currentFont">
-    <font>
-     <family>Consolas</family>
-    </font>
+   <property name="text">
+    <string>Select Font</string>
    </property>
   </widget>
  </widget>

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'gmdebuggersettings.h'
 **
-** Created: Tue Feb 23 00:15:30 2010
+** Created: Tue Feb 23 00:25:47 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -32,14 +32,14 @@ static const uint qt_meta_data_GMDebuggerSettings[] = {
 
  // slots: signature, parameters, type, tag, flags
       20,   19,   19,   19, 0x08,
-      43,   35,   19,   19, 0x08,
+      35,   19,   19,   19, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_GMDebuggerSettings[] = {
     "GMDebuggerSettings\0\0StyleChanged()\0"
-    "newFont\0FontChanged(QFont)\0"
+    "SelectFont()\0"
 };
 
 const QMetaObject GMDebuggerSettings::staticMetaObject = {
@@ -72,7 +72,7 @@ int GMDebuggerSettings::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: StyleChanged(); break;
-        case 1: FontChanged((*reinterpret_cast< const QFont(*)>(_a[1]))); break;
+        case 1: SelectFont(); break;
         default: ;
         }
         _id -= 2;

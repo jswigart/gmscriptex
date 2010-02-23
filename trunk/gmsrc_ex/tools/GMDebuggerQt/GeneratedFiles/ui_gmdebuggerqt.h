@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'gmdebuggerqt.ui'
 **
-** Created: Sun Feb 21 23:28:03 2010
+** Created: Tue Feb 23 00:25:47 2010
 **      by: Qt User Interface Compiler version 4.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
