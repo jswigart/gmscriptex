@@ -12,7 +12,7 @@ void GMDebuggerQt::gmDebuggerRun(int a_threadId, int a_lineNum, const char *a_fu
 	if(!a_func || !a_func[0])
 		a_func = "<unknownfunc>";
 
-	AddUniqueThread( a_threadId, "Running", a_func, a_file );
+	AddUniqueThread( a_threadId, "Running", a_lineNum, a_func, a_file );
 }
 
 void GMDebuggerQt::gmDebuggerStop(int a_threadId)
@@ -110,7 +110,7 @@ void GMDebuggerQt::gmDebuggerBeginThreadInfo()
 
 void GMDebuggerQt::gmDebuggerThreadInfo(int a_threadId, const char * a_threadState, int a_lineNum, const char * a_func, const char * a_file)
 {
-	AddUniqueThread( a_threadId, a_threadState, a_func, a_file );
+	AddUniqueThread( a_threadId, a_threadState, a_lineNum, a_func, a_file );
 }
 
 void GMDebuggerQt::gmDebuggerEndThreadInfo()
@@ -171,10 +171,10 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 
 	varIdTreeMap.insert( a_varId, newItem );
 
-	/*if ( QString(a_varType) == "table" ) {
+	if ( QString(a_varType) == "table" ) {
 		newItem->setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
 		return;
-	}*/
+	}
 
 	if(a_varId != 0)
 		gmMachineGetGlobalsInfo(a_varId);
@@ -191,15 +191,18 @@ void GMDebuggerQt::GlobalExpanded( QTreeWidgetItem * item )
 	gmMachineGetGlobalsInfo(varId);
 }
 
-int GMDebuggerQt::AddUniqueThread( int a_threadId, const char * a_status, const char * a_func, const char * a_file )
+int GMDebuggerQt::AddUniqueThread( int a_threadId, const char * a_status, int a_line, const char * a_func, const char * a_file )
 {
 	const int newRow = ui.threadTable->rowCount();
 	threadRowMap.insert( a_threadId, newRow );
 
+	QString func;
+	func.sprintf( "%s(%d)",a_func,a_line );
+
 	ui.threadTable->insertRow( newRow );
 	ui.threadTable->setItem(newRow,Thread_Id,new QTableWidgetItem(QString::number(a_threadId)));
 	ui.threadTable->setItem(newRow,Thread_Status,new QTableWidgetItem(a_status));
-	ui.threadTable->setItem(newRow,Thread_Function,new QTableWidgetItem(a_func));
+	ui.threadTable->setItem(newRow,Thread_Function,new QTableWidgetItem(func));
 	ui.threadTable->setItem(newRow,Thread_Script,new QTableWidgetItem(a_file));
 
 	return newRow;

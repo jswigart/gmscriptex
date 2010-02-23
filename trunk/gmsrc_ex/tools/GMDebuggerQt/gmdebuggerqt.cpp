@@ -11,12 +11,17 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/gmscriptex/");
 	QCoreApplication::setApplicationName("GM Debugger");
 
+	QFont defaultFont( "Consolas" );
+	QApplication::setFont( defaultFont );
+
 	ackResponseId = 0;
 	currentSourceId = 0;
 	currentThreadId = 0;
 	currentLineOnSrcRecieved = -1;
 	
 	ui.setupUi(this);
+
+	ui.scriptEdit->setTabStopWidth( fontMetrics().width(QLatin1Char('9')) * 4 );
 
 	ui.actionConnect->setEnabled(true);
 	ui.actionDisconnect->setEnabled(false);
@@ -40,7 +45,6 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	connect(ui.threadTable, SIGNAL(itemSelectionChanged()), this, SLOT(ThreadSelectionChanged()));
 	connect(ui.globalsTable, SIGNAL(itemExpanded(QTreeWidgetItem*)), this, SLOT(GlobalExpanded(QTreeWidgetItem*)));
 	
-
 	// create network socket and slots
 	tcpSocket = new QTcpSocket(this);
 	connect(tcpSocket, SIGNAL(connected()), this, SLOT(SocketConnected()));
@@ -56,6 +60,7 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 
 	parentGlobals = new QTreeWidgetItem( ui.globalsTable );
 	parentGlobals->setText(TreeColumn_Name, "globals");
+	parentGlobals->setExpanded( true );
 	parentCurrent = 0;
 
 	// TEMP
