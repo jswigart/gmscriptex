@@ -7,6 +7,8 @@
 #include "codeeditor.h"
 #include "ui_gmdebuggerqt.h"
 
+#include "gmdebuggersettings.h"
+
 #include "../../src/gm/gmDebugger.h"
 
 class GMDebuggerQt : public QMainWindow, public gmDebuggerSession
@@ -17,19 +19,10 @@ public:
 	GMDebuggerQt(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~GMDebuggerQt();
 
-	enum StyleType {
-		Style_Windows,
-		Style_WindowsXP,
-		Style_WindowsVista,
-		Style_Motif,
-		Style_CDE,
-		Style_Plastique,
-		Style_CleanLooks,
-	};
-
 	void closeEvent(QCloseEvent *event);
 	public slots:
 		void OnActionScriptOpen(const QString &path = QString());
+		void OnActionSettings();
 		void OnActionConnect();
 		void OnActionDisConnect();
 		void OnActionRunAll();
@@ -50,13 +43,8 @@ private:
 
 	QTimer *removeThreadTimer;
 
-	
-
 	void writeSettings();
 	void readSettings();
-
-	void SetCurrentStyle( StyleType newStyle );
-	StyleType	currentStyle;
 protected:
 	virtual void DebuggerSendMessage(const void * a_command, int a_len);
 	virtual const void * DebuggerPumpMessage(int &a_len);
@@ -136,6 +124,8 @@ protected:
 		void RemoveThread( int a_threadId );
 		void RemoveExpiredThreads();
 		void ThreadSelectionChanged();
+
+		void GlobalExpanded( QTreeWidgetItem * item );
 };
 
 #endif // GMDEBUGGERQT_H

@@ -3,14 +3,13 @@
 #include <QtNetwork>
 #include "gmdebuggerqt.h"
 
+
 GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 : QMainWindow(parent, flags)
 {
 	QCoreApplication::setOrganizationName("JSwigart");
 	QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/gmscriptex/");
 	QCoreApplication::setApplicationName("GM Debugger");
-
-	SetCurrentStyle( Style_WindowsVista );
 
 	ackResponseId = 0;
 	currentSourceId = 0;
@@ -23,6 +22,7 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	ui.actionDisconnect->setEnabled(false);
 
 	// connect action slots
+	connect(ui.actionSettings, SIGNAL(triggered(bool)), this, SLOT(OnActionSettings()));
 	connect(ui.actionConnect, SIGNAL(triggered(bool)), this, SLOT(OnActionConnect()));
 	connect(ui.actionDisconnect, SIGNAL(triggered(bool)), this, SLOT(OnActionDisConnect()));
 	connect(ui.actionOpen_Script, SIGNAL(triggered(bool)), this, SLOT(OnActionScriptOpen()));
@@ -38,6 +38,7 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	
 	// connect ui slots
 	connect(ui.threadTable, SIGNAL(itemSelectionChanged()), this, SLOT(ThreadSelectionChanged()));
+	connect(ui.globalsTable, SIGNAL(itemExpanded(QTreeWidgetItem*)), this, SLOT(GlobalExpanded(QTreeWidgetItem*)));
 	
 
 	// create network socket and slots
@@ -64,37 +65,6 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 
 GMDebuggerQt::~GMDebuggerQt()
 {
-}
-
-void GMDebuggerQt::SetCurrentStyle( StyleType newStyle )
-{
-	switch( newStyle )
-	{
-	case Style_Windows:
-		QApplication::setStyle(new QWindowsStyle);
-		break;
-	case Style_WindowsXP:
-		QApplication::setStyle(new QWindowsXPStyle);
-		break;
-	case Style_WindowsVista:
-		QApplication::setStyle(new QWindowsVistaStyle);
-		break;
-	case Style_Motif:
-		QApplication::setStyle(new QMotifStyle);
-		break;
-	case Style_CDE:
-		QApplication::setStyle(new QCDEStyle);
-		break;
-	case Style_Plastique:
-		QApplication::setStyle(new QPlastiqueStyle);
-		break;
-	case Style_CleanLooks:
-		QApplication::setStyle(new QCleanlooksStyle);
-		break;
-	default:
-		return;
-	}
-	currentStyle = newStyle;
 }
 
 void GMDebuggerQt::closeEvent(QCloseEvent *event)
@@ -129,7 +99,7 @@ void GMDebuggerQt::writeSettings()
 	settings.beginGroup("LayOut");
 		settings.setValue("geometry", saveGeometry());
 		settings.setValue("windowState", saveState());
-		settings.setValue("style", currentStyle);
+		settings.setValue("style", QApplication::style()->objectName());
 	settings.endGroup();
 }
 
@@ -140,7 +110,7 @@ void GMDebuggerQt::readSettings()
 	settings.beginGroup("LayOut");
 		restoreGeometry(settings.value("geometry").toByteArray());
 		restoreState(settings.value("windowState").toByteArray());
-		SetCurrentStyle((StyleType)settings.value("style",currentStyle).toInt());
+		QApplication::setStyle( settings.value("style",QApplication::style()->objectName()).toString() );
 	settings.endGroup();
 }
 struct PacketHeader {
@@ -249,6 +219,12 @@ void GMDebuggerQt::OnActionScriptOpen(const QString &path)
 			ui.scriptEdit->setDocumentTitle(path);
 		}
 	}
+}
+
+void GMDebuggerQt::OnActionSettings()
+{
+	GMDebuggerSettings settings;
+	settings.exec();
 }
 
 void GMDebuggerQt::OnActionConnect()

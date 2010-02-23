@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'gmdebuggerqt.h'
 **
-** Created: Sun Feb 21 22:50:26 2010
+** Created: Mon Feb 22 00:31:59 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_GMDebuggerQt[] = {
        4,       // revision
        0,       // classname
        0,    0, // classinfo
-      21,   14, // methods
+      23,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -34,43 +34,47 @@ static const uint qt_meta_data_GMDebuggerQt[] = {
       19,   14,   13,   13, 0x0a,
       47,   13,   13,   13, 0x2a,
       68,   13,   13,   13, 0x0a,
-      86,   13,   13,   13, 0x0a,
-     107,   13,   13,   13, 0x0a,
-     124,   13,   13,   13, 0x0a,
+      87,   13,   13,   13, 0x0a,
+     105,   13,   13,   13, 0x0a,
+     126,   13,   13,   13, 0x0a,
      143,   13,   13,   13, 0x0a,
-     161,   13,   13,   13, 0x0a,
-     178,   13,   13,   13, 0x0a,
-     196,   13,   13,   13, 0x0a,
+     162,   13,   13,   13, 0x0a,
+     180,   13,   13,   13, 0x0a,
+     197,   13,   13,   13, 0x0a,
      215,   13,   13,   13, 0x0a,
-     235,   13,   13,   13, 0x0a,
-     256,   13,   13,   13, 0x0a,
-     280,   13,   13,   13, 0x08,
-     298,   13,   13,   13, 0x08,
-     319,   13,   13,   13, 0x08,
-     351,  339,   13,   13, 0x08,
-     438,  404,  400,   13, 0x08,
-     506,  495,   13,   13, 0x08,
-     524,   13,   13,   13, 0x08,
-     547,   13,   13,   13, 0x08,
+     234,   13,   13,   13, 0x0a,
+     254,   13,   13,   13, 0x0a,
+     275,   13,   13,   13, 0x0a,
+     299,   13,   13,   13, 0x08,
+     317,   13,   13,   13, 0x08,
+     338,   13,   13,   13, 0x08,
+     370,  358,   13,   13, 0x08,
+     457,  423,  419,   13, 0x08,
+     525,  514,   13,   13, 0x08,
+     543,   13,   13,   13, 0x08,
+     566,   13,   13,   13, 0x08,
+     596,  591,   13,   13, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_GMDebuggerQt[] = {
     "GMDebuggerQt\0\0path\0OnActionScriptOpen(QString)\0"
-    "OnActionScriptOpen()\0OnActionConnect()\0"
-    "OnActionDisConnect()\0OnActionRunAll()\0"
-    "OnActionBreakAll()\0OnActionKillAll()\0"
-    "OnActionStepIn()\0OnActionStepOut()\0"
-    "OnActionStepOver()\0OnActionRunThread()\0"
-    "OnActionStopThread()\0OnActionSetBreakpoint()\0"
-    "SocketConnected()\0SocketDisconnected()\0"
-    "SocketReadyToRead()\0socketError\0"
+    "OnActionScriptOpen()\0OnActionSettings()\0"
+    "OnActionConnect()\0OnActionDisConnect()\0"
+    "OnActionRunAll()\0OnActionBreakAll()\0"
+    "OnActionKillAll()\0OnActionStepIn()\0"
+    "OnActionStepOut()\0OnActionStepOver()\0"
+    "OnActionRunThread()\0OnActionStopThread()\0"
+    "OnActionSetBreakpoint()\0SocketConnected()\0"
+    "SocketDisconnected()\0SocketReadyToRead()\0"
+    "socketError\0"
     "SocketDisplayError(QAbstractSocket::SocketError)\0"
     "int\0a_threadId,a_status,a_func,a_file\0"
     "AddUniqueThread(int,const char*,const char*,const char*)\0"
     "a_threadId\0RemoveThread(int)\0"
     "RemoveExpiredThreads()\0ThreadSelectionChanged()\0"
+    "item\0GlobalExpanded(QTreeWidgetItem*)\0"
 };
 
 const QMetaObject GMDebuggerQt::staticMetaObject = {
@@ -106,29 +110,31 @@ int GMDebuggerQt::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: OnActionScriptOpen((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 1: OnActionScriptOpen(); break;
-        case 2: OnActionConnect(); break;
-        case 3: OnActionDisConnect(); break;
-        case 4: OnActionRunAll(); break;
-        case 5: OnActionBreakAll(); break;
-        case 6: OnActionKillAll(); break;
-        case 7: OnActionStepIn(); break;
-        case 8: OnActionStepOut(); break;
-        case 9: OnActionStepOver(); break;
-        case 10: OnActionRunThread(); break;
-        case 11: OnActionStopThread(); break;
-        case 12: OnActionSetBreakpoint(); break;
-        case 13: SocketConnected(); break;
-        case 14: SocketDisconnected(); break;
-        case 15: SocketReadyToRead(); break;
-        case 16: SocketDisplayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
-        case 17: { int _r = AddUniqueThread((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const char*(*)>(_a[2])),(*reinterpret_cast< const char*(*)>(_a[3])),(*reinterpret_cast< const char*(*)>(_a[4])));
+        case 2: OnActionSettings(); break;
+        case 3: OnActionConnect(); break;
+        case 4: OnActionDisConnect(); break;
+        case 5: OnActionRunAll(); break;
+        case 6: OnActionBreakAll(); break;
+        case 7: OnActionKillAll(); break;
+        case 8: OnActionStepIn(); break;
+        case 9: OnActionStepOut(); break;
+        case 10: OnActionStepOver(); break;
+        case 11: OnActionRunThread(); break;
+        case 12: OnActionStopThread(); break;
+        case 13: OnActionSetBreakpoint(); break;
+        case 14: SocketConnected(); break;
+        case 15: SocketDisconnected(); break;
+        case 16: SocketReadyToRead(); break;
+        case 17: SocketDisplayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
+        case 18: { int _r = AddUniqueThread((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const char*(*)>(_a[2])),(*reinterpret_cast< const char*(*)>(_a[3])),(*reinterpret_cast< const char*(*)>(_a[4])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 18: RemoveThread((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 19: RemoveExpiredThreads(); break;
-        case 20: ThreadSelectionChanged(); break;
+        case 19: RemoveThread((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 20: RemoveExpiredThreads(); break;
+        case 21: ThreadSelectionChanged(); break;
+        case 22: GlobalExpanded((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1]))); break;
         default: ;
         }
-        _id -= 21;
+        _id -= 23;
     }
     return _id;
 }

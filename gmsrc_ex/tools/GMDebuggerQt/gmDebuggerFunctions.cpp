@@ -167,9 +167,14 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 	newItem->setText(TreeColumn_Name, a_varSymbol);
 	newItem->setText(TreeColumn_Type, a_varType);
 	newItem->setText(TreeColumn_Value, a_varValue);
-	//newItem->setData(0,0,QVariant(a_varId));
+	newItem->setData(0,Qt::UserRole,QVariant(a_varId));
 
 	varIdTreeMap.insert( a_varId, newItem );
+
+	/*if ( QString(a_varType) == "table" ) {
+		newItem->setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
+		return;
+	}*/
 
 	if(a_varId != 0)
 		gmMachineGetGlobalsInfo(a_varId);
@@ -177,8 +182,13 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 
 void GMDebuggerQt::gmDebuggerEndGlobals()
 {
-	/*GMDebuggerFrame *pApp = static_cast<GMDebuggerFrame*>(a_session->m_user);
-	pApp->EndGlobals();*/
+	ui.globalsTable->update();
+}
+
+void GMDebuggerQt::GlobalExpanded( QTreeWidgetItem * item )
+{
+	const int varId = item->data( 0, Qt::UserRole ).toInt();
+	gmMachineGetGlobalsInfo(varId);
 }
 
 int GMDebuggerQt::AddUniqueThread( int a_threadId, const char * a_status, const char * a_func, const char * a_file )
