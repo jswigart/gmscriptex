@@ -105,6 +105,7 @@ void GMDebuggerQt::writeSettings()
 		settings.setValue("geometry", saveGeometry());
 		settings.setValue("windowState", saveState());
 		settings.setValue("style", QApplication::style()->objectName());
+		settings.setValue("font", QApplication::font().toString());		
 	settings.endGroup();
 }
 
@@ -116,6 +117,11 @@ void GMDebuggerQt::readSettings()
 		restoreGeometry(settings.value("geometry").toByteArray());
 		restoreState(settings.value("windowState").toByteArray());
 		QApplication::setStyle( settings.value("style",QApplication::style()->objectName()).toString() );
+
+		QFont savedFont = QApplication::font();
+		if ( savedFont.fromString( settings.value("font").toString() ) ) {
+			QApplication::setFont( savedFont );
+		}
 	settings.endGroup();
 }
 struct PacketHeader {
