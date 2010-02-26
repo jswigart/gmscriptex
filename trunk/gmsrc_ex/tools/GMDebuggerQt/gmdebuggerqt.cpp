@@ -148,7 +148,7 @@ const void * GMDebuggerQt::DebuggerPumpMessage(int &a_len)
 	a_len = 0;
 	if ( !socketData.isEmpty() ) {
 		const char * dataPtr = socketData.constData();
-		const PacketHeader * hdr = (const PacketHeader *)dataPtr;
+		const PacketHeader * hdr = reinterpret_cast<const PacketHeader *>(dataPtr);
 		dataPtr += sizeof( PacketHeader );
 		if ( hdr->magicNum != PacketHeader::MAGIC_NUM ) {
 			ui.outputWindow->append( "MALFORMED PACKET!\n" );
