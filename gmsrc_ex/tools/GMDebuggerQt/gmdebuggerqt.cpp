@@ -26,6 +26,10 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	ui.actionConnect->setEnabled(true);
 	ui.actionDisconnect->setEnabled(false);
 
+	ui.threadTable->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
+	ui.callStack->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
+	ui.context->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
+
 	// connect action slots
 	connect(ui.actionSettings, SIGNAL(triggered(bool)), this, SLOT(OnActionSettings()));
 	connect(ui.actionConnect, SIGNAL(triggered(bool)), this, SLOT(OnActionConnect()));
@@ -43,7 +47,6 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	
 	// connect ui slots
 	connect(ui.threadTable, SIGNAL(itemSelectionChanged()), this, SLOT(ThreadSelectionChanged()));
-	connect(ui.globalsTable, SIGNAL(itemExpanded(QTreeWidgetItem*)), this, SLOT(GlobalExpanded(QTreeWidgetItem*)));
 	
 	// create network socket and slots
 	tcpSocket = new QTcpSocket(this);
@@ -62,6 +65,8 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	parentGlobals->setText(TreeColumn_Name, "globals");
 	parentGlobals->setExpanded( true );
 	parentCurrent = 0;
+
+	memset(treeColumnWidths,0,sizeof(treeColumnWidths));
 
 	// TEMP
 	//OnActionScriptOpen("D:/CVS/Omnibot/head/Installer/Files/et/scripts/goals/goal_checkstuck.gm");

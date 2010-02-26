@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'gmdebuggerqt.ui'
 **
-** Created: Tue Feb 23 00:25:47 2010
+** Created: Fri Feb 26 01:01:21 2010
 **      by: Qt User Interface Compiler version 4.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -214,8 +214,8 @@ public:
         threadTable->setWordWrap(false);
         threadTable->setColumnCount(4);
         threadTable->horizontalHeader()->setVisible(true);
-        threadTable->horizontalHeader()->setCascadingSectionResizes(true);
-        threadTable->horizontalHeader()->setDefaultSectionSize(75);
+        threadTable->horizontalHeader()->setCascadingSectionResizes(false);
+        threadTable->horizontalHeader()->setDefaultSectionSize(100);
         threadTable->horizontalHeader()->setMinimumSectionSize(50);
         threadTable->horizontalHeader()->setStretchLastSection(true);
         threadTable->verticalHeader()->setDefaultSectionSize(20);
@@ -245,8 +245,8 @@ public:
         callStack->setSelectionMode(QAbstractItemView::SingleSelection);
         callStack->setSelectionBehavior(QAbstractItemView::SelectRows);
         callStack->setColumnCount(1);
-        callStack->horizontalHeader()->setDefaultSectionSize(200);
-        callStack->horizontalHeader()->setMinimumSectionSize(200);
+        callStack->horizontalHeader()->setDefaultSectionSize(100);
+        callStack->horizontalHeader()->setMinimumSectionSize(50);
         callStack->horizontalHeader()->setProperty("showSortIndicator", QVariant(true));
         callStack->horizontalHeader()->setStretchLastSection(true);
         callStack->verticalHeader()->setVisible(false);
@@ -279,7 +279,7 @@ public:
         context->setSelectionMode(QAbstractItemView::SingleSelection);
         context->setSelectionBehavior(QAbstractItemView::SelectRows);
         context->setColumnCount(3);
-        context->horizontalHeader()->setDefaultSectionSize(50);
+        context->horizontalHeader()->setDefaultSectionSize(100);
         context->horizontalHeader()->setMinimumSectionSize(50);
         context->horizontalHeader()->setProperty("showSortIndicator", QVariant(true));
         context->horizontalHeader()->setStretchLastSection(true);
@@ -302,8 +302,14 @@ public:
         globalsTable = new QTreeWidget(dockWidgetContents_6);
         globalsTable->setObjectName(QString::fromUtf8("globalsTable"));
         globalsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        globalsTable->setProperty("showDropIndicator", QVariant(false));
+        globalsTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+        globalsTable->setUniformRowHeights(true);
+        globalsTable->header()->setCascadingSectionResizes(false);
         globalsTable->header()->setDefaultSectionSize(100);
-        globalsTable->header()->setMinimumSectionSize(75);
+        globalsTable->header()->setMinimumSectionSize(50);
+        globalsTable->header()->setProperty("showSortIndicator", QVariant(true));
+        globalsTable->header()->setStretchLastSection(false);
 
         horizontalLayout_6->addWidget(globalsTable);
 

@@ -159,10 +159,10 @@
         <bool>true</bool>
        </attribute>
        <attribute name="horizontalHeaderCascadingSectionResizes">
-        <bool>true</bool>
+        <bool>false</bool>
        </attribute>
        <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>75</number>
+        <number>100</number>
        </attribute>
        <attribute name="horizontalHeaderMinimumSectionSize">
         <number>50</number>
@@ -183,7 +183,7 @@
         <bool>true</bool>
        </attribute>
        <attribute name="horizontalHeaderCascadingSectionResizes">
-        <bool>true</bool>
+        <bool>false</bool>
        </attribute>
        <attribute name="horizontalHeaderVisible">
         <bool>true</bool>
@@ -195,7 +195,7 @@
         <bool>true</bool>
        </attribute>
        <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>75</number>
+        <number>100</number>
        </attribute>
        <column>
         <property name="text">
@@ -252,10 +252,10 @@
         <number>1</number>
        </property>
        <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>200</number>
+        <number>100</number>
        </attribute>
        <attribute name="horizontalHeaderMinimumSectionSize">
-        <number>200</number>
+        <number>50</number>
        </attribute>
        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
         <bool>true</bool>
@@ -282,10 +282,10 @@
         <bool>true</bool>
        </attribute>
        <attribute name="horizontalHeaderMinimumSectionSize">
-        <number>200</number>
+        <number>50</number>
        </attribute>
        <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>200</number>
+        <number>100</number>
        </attribute>
        <column>
         <property name="text">
@@ -324,7 +324,7 @@
         <number>3</number>
        </property>
        <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>50</number>
+        <number>100</number>
        </attribute>
        <attribute name="horizontalHeaderMinimumSectionSize">
         <number>50</number>
@@ -357,7 +357,7 @@
         <number>50</number>
        </attribute>
        <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>50</number>
+        <number>100</number>
        </attribute>
        <column>
         <property name="text">
@@ -396,17 +396,44 @@
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="horizontalScrollMode">
+        <enum>QAbstractItemView::ScrollPerItem</enum>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerCascadingSectionResizes">
+        <bool>false</bool>
+       </attribute>
        <attribute name="headerDefaultSectionSize">
         <number>100</number>
        </attribute>
        <attribute name="headerMinimumSectionSize">
-        <number>75</number>
+        <number>50</number>
+       </attribute>
+       <attribute name="headerShowSortIndicator" stdset="0">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="headerStretchLastSection">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="headerCascadingSectionResizes">
+        <bool>false</bool>
        </attribute>
        <attribute name="headerDefaultSectionSize">
         <number>100</number>
        </attribute>
        <attribute name="headerMinimumSectionSize">
-        <number>75</number>
+        <number>50</number>
+       </attribute>
+       <attribute name="headerShowSortIndicator" stdset="0">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="headerStretchLastSection">
+        <bool>false</bool>
        </attribute>
        <column>
         <property name="text">
