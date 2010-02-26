@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'gmdebuggerqt.h'
 **
-** Created: Tue Feb 23 00:25:48 2010
+** Created: Fri Feb 26 01:17:17 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_GMDebuggerQt[] = {
        4,       // revision
        0,       // classname
        0,    0, // classinfo
-      23,   14, // methods
+      22,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -53,7 +53,6 @@ static const uint qt_meta_data_GMDebuggerQt[] = {
      536,  525,   13,   13, 0x08,
      554,   13,   13,   13, 0x08,
      577,   13,   13,   13, 0x08,
-     607,  602,   13,   13, 0x08,
 
        0        // eod
 };
@@ -74,7 +73,6 @@ static const char qt_meta_stringdata_GMDebuggerQt[] = {
     "AddUniqueThread(int,const char*,int,const char*,const char*)\0"
     "a_threadId\0RemoveThread(int)\0"
     "RemoveExpiredThreads()\0ThreadSelectionChanged()\0"
-    "item\0GlobalExpanded(QTreeWidgetItem*)\0"
 };
 
 const QMetaObject GMDebuggerQt::staticMetaObject = {
@@ -131,10 +129,9 @@ int GMDebuggerQt::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 19: RemoveThread((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 20: RemoveExpiredThreads(); break;
         case 21: ThreadSelectionChanged(); break;
-        case 22: GlobalExpanded((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1]))); break;
         default: ;
         }
-        _id -= 23;
+        _id -= 22;
     }
     return _id;
 }

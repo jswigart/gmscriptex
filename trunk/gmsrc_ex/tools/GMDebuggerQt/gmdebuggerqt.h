@@ -76,12 +76,16 @@ protected:
 	enum GlobalTreeColumns {
 		TreeColumn_Name,
 		TreeColumn_Type,
-		TreeColumn_Value
+		TreeColumn_Value,
+
+		TreeColumn_Num
 	};
 	typedef QMap<int,QTreeWidgetItem*> VarItemMap;
 	VarItemMap varIdTreeMap;
 	QTreeWidgetItem * parentGlobals;
 	QTreeWidgetItem * parentCurrent;
+
+	int				treeColumnWidths[TreeColumn_Num];
 
 	enum ThreadColumns {
 		Thread_Id,
@@ -124,8 +128,6 @@ protected:
 		void RemoveThread( int a_threadId );
 		void RemoveExpiredThreads();
 		void ThreadSelectionChanged();
-
-		void GlobalExpanded( QTreeWidgetItem * item );
 };
 
 #endif // GMDEBUGGERQT_H

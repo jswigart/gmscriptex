@@ -70,9 +70,14 @@ void GMDebuggerQt::gmDebuggerContextCallFrame(int a_callFrame, const char * a_fu
 		{
 			const int newRow = ui.context->rowCount();
 			ui.context->insertRow( newRow );
-			ui.context->setItem( newRow, Context_Name, new QTableWidgetItem( a_thisSymbol ) );
-			ui.context->setItem( newRow, Context_Type, new QTableWidgetItem( a_thisType ) );
-			ui.context->setItem( newRow, Context_Value, new QTableWidgetItem( a_thisValue ) );
+
+			QTableWidgetItem * itemName = new QTableWidgetItem( a_thisSymbol );
+			QTableWidgetItem * itemType = new QTableWidgetItem( a_thisType );
+			QTableWidgetItem * itemValue = new QTableWidgetItem( a_thisValue );
+
+			ui.context->setItem( newRow, Context_Name, itemName );
+			ui.context->setItem( newRow, Context_Type, itemType );
+			ui.context->setItem( newRow, Context_Value, itemValue );
 		}
 
 		// do we have the source code?
@@ -141,6 +146,7 @@ void GMDebuggerQt::gmDebuggerQuit()
 
 //////////////////////////////////////////////////////////////////////////
 
+
 void GMDebuggerQt::gmDebuggerBeginGlobals(int a_varId)
 {
 	if ( a_varId ) {
@@ -169,12 +175,13 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 	newItem->setText(TreeColumn_Value, a_varValue);
 	newItem->setData(0,Qt::UserRole,QVariant(a_varId));
 
+	for( int i = 0; i < TreeColumn_Num; ++i ) {
+		treeColumnWidths[i] =
+			qMax( treeColumnWidths[i], 
+					fontMetrics().width(QLatin1Char('9')) * (newItem->text(i).size() + 4) );
+	}	
+	
 	varIdTreeMap.insert( a_varId, newItem );
-
-	/*if ( QString(a_varType) == "table" ) {
-		newItem->setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
-		return;
-	}*/
 
 	if(a_varId != 0)
 		gmMachineGetGlobalsInfo(a_varId);
@@ -182,13 +189,11 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 
 void GMDebuggerQt::gmDebuggerEndGlobals()
 {
-	ui.globalsTable->update();
-}
-
-void GMDebuggerQt::GlobalExpanded( QTreeWidgetItem * item )
-{
-	const int varId = item->data( 0, Qt::UserRole ).toInt();
-	gmMachineGetGlobalsInfo(varId);
+	for( int i = 0; i < TreeColumn_Num; ++i ) {
+		ui.globalsTable->header()->resizeSection( i, treeColumnWidths[i] );
+	}
+	//ui.globalsTable->update();
+	//ui.globalsTable->header()->resizeSections( QHeaderView::ResizeToContents );
 }
 
 int GMDebuggerQt::AddUniqueThread( int a_threadId, const char * a_status, int a_line, const char * a_func, const char * a_file )
