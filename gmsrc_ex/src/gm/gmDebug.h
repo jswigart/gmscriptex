@@ -22,10 +22,6 @@ class gmDebugSession;
 // bind debug lib
 void gmBindDebugLib(gmMachine * a_machine);
 
-// callbacks used to hook up comms
-typedef void (GM_CDECL *gmSendDebuggerMessage)(gmDebugSession * a_session, const void * a_command, int a_len);
-typedef const void * (GM_CDECL *gmPumpDebuggerMessage)(gmDebugSession * a_session, int &a_len);
-
 #if GMDEBUG_SUPPORT
 
 /// \class gmDebugSession
@@ -34,23 +30,23 @@ class gmDebugSession
 public:
 
 	gmDebugSession();
-	~gmDebugSession();
+	virtual ~gmDebugSession();
 
-	/// \brief Update() must be called to pump messages
-	void Update();
+	/// \brief UpdateDebugSession() must be called to pump messages
+	void UpdateDebugSession();
 
 	/// \brief Open() will start debugging on a_machine
-	bool Open(gmMachine * a_machine);
+	bool OpenDebugSession(gmMachine * a_machine);
 
 	/// \brief Close() will stop debugging
-	bool Close();
+	bool CloseDebugSession();
 
 	/// \brief GetMachine()
 	inline gmMachine * GetMachine() const { return m_machine; }
 
-	gmSendDebuggerMessage m_sendMessage;
-	gmPumpDebuggerMessage m_pumpMessage;
-	void * m_user;
+	// callbacks used to hook up comms
+	virtual void SendDebuggerMessage(const void * a_command, int a_len) = 0;
+	virtual const void * PumpDebuggerMessage(int &a_len) = 0;
 
 	// send message helpers
 	gmDebugSession &Pack(int a_val);

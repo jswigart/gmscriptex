@@ -171,7 +171,7 @@ static bool VerifyCallback(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVa
 			if(!call.GetReturnedInt(RetVal) || RetVal==0)
 			{
 				a_errs.VA("CheckCallback '%s' failed with unknown error.",
-					CheckCallback->GetDebugName("<unknown>"));
+					CheckCallback->GetDebugName());
 				return false;
 			}
 			return true;
