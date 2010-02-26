@@ -286,13 +286,17 @@ const char * gmFunctionObject::GetSymbol(int a_offset, const char *a_default) co
 	return a_default;
 }
 
-const char * gmFunctionObject::GetDebugName(const char *a_default) const
+const char * gmFunctionObject::GetDebugName() const
 {
 	if(m_debugInfo && m_debugInfo->m_debugName)
 	{
 		return m_debugInfo->m_debugName;
 	}
-	return a_default;
+	if(m_cFunction || m_cFunctor)
+	{
+		return "__native";
+	}
+	return "__unknown";
 }
 
 int gmFunctionObject::GetFunctionSourceLine(int a_relativeLine)

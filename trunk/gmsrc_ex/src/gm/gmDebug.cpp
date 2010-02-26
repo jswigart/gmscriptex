@@ -268,12 +268,12 @@ gmDebugSession::~gmDebugSession()
 }
 
 
-void gmDebugSession::Update()
+void gmDebugSession::UpdateDebugSession()
 {
 	for(;;)
 	{
 		int len;
-		const void * msg = m_pumpMessage(this, len);
+		const void * msg = PumpDebuggerMessage(len);
 		if(msg == NULL)
 			break;
 
@@ -356,9 +356,9 @@ void gmDebugSession::Update()
 }
 
 
-bool gmDebugSession::Open(gmMachine * a_machine)
+bool gmDebugSession::OpenDebugSession(gmMachine * a_machine)
 {
-	Close();
+	CloseDebugSession();
 	m_machine = a_machine;
 	m_machine->m_debugUser = this;
 	m_machine->m_line = LineCallback;
@@ -382,7 +382,7 @@ static bool threadIterClose(gmThread * a_thread, void * a_context)
 }
 
 
-bool gmDebugSession::Close()
+bool gmDebugSession::CloseDebugSession()
 {
 	if(m_machine && m_machine->m_debugUser == this)
 	{
@@ -433,7 +433,7 @@ gmDebugSession &gmDebugSession::Pack(const char * a_val)
 
 void gmDebugSession::Send()
 {
-	m_sendMessage(this, m_out.GetData(), m_out.GetSize());
+	SendDebuggerMessage(m_out.GetData(), m_out.GetSize());
 	m_out.Reset();
 }
 
@@ -780,7 +780,7 @@ void gmMachineKillAll(gmDebugSession * a_session)
 }
 void gmMachineQuit(gmDebugSession * a_session)
 {
-	a_session->Close();
+	a_session->CloseDebugSession();
 }
 
 void gmDebuggerBreak(gmDebugSession * a_session, int a_threadId, int a_sourceId, int a_lineNumber) {

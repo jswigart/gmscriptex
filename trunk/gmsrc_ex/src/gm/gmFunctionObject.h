@@ -90,7 +90,7 @@ public:
 	inline const void * GetByteCode() const { return m_byteCode; }
 
 	/// \brief GetDebugName()
-	const char * GetDebugName(const char *a_default = "__unknown") const;
+	const char * GetDebugName() const;
 
 	/// \brief GetFunctionSourceLine()
 	int GetFunctionSourceLine(int a_relativeLine);
@@ -110,7 +110,7 @@ public:
 
 	// public data
 	gmCFunction			m_cFunction;
-	gmObjFunctor*			m_cFunctor;
+	gmObjFunctor*		m_cFunctor;
 
 protected:
 
