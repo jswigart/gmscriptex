@@ -45,10 +45,6 @@ protected:
   virtual void DebuggerSendMessage(const void * a_command, int a_len) = 0;
   virtual const void * DebuggerPumpMessage(int &a_len) = 0;
 
-  //gmSendMachineMessage m_sendMessage;
-  //gmPumpMachineMessage m_pumpMessage;
-  //void * m_user; // hook to your debugger
-
   // send message helpers
   gmDebuggerSession &Pack(int a_val);
   gmDebuggerSession &Pack(const char * a_val);
