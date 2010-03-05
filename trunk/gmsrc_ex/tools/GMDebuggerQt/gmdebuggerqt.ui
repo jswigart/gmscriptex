@@ -104,7 +104,6 @@
    <addaction name="actionStop_Thread"/>
    <addaction name="actionStop_All_Threads"/>
    <addaction name="actionRun_All_Threads"/>
-   <addaction name="actionSet_Break_Point"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
@@ -585,18 +584,6 @@
    </property>
    <property name="text">
     <string>Run All Threads</string>
-   </property>
-  </action>
-  <action name="actionSet_Break_Point">
-   <property name="icon">
-    <iconset resource="gmdebuggerqt.qrc">
-     <normaloff>:/GMDebuggerQt/Resources/breakpoint.png</normaloff>:/GMDebuggerQt/Resources/breakpoint.png</iconset>
-   </property>
-   <property name="text">
-    <string>Set Break Point</string>
-   </property>
-   <property name="shortcut">
-    <string>F9</string>
    </property>
   </action>
   <action name="actionDisconnect">

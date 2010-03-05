@@ -47,6 +47,7 @@ See Copyright Notice in gmMachine.h
 #define ID_dctx GM_MAKE_ID32('d','c','t','x')
 #define ID_call GM_MAKE_ID32('c','a','l','l')
 #define ID_vari GM_MAKE_ID32('v','a','r','i')
+#define ID_brkp GM_MAKE_ID32('b','r','k','p')
 #define ID_done GM_MAKE_ID32('d','o','n','e')
 #define ID_dsri GM_MAKE_ID32('d','s','r','i')
 #define ID_srci GM_MAKE_ID32('s','r','c','i')
@@ -58,12 +59,14 @@ See Copyright Notice in gmMachine.h
 #define ID_dmsg GM_MAKE_ID32('d','m','s','g')
 #define ID_dend GM_MAKE_ID32('d','e','n','d')
 #define ID_dbps GM_MAKE_ID32('d','b','p','s')
+#define ID_dbpc GM_MAKE_ID32('d','b','p','c')
 
 // my new fns
 #define ID_gbeg GM_MAKE_ID32('g','b','e','g')
 #define ID_glob GM_MAKE_ID32('g','l','o','b')
 #define ID_gend GM_MAKE_ID32('g','e','n','d')
 #define ID_srun GM_MAKE_ID32('s','r','u','n')
+#define ID_retv GM_MAKE_ID32('r','e','t','v')
 //
 // Please note that gmDebugger.c/.h are for implementing
 // a debugger application and should not be included
@@ -171,6 +174,12 @@ void gmDebuggerSession::UpdateDebugSession()
 							.Unpack(thisId);
 						gmDebuggerContextVariable(thisSymbol, thisValue, thisType, thisId);
 					}
+					else if(cmdId == ID_brkp)
+					{
+						int lineNum = 0;
+						Unpack(lineNum);
+						gmDebuggerContextBreakpoint(lineNum);
+					}
 					else if(cmdId == ID_done) break;
 					else break;
 				}
@@ -219,9 +228,14 @@ void gmDebuggerSession::UpdateDebugSession()
 			}
 		case ID_dbps :
 			{
-				int sourceId = 0, lineNum = 0;
-				Unpack(sourceId).Unpack(lineNum);
-				gmDebuggerBreakPointSet(sourceId, lineNum);
+				int sourceId = 0, lineNum = 0, enabled = 0;
+				Unpack(sourceId).Unpack(lineNum).Unpack(enabled);
+				gmDebuggerBreakPointSet(sourceId, lineNum, enabled);
+				break;
+			}
+		case ID_dbpc :
+			{
+				gmDebuggerBreakClear();
 				break;
 			}
 		case ID_dend :
@@ -251,6 +265,14 @@ void gmDebuggerSession::UpdateDebugSession()
 					else break;
 				}
 				gmDebuggerEndGlobals();
+				break;
+			}
+		case ID_retv :
+			{
+				int varId = 0;
+				const char * thisValue = 0, * thisType = 0;
+				Unpack(thisValue).Unpack(thisType).Unpack(varId);
+				gmDebuggerReturnValue(thisValue,thisType,varId);
 				break;
 			}
 		default:
@@ -387,9 +409,9 @@ void gmDebuggerSession::gmMachineGetVariableInfo(int a_variableId)
 	Pack(ID_mgvi).Pack(a_variableId).Send();
 }
 
-void gmDebuggerSession::gmMachineSetBreakPoint(int a_responseId, int a_sourceId, int a_lineNumber, int a_threadId, int a_enabled)
+void gmDebuggerSession::gmMachineSetBreakPoint(int a_sourceId, int a_lineNumber, int a_threadId, int a_enabled)
 {
-	Pack(ID_msbp).Pack(a_responseId).Pack(a_sourceId).Pack(a_lineNumber).Pack(a_threadId).Pack(a_enabled).Send();
+	Pack(ID_msbp).Pack(a_sourceId).Pack(a_lineNumber).Pack(a_threadId).Pack(a_enabled).Send();
 }
 
 void gmDebuggerSession::gmMachineBreak(int a_threadId)

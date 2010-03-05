@@ -21,14 +21,22 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	
 	ui.setupUi(this);
 
-	ui.scriptEdit->setTabStopWidth( fontMetrics().width(QLatin1Char('9')) * 4 );
+	const int fontWidth = fontMetrics().width(QLatin1Char('9'));
+
+	ui.scriptEdit->setReadOnly( true );
+	ui.scriptEdit->setTabStopWidth( fontWidth * 4 );
 
 	ui.actionConnect->setEnabled(true);
 	ui.actionDisconnect->setEnabled(false);
 
-	ui.threadTable->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
+	/*ui.threadTable->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
 	ui.callStack->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
-	ui.context->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
+	ui.context->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );*/
+	
+	ui.context->insertRow( 0 );
+	ui.context->setItem( 0, Context_Name, new QTableWidgetItem( "returned" ) );
+	ui.context->setItem( 0, Context_Type, new QTableWidgetItem( "" ) );
+	ui.context->setItem( 0, Context_Value, new QTableWidgetItem( "" ) );
 
 	// connect action slots
 	connect(ui.actionSettings, SIGNAL(triggered(bool)), this, SLOT(OnActionSettings()));
@@ -43,11 +51,13 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	connect(ui.actionStep_Over, SIGNAL(triggered(bool)), this, SLOT(OnActionStepOver()));
 	connect(ui.actionRun_Thread, SIGNAL(triggered(bool)), this, SLOT(OnActionRunThread()));
 	connect(ui.actionStop_Thread, SIGNAL(triggered(bool)), this, SLOT(OnActionStopThread()));
-	connect(ui.actionStop_Thread, SIGNAL(triggered(bool)), this, SLOT(OnActionSetBreakpoint()));
 	
 	// connect ui slots
 	connect(ui.threadTable, SIGNAL(itemSelectionChanged()), this, SLOT(ThreadSelectionChanged()));
 	
+	// connect script edit slots
+	connect(ui.scriptEdit, SIGNAL(BreakPointChanged(int,bool)), this, SLOT(OnBreakPointChanged(int,bool)));
+
 	// create network socket and slots
 	tcpSocket = new QTcpSocket(this);
 	connect(tcpSocket, SIGNAL(connected()), this, SLOT(SocketConnected()));
@@ -66,7 +76,15 @@ GMDebuggerQt::GMDebuggerQt(QWidget *parent, Qt::WFlags flags)
 	parentGlobals->setExpanded( true );
 	parentCurrent = 0;
 
-	memset(treeColumnWidths,0,sizeof(treeColumnWidths));
+	memset(globalColumnWidths,0,sizeof(globalColumnWidths));
+	memset(contextColumnWidths,0,sizeof(contextColumnWidths));
+
+	for(int i = 0; i < ThreadColumn_Num; ++i) {
+		threadColumnWidths[i] = fontWidth * (ui.threadTable->horizontalHeaderItem(i)->text().size() + 4);
+	}
+
+	/*ui.threadTable->sortItems(Thread_Id);
+	ui.threadTable->setSortingEnabled(true);*/
 
 	// TEMP
 	//OnActionScriptOpen("D:/CVS/Omnibot/head/Installer/Files/et/scripts/goals/goal_checkstuck.gm");
@@ -259,7 +277,8 @@ void GMDebuggerQt::OnActionDisConnect()
 
 void GMDebuggerQt::OnActionRunAll()
 {
-
+	//gmMachineRunAll();
+	//ui.scriptEdit->SetInstructionLine( -1 );
 }
 
 void GMDebuggerQt::OnActionBreakAll()
@@ -274,30 +293,26 @@ void GMDebuggerQt::OnActionKillAll()
 
 void GMDebuggerQt::OnActionStepIn()
 {
-
+	gmMachineStepInto( currentThreadId );
 }
 
 void GMDebuggerQt::OnActionStepOut()
 {
-
+	gmMachineStepOut( currentThreadId );
 }
 
 void GMDebuggerQt::OnActionStepOver()
 {
-
+	gmMachineStepOver( currentThreadId );
 }
 
 void GMDebuggerQt::OnActionRunThread()
 {
-
+	gmMachineRun( currentThreadId );
+	ui.scriptEdit->SetInstructionLine( -1 );
 }
 
 void GMDebuggerQt::OnActionStopThread()
 {
-
-}
-
-void GMDebuggerQt::OnActionSetBreakpoint()
-{
-
+	gmMachineBreak( currentThreadId );
 }

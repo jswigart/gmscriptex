@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="GMDebuggerQt">
+    <file>Resources/currentline.png</file>
     <file>Resources/script_open.png</file>
     <file>Resources/disconnect.png</file>
     <file>Resources/breakpoint.png</file>
