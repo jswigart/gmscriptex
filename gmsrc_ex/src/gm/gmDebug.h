@@ -58,9 +58,10 @@ public:
 	gmDebugSession &Unpack(const char * &a_val);
 
 	// helpers
-	bool AddBreakPoint(const void * a_bp, int a_threadId);
+	bool AddBreakPoint(const void * a_bp, int a_threadId, int a_lineNum);
 	int * FindBreakPoint(const void * a_bp); // return thread id
 	bool RemoveBreakPoint(const void * a_bp);
+	int GetBreakPointsForThread(int a_threadId, int *a_bpline, const int maxlines) ;
 
 private:
 
@@ -70,11 +71,13 @@ private:
 		inline const void * GetKey() const { return m_bp; }
 		const void * m_bp;
 		int m_threadId;
+		int m_lineNum;
 	};
 
 	gmMachine * m_machine;
 
-	gmHash<void *, BreakPoint> m_breaks;
+	typedef gmHash<void *, BreakPoint> BreakpointMap;
+	BreakpointMap m_breaks;
 	gmStreamBufferDynamic m_out;
 	gmStreamBufferStatic m_in;
 };

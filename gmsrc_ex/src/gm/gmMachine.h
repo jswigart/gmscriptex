@@ -108,8 +108,10 @@ typedef bool (GM_CDECL *gmUserBreakCallback)(gmThread * a_thread);
 // the following callbacks return true if the thread is to yield after completion of the callback.
 typedef bool (GM_CDECL *gmDebugLineCallback)(gmThread * a_thread);
 typedef bool (GM_CDECL *gmDebugCallCallback)(gmThread * a_thread);
+typedef void (GM_CDECL *gmDebugCallEndCallback)(gmThread * a_thread, const gmVariable & retVal);
 typedef bool (GM_CDECL *gmDebugRetCallback)(gmThread * a_thread);
 typedef bool (GM_CDECL *gmDebugIsBrokenCallback)(gmThread * a_thread); // returns true if the thread is broken, or if the thread is pending delete after exception
+typedef bool (GM_CDECL *gmDebugIsKilledCallback)(gmThread * a_thread); // returns true if the thread is killed
 
 typedef void (GM_CDECL *gmDebugChildInfoCallback)(gmUserObject *a_object, gmMachine *a_machine, gmChildInfoCallback a_infoCallback);
 
@@ -545,8 +547,10 @@ public:
 
 	gmDebugLineCallback m_line;
 	gmDebugCallCallback m_call;
+	gmDebugCallEndCallback m_callEnd;
 	gmDebugRetCallback m_return;
 	gmDebugIsBrokenCallback m_isBroken;
+	gmDebugIsKilledCallback m_isKilled;
 
 	//
 	//

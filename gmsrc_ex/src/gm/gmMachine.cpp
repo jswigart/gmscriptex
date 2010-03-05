@@ -207,6 +207,7 @@ m_cppOwnedGMObjs(GMMACHINE_CPPOWNEDGMOBJHASHSIZE)
 	m_call = NULL;
 	m_return = NULL;
 	m_isBroken = NULL;
+	m_isKilled = NULL;
 
 #if GM_USE_INCGC
 	m_gc = GM_NEW( gmGarbageCollector );
@@ -1282,11 +1283,10 @@ bool gmMachine::CollectGarbage(bool a_forceFullCollect)
 					// If we hardly used any of our memory, let the memory limit shrink
 					if(fracMemUsed < GMMACHINE_GC_HARD_MEM_SHRINK_THRESH)
 					{
-						if( GMMACHINE_AUTOMEMALLOWSHRINK )
-						{
+#if( GMMACHINE_AUTOMEMALLOWSHRINK )
 							SetDesiredByteMemoryUsageHard( (int)(GMMACHINE_GC_HARD_MEM_DEC_FRAC_OF_USED * (float)afterMemUsage) );
 							SetDesiredByteMemoryUsageSoft( (int)(GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD * (float)GetDesiredByteMemoryUsageHard()) );
-						}
+#endif
 					}
 					else
 					{
@@ -1318,18 +1318,17 @@ bool gmMachine::CollectGarbage(bool a_forceFullCollect)
 					int newHard = (int)(GMMACHINE_GC_HARD_MEM_INC_FRAC_OF_USED * (float)afterMemUsage);
 					int newSoft = (int)(GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD * (float)GetDesiredByteMemoryUsageHard());
 
-					if( !GMMACHINE_AUTOMEMALLOWSHRINK )
+#if(GMMACHINE_AUTOMEMALLOWSHRINK==0)
+					// Don't allow shrink
+					newSoft = gmMax(newSoft, GetDesiredByteMemoryUsageSoft());
+					newHard = gmMax(newHard, GetDesiredByteMemoryUsageHard());
+					// We can only size up, so make sure hard limit is at least this fraction above soft
+					float softFracHard = (float)newSoft / (float)newHard;
+					if( softFracHard < GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD )
 					{
-						// Don't allow shrink
-						newSoft = gmMax(newSoft, GetDesiredByteMemoryUsageSoft());
-						newHard = gmMax(newHard, GetDesiredByteMemoryUsageHard());
-						// We can only size up, so make sure hard limit is at least this fraction above soft
-						float softFracHard = (float)newSoft / (float)newHard;
-						if( softFracHard < GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD )
-						{
-							newHard = (int)(newSoft * (1.0f / GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD) );
-						}
+						newHard = (int)(newSoft * (1.0f / GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD) );
 					}
+#endif
 
 					SetDesiredByteMemoryUsageHard( newHard );
 					SetDesiredByteMemoryUsageSoft( newSoft );
