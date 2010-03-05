@@ -52,7 +52,6 @@ QT_BEGIN_NAMESPACE
 class QTextDocument;
 QT_END_NAMESPACE
 
-//! [0]
 class Highlighter : public QSyntaxHighlighter
 {
 	Q_OBJECT
@@ -81,8 +80,8 @@ private:
 	QTextCharFormat quotationFormat;
 	QTextCharFormat functionFormat;
 };
-//! [0]
 
+class LineNumberArea;
 class CodeEditor : public QTextEdit
 {
 	Q_OBJECT
@@ -94,7 +93,17 @@ public:
 	int lineNumberAreaWidth();
 
 	void SetLineSelected( int line );
+	void SetInstructionLine( int line ) { currentInstructionLine = line; }
 	void SetSource( const QString & a_file, const QString & a_source );
+
+	void AddBreakPoint( int lineNum );
+	void RemoveBreakPoint( int lineNum );
+	void ClearBreakPoints();
+public slots:
+	void LineMarginClicked( int lineNum );
+
+signals:
+	void BreakPointChanged( int lineNum, bool enabled );
 protected:
 	void resizeEvent(QResizeEvent *event);
 	bool viewportEvent( QEvent * event );
@@ -106,29 +115,38 @@ private slots:
 	void updateLineNumberArea(const QRect &, int);
 
 private:
-	QWidget *lineNumberArea;
-	Highlighter *highlighter;
+	LineNumberArea *	lineNumberArea;
+	Highlighter *		highlighter;
+
+	QImage *			imageBreakPoint;
+	QImage *			imageCurrentLine;
+
+	int					currentInstructionLine;
+
+	QSet<int>			lineBreakPoints;
 };
 
 class LineNumberArea : public QWidget
 {
-public:
-	LineNumberArea(CodeEditor *editor) : QWidget(editor) {
-		codeEditor = editor;
-	}
+	Q_OBJECT
+public:	
 
-	QSize sizeHint() const {
-		return QSize(codeEditor->lineNumberAreaWidth(), 0);
-	}
+	void SetLinesDisplayed( int min, int max );
 
+	QSize sizeHint() const;
+
+	LineNumberArea(CodeEditor *editor);
+signals:
+	void lineClicked( int lineNum );
 protected:
-	void paintEvent(QPaintEvent *event) {
-		QWidget::paintEvent(event);
-		codeEditor->lineNumberAreaPaintEvent(event);
-	}
+	void paintEvent(QPaintEvent *event);
 
+	void mouseReleaseEvent(QMouseEvent * event);
 private:
 	CodeEditor *codeEditor;
+
+	int		minLine;
+	int		maxLine;
 };
 
 #endif

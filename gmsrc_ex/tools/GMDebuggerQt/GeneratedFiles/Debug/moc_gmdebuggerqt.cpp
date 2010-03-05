@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'gmdebuggerqt.h'
 **
-** Created: Fri Feb 26 01:17:17 2010
+** Created: Fri Mar 5 00:30:38 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -44,15 +44,15 @@ static const uint qt_meta_data_GMDebuggerQt[] = {
      215,   13,   13,   13, 0x0a,
      234,   13,   13,   13, 0x0a,
      254,   13,   13,   13, 0x0a,
-     275,   13,   13,   13, 0x0a,
-     299,   13,   13,   13, 0x08,
-     317,   13,   13,   13, 0x08,
-     338,   13,   13,   13, 0x08,
-     370,  358,   13,   13, 0x08,
-     464,  423,  419,   13, 0x08,
-     536,  525,   13,   13, 0x08,
-     554,   13,   13,   13, 0x08,
-     577,   13,   13,   13, 0x08,
+     275,   13,   13,   13, 0x08,
+     293,   13,   13,   13, 0x08,
+     314,   13,   13,   13, 0x08,
+     346,  334,   13,   13, 0x08,
+     440,  399,  395,   13, 0x08,
+     512,  501,   13,   13, 0x08,
+     530,   13,   13,   13, 0x08,
+     553,   13,   13,   13, 0x08,
+     594,  578,   13,   13, 0x08,
 
        0        // eod
 };
@@ -65,14 +65,14 @@ static const char qt_meta_stringdata_GMDebuggerQt[] = {
     "OnActionKillAll()\0OnActionStepIn()\0"
     "OnActionStepOut()\0OnActionStepOver()\0"
     "OnActionRunThread()\0OnActionStopThread()\0"
-    "OnActionSetBreakpoint()\0SocketConnected()\0"
-    "SocketDisconnected()\0SocketReadyToRead()\0"
-    "socketError\0"
+    "SocketConnected()\0SocketDisconnected()\0"
+    "SocketReadyToRead()\0socketError\0"
     "SocketDisplayError(QAbstractSocket::SocketError)\0"
     "int\0a_threadId,a_status,a_line,a_func,a_file\0"
     "AddUniqueThread(int,const char*,int,const char*,const char*)\0"
     "a_threadId\0RemoveThread(int)\0"
     "RemoveExpiredThreads()\0ThreadSelectionChanged()\0"
+    "lineNum,enabled\0OnBreakPointChanged(int,bool)\0"
 };
 
 const QMetaObject GMDebuggerQt::staticMetaObject = {
@@ -119,16 +119,16 @@ int GMDebuggerQt::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 10: OnActionStepOver(); break;
         case 11: OnActionRunThread(); break;
         case 12: OnActionStopThread(); break;
-        case 13: OnActionSetBreakpoint(); break;
-        case 14: SocketConnected(); break;
-        case 15: SocketDisconnected(); break;
-        case 16: SocketReadyToRead(); break;
-        case 17: SocketDisplayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
-        case 18: { int _r = AddUniqueThread((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const char*(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< const char*(*)>(_a[4])),(*reinterpret_cast< const char*(*)>(_a[5])));
+        case 13: SocketConnected(); break;
+        case 14: SocketDisconnected(); break;
+        case 15: SocketReadyToRead(); break;
+        case 16: SocketDisplayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
+        case 17: { int _r = AddUniqueThread((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const char*(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< const char*(*)>(_a[4])),(*reinterpret_cast< const char*(*)>(_a[5])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
-        case 19: RemoveThread((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 20: RemoveExpiredThreads(); break;
-        case 21: ThreadSelectionChanged(); break;
+        case 18: RemoveThread((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 19: RemoveExpiredThreads(); break;
+        case 20: ThreadSelectionChanged(); break;
+        case 21: OnBreakPointChanged((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         default: ;
         }
         _id -= 22;

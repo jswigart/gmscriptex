@@ -33,7 +33,6 @@ public:
 		void OnActionStepOver();
 		void OnActionRunThread();
 		void OnActionStopThread();
-		void OnActionSetBreakpoint();
 private:
 	Ui::GMDebuggerQtClass ui;
 
@@ -58,6 +57,7 @@ protected:
 	void gmDebuggerBeginContext(int a_threadId, int a_callFrame);
 	void gmDebuggerContextCallFrame(int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, const char * a_thisType, int a_thisId);
 	void gmDebuggerContextVariable(const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId);
+	void gmDebuggerContextBreakpoint(int a_lineNum);
 	void gmDebuggerEndContext();
 
 	void gmDebuggerBeginThreadInfo();
@@ -66,12 +66,15 @@ protected:
 
 	void gmDebuggerError(const char * a_error);
 	void gmDebuggerMessage(const char * a_message);
-	void gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum);
+	void gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum, int a_enabled);
+	void gmDebuggerBreakClear();
 	void gmDebuggerQuit();
 
 	void gmDebuggerBeginGlobals(int a_VarId);
 	void gmDebuggerGlobal(const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId);
 	void gmDebuggerEndGlobals();
+
+	void gmDebuggerReturnValue(const char * a_retVal, const char * a_retType, int a_retVarId);
 
 	enum GlobalTreeColumns {
 		TreeColumn_Name,
@@ -85,16 +88,14 @@ protected:
 	QTreeWidgetItem * parentGlobals;
 	QTreeWidgetItem * parentCurrent;
 
-	int				treeColumnWidths[TreeColumn_Num];
-
 	enum ThreadColumns {
 		Thread_Id,
 		Thread_Status,
 		Thread_Function,
 		Thread_Script,
+
+		ThreadColumn_Num
 	};
-	typedef QMap<int,int> ThreadRowMap;
-	ThreadRowMap		threadRowMap;
 
 	enum CallStackColumns {
 		Callstack_FuncName,
@@ -103,8 +104,14 @@ protected:
 	enum ContextColumns {
 		Context_Name,
 		Context_Type,
-		Context_Value
+		Context_Value,
+
+		ContextColumn_Num,
 	};
+
+	int				globalColumnWidths[TreeColumn_Num];
+	int				threadColumnWidths[ThreadColumn_Num];
+	int				contextColumnWidths[ContextColumn_Num];
 
 	struct SourceInfo {
 		QString			sourceFile;
@@ -128,6 +135,8 @@ protected:
 		void RemoveThread( int a_threadId );
 		void RemoveExpiredThreads();
 		void ThreadSelectionChanged();
+
+		void OnBreakPointChanged( int lineNum, bool enabled );
 };
 
 #endif // GMDEBUGGERQT_H

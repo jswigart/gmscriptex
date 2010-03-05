@@ -128,12 +128,24 @@ CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 	lineNumberArea = new LineNumberArea(this);
 	highlighter = new Highlighter(document());
 
+	imageBreakPoint = new QImage( QString::fromUtf8(":/GMDebuggerQt/Resources/breakpoint.png") );
+	imageCurrentLine = new QImage( QString::fromUtf8(":/GMDebuggerQt/Resources/currentline.png") );
+
 	connect(document(), SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
 	connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+	connect(lineNumberArea, SIGNAL(lineClicked(int)), this, SLOT(LineMarginClicked(int)));
 
 	updateLineNumberAreaWidth(0);
 	highlightCurrentLine();
+}
+
+void CodeEditor::LineMarginClicked( int lineNum ) {
+	if ( lineBreakPoints.find( lineNum ) != lineBreakPoints.end() ) {
+		emit BreakPointChanged( lineNum, false );
+	} else {
+		emit BreakPointChanged( lineNum, true );
+	}
 }
 
 int CodeEditor::lineNumberAreaWidth()
@@ -146,6 +158,9 @@ int CodeEditor::lineNumberAreaWidth()
 	}
 
 	int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+
+	space += imageBreakPoint->rect().width();
+	space += imageCurrentLine->rect().width() / 2;
 
 	return space;
 }
@@ -211,11 +226,37 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 	QSizeF pageSize = document()->size();
 	QRect vpRect = viewport()->rect();
 
+	const int instructionLine = currentInstructionLine;
+
+	int minLine = -1, maxLine = -1;
+
 	for (QTextBlock it = document()->begin(); it != document()->end(); it = it.next())
 	{
 		QRectF blockRect = document()->documentLayout()->blockBoundingRect(it);
 		if(blockRect.top() < fRect.bottom() && blockRect.bottom() > fRect.top())
 		{
+			const int currentLineNum = it.blockNumber() + 1;
+			if ( minLine == -1 ) {
+				minLine = currentLineNum;
+			}
+			maxLine = currentLineNum;
+
+			// current line?
+			if ( instructionLine == currentLineNum ) {
+				painter.drawImage(
+					imageCurrentLine->rect().width(),
+					(int)(blockRect.top()-framePos.y()),
+					*imageCurrentLine);
+			}
+
+			// breakpoint on this line?
+			if ( lineBreakPoints.find( currentLineNum ) != lineBreakPoints.end()) {
+				painter.drawImage(
+					0,
+					(int)(blockRect.top()-framePos.y()),
+					*imageBreakPoint);
+			}
+
 			QString number = QString::number(it.blockNumber() + 1);
 			painter.setPen(Qt::black);
 			painter.drawText(
@@ -227,6 +268,8 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 				number);
 		}
 	}
+
+	lineNumberArea->SetLinesDisplayed( minLine, maxLine );
 
 	// why is this necessary?
 	update();
@@ -241,11 +284,55 @@ void CodeEditor::SetLineSelected( int line )
 {
 	QTextCursor cursor( document()->findBlockByLineNumber( line-1 ) );
 	setTextCursor( cursor );
-	//ensureCursorVisible();	
+	//ensureCursorVisible();
 }
 
 void CodeEditor::SetSource( const QString & a_file, const QString & a_source )
 {
 	setPlainText( a_source );
 	setDocumentTitle( a_file );
+}
+
+void CodeEditor::AddBreakPoint( int lineNum ) {
+	lineBreakPoints.insert( lineNum );
+}
+
+void CodeEditor::RemoveBreakPoint( int lineNum ) {
+	lineBreakPoints.remove( lineNum );
+}
+
+void CodeEditor::ClearBreakPoints() {
+	lineBreakPoints.clear();
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+LineNumberArea::LineNumberArea(CodeEditor *editor) : QWidget(editor) {
+	codeEditor = editor;
+	minLine = 0;
+	maxLine = 0;
+}
+
+void LineNumberArea::SetLinesDisplayed( int min, int max ) {
+	minLine = min;
+	maxLine = max;
+}
+
+QSize LineNumberArea::sizeHint() const {
+	return QSize(codeEditor->lineNumberAreaWidth(), 0);
+}
+
+void LineNumberArea::paintEvent(QPaintEvent *event) {
+	QWidget::paintEvent(event);
+	codeEditor->lineNumberAreaPaintEvent(event);
+}
+
+void LineNumberArea::mouseReleaseEvent ( QMouseEvent * event ) {
+	event->accept();
+
+	const float fontHeight = fontMetrics().height();
+	const int lineNum = minLine + event->y() / fontHeight;
+	if ( lineNum <= maxLine ) {
+		emit lineClicked( lineNum );
+	}
 }

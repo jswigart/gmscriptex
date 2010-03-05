@@ -31,6 +31,7 @@ void GMDebuggerQt::gmDebuggerSource(int a_sourceId, const char * a_sourceName, c
 		ui.scriptEdit->SetSource( a_sourceName, a_source );
 		if ( currentLineOnSrcRecieved != -1 ) {
 			ui.scriptEdit->SetLineSelected( currentLineOnSrcRecieved );
+			ui.scriptEdit->SetInstructionLine( currentLineOnSrcRecieved );
 		}
 	}
 }
@@ -44,11 +45,13 @@ void GMDebuggerQt::gmDebuggerBeginContext(int a_threadId, int a_callFrame)
 {
 	while(ui.callStack->rowCount())
 		ui.callStack->removeRow(0);
-	while(ui.context->rowCount())
-		ui.context->removeRow(0);
+	while(ui.context->rowCount() > 1) {
+		ui.context->removeRow(ui.context->rowCount()-1);
+	}
 
 	currentThreadId = a_threadId;
 	currentCallFrame = a_callFrame;
+	ui.scriptEdit->ClearBreakPoints();
 }
 
 void GMDebuggerQt::gmDebuggerContextCallFrame(int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, const char * a_thisType, int a_thisId)
@@ -89,6 +92,7 @@ void GMDebuggerQt::gmDebuggerContextCallFrame(int a_callFrame, const char * a_fu
 		} else {
 			ui.scriptEdit->SetSource( it.value().sourceFile, it.value().sourceData );
 			ui.scriptEdit->SetLineSelected( a_lineNumber );
+			ui.scriptEdit->SetInstructionLine( a_lineNumber );
 		}
 	}
 }
@@ -102,15 +106,20 @@ void GMDebuggerQt::gmDebuggerContextVariable(const char * a_varSymbol, const cha
 	ui.context->setItem( newRow, Context_Value, new QTableWidgetItem( a_varValue ) );
 }
 
+void GMDebuggerQt::gmDebuggerContextBreakpoint(int a_lineNum)
+{
+	ui.scriptEdit->AddBreakPoint( a_lineNum );
+}
+
 void GMDebuggerQt::gmDebuggerEndContext()
 {
 }
 
 void GMDebuggerQt::gmDebuggerBeginThreadInfo()
 {
-	while(ui.threadTable->rowCount())
+	/*while(ui.threadTable->rowCount())
 		ui.threadTable->removeRow(0);
-	threadRowMap.clear();
+	threadRowMap.clear();*/
 }
 
 void GMDebuggerQt::gmDebuggerThreadInfo(int a_threadId, const char * a_threadState, int a_lineNum, const char * a_func, const char * a_file)
@@ -121,6 +130,9 @@ void GMDebuggerQt::gmDebuggerThreadInfo(int a_threadId, const char * a_threadSta
 void GMDebuggerQt::gmDebuggerEndThreadInfo()
 {
 	//ui.threadTable->sortItems(0);
+	for( int i = 0; i < ThreadColumn_Num; ++i ) {
+		ui.threadTable->horizontalHeader()->resizeSection( i, threadColumnWidths[i] );
+	}
 }
 
 void GMDebuggerQt::gmDebuggerError(const char * a_error)
@@ -133,9 +145,16 @@ void GMDebuggerQt::gmDebuggerMessage(const char * a_message)
 	ui.outputWindow->append( a_message );
 }
 
-void GMDebuggerQt::gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum)
-{
-	// todo:
+void GMDebuggerQt::gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum, int a_enabled) {
+	if ( a_enabled ) {
+		ui.scriptEdit->AddBreakPoint( a_lineNum );
+	} else {
+		ui.scriptEdit->RemoveBreakPoint( a_lineNum );
+	}
+}
+
+void GMDebuggerQt::gmDebuggerBreakClear() {
+	ui.scriptEdit->ClearBreakPoints();
 }
 
 void GMDebuggerQt::gmDebuggerQuit()
@@ -176,8 +195,8 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 	newItem->setData(0,Qt::UserRole,QVariant(a_varId));
 
 	for( int i = 0; i < TreeColumn_Num; ++i ) {
-		treeColumnWidths[i] =
-			qMax( treeColumnWidths[i], 
+		globalColumnWidths[i] =
+			qMax( globalColumnWidths[i], 
 					fontMetrics().width(QLatin1Char('9')) * (newItem->text(i).size() + 4) );
 	}	
 	
@@ -190,27 +209,64 @@ void GMDebuggerQt::gmDebuggerGlobal(const char * a_varSymbol,
 void GMDebuggerQt::gmDebuggerEndGlobals()
 {
 	for( int i = 0; i < TreeColumn_Num; ++i ) {
-		ui.globalsTable->header()->resizeSection( i, treeColumnWidths[i] );
+		ui.globalsTable->header()->resizeSection( i, globalColumnWidths[i] );
 	}
 	//ui.globalsTable->update();
 	//ui.globalsTable->header()->resizeSections( QHeaderView::ResizeToContents );
 }
 
+void GMDebuggerQt::gmDebuggerReturnValue(const char * a_retVal, const char * a_retType, int a_retVarId)
+{
+	ui.context->item( 0, Context_Name )->setText( "returned" );
+	ui.context->item( 0, Context_Type )->setText( a_retType );
+	ui.context->item( 0, Context_Value )->setText( a_retVal );
+}
+
 int GMDebuggerQt::AddUniqueThread( int a_threadId, const char * a_status, int a_line, const char * a_func, const char * a_file )
 {
-	const int newRow = ui.threadTable->rowCount();
-	threadRowMap.insert( a_threadId, newRow );
+	int threadRow = -1;
+
+	QList<QTableWidgetItem *> items = 
+		ui.threadTable->findItems( QString::number(a_threadId),Qt::MatchExactly );
+
+	if( !items.isEmpty() ) {
+		threadRow = items[0]->row();
+	} else {
+		threadRow = ui.threadTable->rowCount();
+		ui.threadTable->insertRow( threadRow );	
+	}
 
 	QString func;
-	func.sprintf( "%s(%d)",a_func,a_line );
+	func.sprintf( "%s(%d)",a_func,a_line );	
 
-	ui.threadTable->insertRow( newRow );
-	ui.threadTable->setItem(newRow,Thread_Id,new QTableWidgetItem(QString::number(a_threadId)));
-	ui.threadTable->setItem(newRow,Thread_Status,new QTableWidgetItem(a_status));
-	ui.threadTable->setItem(newRow,Thread_Function,new QTableWidgetItem(func));
-	ui.threadTable->setItem(newRow,Thread_Script,new QTableWidgetItem(a_file));
+	if(ui.threadTable->item(threadRow,Thread_Id)) {
+		ui.threadTable->item(threadRow,Thread_Id)->setText(QString::number(a_threadId));
+	} else {
+		ui.threadTable->setItem(threadRow,Thread_Id,new QTableWidgetItem(QString::number(a_threadId)));
+	}
+	if(ui.threadTable->item(threadRow,Thread_Status)) {
+		ui.threadTable->item(threadRow,Thread_Status)->setText(a_status);
+	} else {
+		ui.threadTable->setItem(threadRow,Thread_Status,new QTableWidgetItem(a_status));
+	}
+	if(ui.threadTable->item(threadRow,Thread_Function)) {
+		ui.threadTable->item(threadRow,Thread_Function)->setText(func);
+	} else {
+		ui.threadTable->setItem(threadRow,Thread_Function,new QTableWidgetItem(func));
+	}
 
-	return newRow;
+	if(ui.threadTable->item(threadRow,Thread_Script)) {
+		ui.threadTable->item(threadRow,Thread_Script)->setText(a_file);
+	} else {
+		ui.threadTable->setItem(threadRow,Thread_Script,new QTableWidgetItem(a_file));
+	}
+	
+	const int fontWidth = fontMetrics().width(QLatin1Char('9'));
+	for(int i = 0; i < ThreadColumn_Num; ++i) {
+		threadColumnWidths[i] = 
+			qMax( threadColumnWidths[i], fontWidth * (ui.threadTable->item(threadRow,i)->text().size() + 4) );
+	}
+	return threadRow;
 }
 
 void GMDebuggerQt::RemoveThread( int a_threadId )
@@ -218,7 +274,6 @@ void GMDebuggerQt::RemoveThread( int a_threadId )
 	QList<QTableWidgetItem *> items = ui.threadTable->findItems(QString::number(a_threadId),Qt::MatchExactly);
 	if ( !items.empty() ) {
 		ui.threadTable->removeRow( items[0]->row() );
-		threadRowMap.remove( a_threadId );
 	}
 }
 
@@ -237,4 +292,9 @@ void GMDebuggerQt::ThreadSelectionChanged()
 		}
 		break;
 	}
+}
+
+void GMDebuggerQt::OnBreakPointChanged( int lineNum, bool enabled )
+{
+	gmMachineSetBreakPoint( currentSourceId, lineNum, currentThreadId, enabled );
 }

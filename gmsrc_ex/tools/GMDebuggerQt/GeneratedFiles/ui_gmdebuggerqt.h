@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'gmdebuggerqt.ui'
 **
-** Created: Fri Feb 26 01:01:21 2010
+** Created: Tue Mar 2 23:28:41 2010
 **      by: Qt User Interface Compiler version 4.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -42,7 +42,6 @@ public:
     QAction *actionStop_Thread;
     QAction *actionStop_All_Threads;
     QAction *actionRun_All_Threads;
-    QAction *actionSet_Break_Point;
     QAction *actionDisconnect;
     QAction *actionOpen_Script;
     QAction *actionSettings;
@@ -122,21 +121,16 @@ public:
         QIcon icon7;
         icon7.addFile(QString::fromUtf8(":/GMDebuggerQt/Resources/thread_runall.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionRun_All_Threads->setIcon(icon7);
-        actionSet_Break_Point = new QAction(GMDebuggerQtClass);
-        actionSet_Break_Point->setObjectName(QString::fromUtf8("actionSet_Break_Point"));
-        QIcon icon8;
-        icon8.addFile(QString::fromUtf8(":/GMDebuggerQt/Resources/breakpoint.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionSet_Break_Point->setIcon(icon8);
         actionDisconnect = new QAction(GMDebuggerQtClass);
         actionDisconnect->setObjectName(QString::fromUtf8("actionDisconnect"));
-        QIcon icon9;
-        icon9.addFile(QString::fromUtf8(":/GMDebuggerQt/Resources/disconnect.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDisconnect->setIcon(icon9);
+        QIcon icon8;
+        icon8.addFile(QString::fromUtf8(":/GMDebuggerQt/Resources/disconnect.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDisconnect->setIcon(icon8);
         actionOpen_Script = new QAction(GMDebuggerQtClass);
         actionOpen_Script->setObjectName(QString::fromUtf8("actionOpen_Script"));
-        QIcon icon10;
-        icon10.addFile(QString::fromUtf8(":/GMDebuggerQt/Resources/script_open.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionOpen_Script->setIcon(icon10);
+        QIcon icon9;
+        icon9.addFile(QString::fromUtf8(":/GMDebuggerQt/Resources/script_open.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionOpen_Script->setIcon(icon9);
         actionSettings = new QAction(GMDebuggerQtClass);
         actionSettings->setObjectName(QString::fromUtf8("actionSettings"));
         actionSettings->setCheckable(false);
@@ -357,7 +351,6 @@ public:
         mainToolBar->addAction(actionStop_Thread);
         mainToolBar->addAction(actionStop_All_Threads);
         mainToolBar->addAction(actionRun_All_Threads);
-        mainToolBar->addAction(actionSet_Break_Point);
 
         retranslateUi(GMDebuggerQtClass);
 
@@ -382,8 +375,6 @@ public:
         actionStop_All_Threads->setText(QApplication::translate("GMDebuggerQtClass", "Stop All Threads", 0, QApplication::UnicodeUTF8));
         actionStop_All_Threads->setShortcut(QApplication::translate("GMDebuggerQtClass", "Pause", 0, QApplication::UnicodeUTF8));
         actionRun_All_Threads->setText(QApplication::translate("GMDebuggerQtClass", "Run All Threads", 0, QApplication::UnicodeUTF8));
-        actionSet_Break_Point->setText(QApplication::translate("GMDebuggerQtClass", "Set Break Point", 0, QApplication::UnicodeUTF8));
-        actionSet_Break_Point->setShortcut(QApplication::translate("GMDebuggerQtClass", "F9", 0, QApplication::UnicodeUTF8));
         actionDisconnect->setText(QApplication::translate("GMDebuggerQtClass", "Disconnect", 0, QApplication::UnicodeUTF8));
         actionOpen_Script->setText(QApplication::translate("GMDebuggerQtClass", "Open Script", 0, QApplication::UnicodeUTF8));
         actionSettings->setText(QApplication::translate("GMDebuggerQtClass", "Settings", 0, QApplication::UnicodeUTF8));

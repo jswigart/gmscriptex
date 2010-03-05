@@ -18,12 +18,7 @@
 // in an normal GM application build.
 //
 
-
 class gmDebuggerSession;
-
-// callbacks used to hook up comms
-typedef void (*gmSendMachineMessage)(gmDebuggerSession * a_session, const void * a_command, int a_len);
-typedef const void * (*gmPumpMachineMessage)(gmDebuggerSession * a_session, int &a_len);
 
 /// \class gmDebuggerSession
 class gmDebuggerSession
@@ -69,6 +64,7 @@ protected:
 	virtual void gmDebuggerBeginContext(int a_threadId, int a_callFrame) = 0;
 	virtual void gmDebuggerContextCallFrame(int a_callFrame, const char * a_functionName, int a_sourceId, int a_lineNumber, const char * a_thisSymbol, const char * a_thisValue, const char * a_thisType, int a_thisId) = 0;
 	virtual void gmDebuggerContextVariable(const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId) = 0;
+	virtual void gmDebuggerContextBreakpoint(int a_lineNum) = 0;
 	virtual void gmDebuggerEndContext() = 0;
 
 	virtual void gmDebuggerBeginThreadInfo() = 0;
@@ -77,11 +73,14 @@ protected:
 
 	virtual void gmDebuggerError(const char * a_error) = 0;
 	virtual void gmDebuggerMessage(const char * a_message) = 0;
-	virtual void gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum) = 0;
+	virtual void gmDebuggerBreakPointSet(int a_sourceId, int a_lineNum, int a_enabled) = 0;
+	virtual void gmDebuggerBreakClear() = 0;
 
 	virtual void gmDebuggerBeginGlobals(int a_VarId) = 0;
 	virtual void gmDebuggerGlobal(const char * a_varSymbol, const char * a_varValue, const char * a_varType, int a_varId) = 0;
 	virtual void gmDebuggerEndGlobals() = 0;
+
+	virtual void gmDebuggerReturnValue(const char * a_retVal, const char * a_retType, int a_retVarId) = 0;
 
 	virtual void gmDebuggerQuit() = 0;
 
@@ -99,7 +98,7 @@ protected:
 	void gmMachineGetThreadInfo();
 	void gmMachineGetGlobalsInfo(int a_tableRef);
 	void gmMachineGetVariableInfo(int a_variableId);
-	void gmMachineSetBreakPoint(int a_responseId, int a_sourceId, int a_lineNumber, int a_threadId, int a_enabled);
+	void gmMachineSetBreakPoint(int a_sourceId, int a_lineNumber, int a_threadId, int a_enabled);
 	void gmMachineBreak(int a_threadId);
 	void gmMachineBreakAll();
 	void gmMachineKill(int a_threadId);
