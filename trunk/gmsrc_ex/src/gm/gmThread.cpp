@@ -66,6 +66,7 @@ gmThread::gmThread(gmMachine * a_machine, int a_initialByteSize)
 #if GMDEBUG_SUPPORT
 	m_debugUser = 0;
 	m_debugFlags = 0;
+	m_debugState = -1;
 #endif // GMDEBUG_SUPPORT
 
 	m_timeStamp = 0;
@@ -220,7 +221,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 
 	if(m_debugFlags && m_machine->GetDebugMode() )
 	{
-		if(m_debugFlags & (1 << 4))
+		if(m_machine->m_isKilled && m_machine->m_isKilled(this))
 			return KILLED;
 		if(m_machine->m_isBroken && m_machine->m_isBroken(this))
 			return RUNNING;
@@ -758,15 +759,21 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 
 				int numParams = (int) OPCODE_PTR(instruction);
 
+				gmVariable * callFunc = &m_stack[m_base - numParams];
+
 				State res = PushStackFrame(numParams, &instruction, &code);
 				top = GetTop(); 
 				base = GetBase();
 
 				if(res == RUNNING)
 				{
-
 #if GMDEBUG_SUPPORT
-
+					if(m_debugFlags && m_machine->GetDebugMode() && m_machine->m_callEnd)
+					{
+						callFunc;
+						const gmVariable & retVal = *(top-1);
+						m_machine->m_callEnd(this, retVal);
+					}
 					if(m_debugFlags && m_machine->GetDebugMode() && m_machine->m_call)
 					{
 						m_instruction = instruction;
@@ -799,17 +806,13 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 
 				if(res == RUNNING) 
 				{
-
 #if GMDEBUG_SUPPORT
-
 					if(m_debugFlags && m_machine->GetDebugMode() && m_machine->m_return)
 					{
 						m_instruction = instruction;
 						if(m_machine->m_return(this)) return RUNNING;
 					}
-
 #endif // GMDEBUG_SUPPORT
-
 					break;
 				}
 				if(res == KILLED)

@@ -90,7 +90,7 @@ public:
 	void Sys_Reset(int a_id);
 
 	/// \brief Sys_SetState() will set the thread state.
-	inline void Sys_SetState(State a_state) { m_state = a_state; }
+	void Sys_SetState(State a_state) { m_state = a_state; }
 
 	/// \brief PushStackFrame will push a stack frame and adjust the instruction and code pointers. 
 	///        If the function to be called is a c bound function, the call will occur within PushStackFrame.
@@ -301,6 +301,7 @@ public:
 #if GMDEBUG_SUPPORT
 	mutable int m_debugFlags; //!< non-zero when thread is being debugged
 	mutable int m_debugUser;
+	mutable int m_debugState;
 #endif // GMDEBUG_SUPPORT
 	mutable int m_user;
 
