@@ -22,7 +22,7 @@ See Copyright Notice in gmMachine.h
 // Conversion
 //
 
-int GM_CDECL gmfToString(gmThread * a_thread)
+static int GM_CDECL gmfToString(gmThread * a_thread)
 {
 	const gmVariable * var = a_thread->GetThis();
 
