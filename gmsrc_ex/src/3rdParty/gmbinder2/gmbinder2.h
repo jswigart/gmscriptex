@@ -1063,10 +1063,12 @@ namespace gmBind2
 		}
 		void Push(const char *_tablename)
 		{
-			GM_ASSERT(m_StackTop <= TableStackSize);
-			m_StackTop++;
-			m_TableStack[m_StackTop].Set(m_Machine->AllocTableObject(),m_Machine);
-			m_TableStack[m_StackTop-1]->Set(m_Machine,_tablename,gmVariable(m_TableStack[m_StackTop]));
+			GM_ASSERT(m_StackTop < TableStackSize);
+			if ( m_StackTop < TableStackSize ) {
+				m_StackTop++;
+				m_TableStack[m_StackTop].Set(m_Machine->AllocTableObject(),m_Machine);
+				m_TableStack[m_StackTop-1]->Set(m_Machine,_tablename,gmVariable(m_TableStack[m_StackTop]));
+			}
 		}
 		void Pop()
 		{
