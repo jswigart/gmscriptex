@@ -601,6 +601,7 @@ protected:
 	gmListDouble<gmThread> m_sleepingThreads;       ///< sorted by timez
 	gmListDouble<gmThread> m_killedThreads;
 	gmListDouble<gmThread> m_exceptionThreads;      ///< dead threads, hanging around for debugging
+	gmListDouble<gmThread> m_deletedThreads;		// threads to be deleted at the end of the update
 	gmHash<int, gmThread> m_threads;
 	int GetThreadId();
 	gmuint32 m_time;                                ///< machine time in milliseconds. (gives us 50 days)
