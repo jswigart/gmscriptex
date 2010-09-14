@@ -1119,9 +1119,8 @@ void gmMachine::Sys_SwitchState(gmThread * a_thread, int a_to)
 				// Besides it's ID is now invalid.
 				return;
 			}
-			// NOTE: Might be good to always delay thread deletion so killed threads are valid in nested call stacks.
-			//       Would we need to take care not to reuse a recent thread if it could still be read/written to?
-			delete a_thread;
+			// mark the thread for deletion
+			m_deletedThreads.InsertLast(a_thread);
 			return;
 		}
 	default : GM_ASSERT(0); break;
@@ -1197,6 +1196,14 @@ int gmMachine::Execute(gmuint32 a_delta)
 		it = m_nextThread;
 	}
 	m_nextThreadValid = false;
+
+	// Comment this back in to see the peak threads deleted in a single update
+	/*int count = m_deletedThreads.Count();
+	static int maxDeletedThreads = 0;
+	if ( count > maxDeletedThreads )
+		maxDeletedThreads = count;*/
+
+	m_deletedThreads.RemoveAndDeleteAll();
 
 	CollectGarbage();
 
