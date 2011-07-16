@@ -6,6 +6,7 @@
 #include "gmCall.h"
 
 #include <float.h>
+#include <limits.h>
 
 namespace gmSchema
 {
