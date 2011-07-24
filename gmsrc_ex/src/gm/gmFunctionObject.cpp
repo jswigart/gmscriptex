@@ -155,7 +155,7 @@ bool gmFunctionObject::Init(gmMachine * a_machine, bool a_debug, gmFunctionInfo 
 			case BC_BRZK :
 			case BC_BRNZK :
 			case BC_FOREACH :
-			case BC_PUSHINT :
+			case BC_PUSHINT : instruction += sizeof(gmint); break;
 			case BC_GETGLOBAL :
 			case BC_SETGLOBAL :
 			case BC_GETTHIS :
@@ -207,7 +207,7 @@ bool gmFunctionObject::Init(gmMachine * a_machine, bool a_debug, gmFunctionInfo 
 		// debug name
 		if(a_info.m_debugName)
 		{
-			int len = strlen(a_info.m_debugName) + 1;
+			int len = (int)strlen(a_info.m_debugName) + 1;
 			m_debugInfo->m_debugName = (char *) a_machine->Sys_Alloc(len);
 			memcpy(m_debugInfo->m_debugName, a_info.m_debugName, len);
 		}
@@ -219,7 +219,7 @@ bool gmFunctionObject::Init(gmMachine * a_machine, bool a_debug, gmFunctionInfo 
 			int i;
 			for(i = 0; i < m_numParamsLocals; ++i)
 			{
-				int len = strlen(a_info.m_symbols[i]) + 1;
+				int len = (int)strlen(a_info.m_symbols[i]) + 1;
 				m_debugInfo->m_symbols[i] = (char *) a_machine->Sys_Alloc(len);
 				memcpy(m_debugInfo->m_symbols[i], a_info.m_symbols[i], len);
 			}

@@ -90,8 +90,8 @@ struct gmVariable
 	gmType m_type;
 	union
 	{
-		int m_int;
-		float m_float;
+		gmint m_int;
+		gmfloat m_float;
 		gmptr m_ref;
 #if(GM_USE_VECTOR3_STACK)
 		gmVec3Data m_vec3;

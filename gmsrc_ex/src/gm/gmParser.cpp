@@ -926,7 +926,7 @@ yynewstate:
 #endif
 
       /* Get the current used size of the three stacks, in elements.  */
-      int size = yyssp - yyss + 1;
+      int size = (int)(yyssp - yyss + 1); // _GD_ cast for 64bit build
 
 #ifdef yyoverflow
       /* Each stack pointer address is followed by the size of
@@ -1840,7 +1840,7 @@ case 127:
 case 128:
 {
       yyval = gmCodeTreeNode::Create(CTNT_EXPRESSION, CTNET_IDENTIFIER, gmlineno);
-      yyval->m_data.m_string = (char *) gmCodeTree::Get().Alloc(strlen(gmtext) + 1);
+      yyval->m_data.m_string = (char *) gmCodeTree::Get().Alloc((int)strlen(gmtext) + 1);
       strcpy(yyval->m_data.m_string, gmtext);
     ;
     break;}
@@ -1878,7 +1878,7 @@ case 134:
 {
       yyval = gmCodeTreeNode::Create(CTNT_EXPRESSION, CTNET_CONSTANT, gmlineno, CTNCT_INT);
 
-      char * c = (char *) gmCodeTree::Get().Alloc(strlen(gmtext) + 1);
+      char * c = (char *) gmCodeTree::Get().Alloc((int)strlen(gmtext) + 1);
       strcpy(c, gmtext);
       int result = 0;
       int shr = 0;
@@ -1941,7 +1941,7 @@ case 137:
 case 138:
 {
       yyval = gmCodeTreeNode::Create(CTNT_EXPRESSION, CTNET_CONSTANT, gmlineno, CTNCT_STRING);
-      yyval->m_data.m_string = (char *) gmCodeTree::Get().Alloc(strlen(gmtext) + 1);
+      yyval->m_data.m_string = (char *) gmCodeTree::Get().Alloc((int)strlen(gmtext) + 1);
       strcpy(yyval->m_data.m_string, gmtext);
       if(gmtext[0] == '"')
       {
@@ -1956,8 +1956,8 @@ case 138:
 case 139:
 {
       yyval = yyvsp[-1];
-      int alen = strlen(yyval->m_data.m_string);
-      int blen = strlen(gmtext);
+      int alen = (int)strlen(yyval->m_data.m_string);
+      int blen = (int)strlen(gmtext);
       char * str = (char *) gmCodeTree::Get().Alloc(alen + blen + 1);
       if(str)
       {
@@ -2052,7 +2052,7 @@ yyerrlab:   /* here on detecting error */
           for (x = (yyn < 0 ? -yyn : 0);
                x < (int)(sizeof(yytname) / sizeof(char *)); x++) //_GD_
             if (yycheck[x + yyn] == x)
-              size += strlen(yytname[x]) + 15, count++;
+              size += (int)strlen(yytname[x]) + 15, count++; // _GD_ add cast for 64bit build
           //_GD_ msg = (char *) malloc(size + 15);
           msg = GM_NEW( char [size + 15] );
           if (msg != 0)

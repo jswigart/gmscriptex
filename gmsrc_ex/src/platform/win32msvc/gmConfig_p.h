@@ -28,7 +28,11 @@
 #ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE // Allow old unsecure standard library functions, Disable some 'warning C4996 - function was deprecated'
 #endif
+#if defined(_M_X64)
+#define _USE_64BIT_TIME_T
+#else
 #define _USE_32BIT_TIME_T // So system binds can use int for timestamps
+#endif
 
 #include <malloc.h> // alloca
 #include <new>

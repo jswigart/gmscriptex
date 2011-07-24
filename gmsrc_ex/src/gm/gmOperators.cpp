@@ -368,7 +368,7 @@ int GM_CDECL gmFloatOpNOT(gmThread * a_thread, gmVariable * a_operands)
 inline const char * gmUnknownToString(gmMachine * a_machine, gmVariable * a_unknown, char * a_buffer, int a_bufferLen, int * a_len = NULL)
 {
 	const char * typeString = a_unknown->AsString(a_machine,a_buffer,a_bufferLen);
-	if(a_len) { *a_len = strlen(typeString); }
+	if(a_len) { *a_len = (int)strlen(typeString); }
 	return typeString;
 }
 int GM_CDECL gmStringOpAdd(gmThread * a_thread, gmVariable * a_operands)
