@@ -108,7 +108,7 @@ public:
 	inline gmVariable * GetBottom() const { return m_stack; }
 
 	/// \brief SetTop() will set the top of stack
-	inline void SetTop(gmVariable * a_top) { m_top = a_top - m_stack; }
+	inline void SetTop(gmVariable * a_top) { m_top = (int)(a_top - m_stack); }
 
 	/// \brief GetBase() will return the current stack base.
 	inline gmVariable * GetBase() const { return &m_stack[m_base]; }
@@ -137,7 +137,7 @@ public:
 	inline gmVariable &Pop() { return m_stack[--m_top]; }
 	inline void Push(const gmVariable &a_variable) { m_stack[m_top++] = a_variable; }
 	inline void PushNull();
-	inline void PushInt(gmptr a_value);
+	inline void PushInt(gmint a_value);
 	inline void PushFloat(gmfloat a_value);
 	inline void PushString(gmStringObject * a_string);
 	inline void PushTable(gmTableObject * a_table);
@@ -153,8 +153,8 @@ public:
 	// Versions that return bool return false if type was invalid, otherwise true, even if param was out of range. NOTE: Could switch to more complex return code, but user could simply check num params for range check if needed.
 	// 
 
-	inline int ParamInt(int a_param, gmptr a_default = 0) const;
-	inline bool ParamInt(int a_param, int& a_value, gmptr a_default = 0) const;
+	inline int ParamInt(int a_param, gmint a_default = 0) const;
+	inline bool ParamInt(int a_param, gmint& a_value, gmint a_default = 0) const;
 	inline gmfloat ParamFloat(int a_param, gmfloat a_default = 0.0f) const;
 	inline bool ParamFloat(int a_param, gmfloat& a_value, gmfloat a_default = 0.0f) const;
 	inline gmfloat ParamFloatOrInt(int a_param, gmfloat a_default = 0.0f) const;
@@ -375,7 +375,7 @@ inline void gmThread::PushNull()
 }
 
 
-inline void gmThread::PushInt(gmptr a_value)
+inline void gmThread::PushInt(gmint a_value)
 {
 	m_stack[m_top].m_type = GM_INT;
 	m_stack[m_top++].m_value.m_int = a_value;
@@ -441,7 +441,7 @@ gmUserObject * gmThread::PushNewUser(void * a_user, int a_userType)
 // Parameter methods. (do not cause an error if the desired parameter is incorrect type)
 //
 
-inline int gmThread::ParamInt(int a_param, int a_default) const
+inline int gmThread::ParamInt(int a_param, gmint a_default) const
 {
 	if(a_param >= m_numParameters) return a_default;
 	gmVariable * var = m_stack + m_base + a_param;
@@ -449,7 +449,7 @@ inline int gmThread::ParamInt(int a_param, int a_default) const
 	return a_default;
 }
 
-inline bool gmThread::ParamInt(int a_param, int& a_value, int a_default) const
+inline bool gmThread::ParamInt(int a_param, gmint& a_value, gmint a_default) const
 {
 	// Out of range
 	if( a_param >= m_numParameters )

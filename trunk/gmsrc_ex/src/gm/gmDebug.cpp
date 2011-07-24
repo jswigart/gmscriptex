@@ -454,11 +454,18 @@ gmDebugSession &gmDebugSession::Pack(int a_val)
 	return *this;
 }
 
+#ifdef GM_PTR_SIZE_64 // Only needed if types gmptr != gmint
+gmDebugSession &gmDebugSession::Pack(gmint64 a_val)
+{
+	m_out << a_val;
+	return *this;
+}
+#endif //GM_PTR_SIZE_64
 
 gmDebugSession &gmDebugSession::Pack(const char * a_val)
 {
 	if(a_val)
-		m_out.Write(a_val, strlen(a_val) + 1);
+		m_out.Write(a_val, (unsigned int)strlen(a_val) + 1);
 	else
 		m_out.Write("", 1);
 	return *this;
@@ -478,12 +485,19 @@ gmDebugSession &gmDebugSession::Unpack(int &a_val)
 	return *this;
 }
 
+#ifdef GM_PTR_SIZE_64 // Only needed if types gmptr != gmint
+gmDebugSession &gmDebugSession::Unpack(gmint64 &a_val)
+{
+	if(m_in.Read(&a_val, sizeof(gmint64)) != sizeof(gmint64)) a_val = 0;
+	return *this;
+}
+#endif //GM_PTR_SIZE_64
 
 gmDebugSession &gmDebugSession::Unpack(const char * &a_val)
 {
 	// this is dangerous!!!
 	a_val = &m_in.GetData()[m_in.Tell()];
-	int len = strlen(a_val);
+	int len = (int)strlen(a_val);
 	m_in.Seek(m_in.Tell() + len + 1);
 	return *this;
 }
@@ -738,7 +752,7 @@ void gmMachineGetVariableInfo(gmDebugSession * a_session, int a_variableId)
 namespace DebugChild
 {
 	gmDebugSession *Session = 0;
-	void _gmChildInfoCallback(const char * a_symbol, const char * a_value, const char * a_valuetype, int a_varId)
+	void _gmChildInfoCallback(const char * a_symbol, const char * a_value, const char * a_valuetype, gmptr a_varId)
 	{
 		gmDebuggerGlobal(Session, a_symbol, a_value, a_valuetype, a_varId);
 	}

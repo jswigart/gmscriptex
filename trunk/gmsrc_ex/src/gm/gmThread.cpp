@@ -19,6 +19,7 @@ See Copyright Notice in gmMachine.h
 
 // helper macros
 
+#define OPCODE_INT(I)  *((gmint *) (I)); (I) += sizeof(gmint);
 #define OPCODE_PTR(I)  *((gmptr *) (I)); (I) += sizeof(gmptr);
 #define OPCODE_PTR_NI(I)  *((gmptr *) I);
 #define OPCODE_FLOAT(I)  *((gmfloat *) I); I += sizeof(gmfloat);
@@ -42,7 +43,7 @@ void gmGetLineFromString(const char * a_string, int a_line, char * a_buffer, int
 
 	eol = cp;
 	while(*eol && *eol != '\n' && *eol != '\r') ++eol;
-	int len = eol - cp;
+	int len = (int)(eol - cp);
 	len = ((a_len - 1) < len) ? (a_len - 1) : len;
 	memcpy(a_buffer, cp, len);
 	a_buffer[len] = '\0';
@@ -757,7 +758,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 			{
 				SetTop(top);
 
-				int numParams = (int) OPCODE_PTR(instruction);
+				int numParams = (int) OPCODE_INT(instruction);
 
 				gmVariable * callFunc = &m_stack[m_base - numParams];
 
@@ -858,7 +859,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 #endif //GM_USE_FORK
 		case BC_FOREACH :
 			{
-				gmuint32 localvalue = OPCODE_PTR(instruction);
+				gmuint32 localvalue = OPCODE_INT(instruction);
 				gmuint32 localkey = localvalue >> 16;
 				localvalue &= 0xffff;
 
@@ -955,7 +956,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 		case BC_PUSHINT :
 			{
 				top->m_type = GM_INT;
-				top->m_value.m_int = OPCODE_PTR(instruction);
+				top->m_value.m_int = OPCODE_INT(instruction);
 				++top;
 				break;
 			}
@@ -1010,13 +1011,13 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 			}
 		case BC_GETLOCAL :
 			{
-				gmuint32 offset = OPCODE_PTR(instruction);
+				gmuint32 offset = OPCODE_INT(instruction);
 				*(top++) = base[offset];
 				break;
 			}
 		case BC_SETLOCAL :
 			{
-				gmuint32 offset = OPCODE_PTR(instruction);
+				gmuint32 offset = OPCODE_INT(instruction);
 				base[offset] = *(--top);
 				break;
 			}
