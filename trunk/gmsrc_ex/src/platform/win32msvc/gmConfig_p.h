@@ -52,8 +52,6 @@
 //  #define GM_X86
 #endif //_WIN32
 
-//#define GM_COMPILER_MSVC6
-
 #define GM_CDECL              __cdecl
 #ifdef _DEBUG
   #define GM_ASSERT(A)        assert(A)
@@ -75,8 +73,6 @@
 
 #define GM_NEW( alloc_params ) new alloc_params
 #define GM_PLACEMENT_NEW( alloc_params, address ) new(address) alloc_params
-
-//#define GM_DEFAULT_ALLOC_ALIGNMENT 4
 
 #define GM_MAKE_ID32( a, b, c, d )  ( ((d)<<24) | ((c)<<16) | ((b)<<8) | (a))
 
