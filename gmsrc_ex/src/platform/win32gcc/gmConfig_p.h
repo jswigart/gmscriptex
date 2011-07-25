@@ -56,8 +56,6 @@
 #define GM_NEW( alloc_params ) new alloc_params
 #define GM_PLACEMENT_NEW( alloc_params, address ) new(address) alloc_params
 
-#define GM_DEFAULT_ALLOC_ALIGNMENT 4
-
 #define GM_MAKE_ID32( a, b, c, d )  ( ((d)<<24) | ((c)<<16) | ((b)<<8) | (a))
 
 #define GM_MIN_FLOAT32        -3.402823466e38f
@@ -104,10 +102,10 @@ typedef int gmint;
 typedef unsigned int gmuint;
 typedef float gmfloat;
 #ifdef GM_PTR_SIZE_64
-  typedef __int64 gmptr; // machine pointer size as int
-  typedef unsigned __int64 gmuptr; // machine pointer size as int
-  typedef __int64 gmint64;
-  typedef unsigned __int64 gmuint64;
+  typedef long long gmptr; // machine pointer size as int
+  typedef unsigned long long gmuptr; // machine pointer size as int
+  typedef long long gmint64;
+  typedef unsigned long long gmuint64;
 #else //!GM_PTR_SIZE_64
   typedef int gmptr; // machine pointer size as int
   typedef unsigned int gmuptr; // machine pointer size as int
