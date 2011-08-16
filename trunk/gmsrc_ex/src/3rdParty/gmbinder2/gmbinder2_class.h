@@ -755,28 +755,28 @@ namespace gmBind2
 			{
 			}
 			gmDoc(const char *_name, int _args, const char *_comment)
-				: m_DocType(Func)
-				, m_Name(_name)
+				: m_Name(_name)
 				, m_Type(0)
 				, m_Comment(_comment)
+				, m_DocType(Func)
 				, m_Arguments(_args)
 				, m_Op(O_MAXOPERATORS)
 			{
 			}
 			gmDoc(gmOperator _op, const char *_comment)
-				: m_DocType(Operator)
-				, m_Name(0)
+				: m_Name(0)
 				, m_Type(0)
 				, m_Comment(_comment)
+				, m_DocType(Operator)
 				, m_Arguments(0)
 				, m_Op(_op)
 			{
 			}
 			gmDoc()
-				: m_DocType(Prop)
-				, m_Name(0)
+				: m_Name(0)
 				, m_Type(0)
 				, m_Comment(0)
+				, m_DocType(Prop)
 				, m_Arguments(0)
 				, m_Op(O_MAXOPERATORS)
 			{
