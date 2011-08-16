@@ -65,21 +65,21 @@ protected:
 	/// \brief Internal data structure for small allocations
 	struct SmallMemNode
 	{
-    // NOTE: IMPORTANT size is NOT stored in m_size but (int*)Data()[-1]
-    //       This allows SmallMemNode and BigMemNode to both check the same memory offset to determine size
-    //       We must allocate AT LEAST enough memory for the size to be stored.
-    private: int m_size_reserved;                         ///< Allocation size (WARNING: Do not directly access)
-	public: char* Data() {return (char*)(this + 1);}      ///< Get ptr after this structure
+	// NOTE: IMPORTANT size is NOT stored in m_size but (int *)Data()[-1
+	//	This allows SmallMemNode and BigMemNode to both check the same memory offset to determine size
+	//	We must allocate AT LEAST enough memory for the size to be stored
+		private: int m_size_reserved;				///< Allocation size
+		public: char* Data() {return (char*)(this + 1);}	///< Get ptr after this structure
 	};
 
 	/// \brief Internal data structure for large allocations
 	struct BigMemNode: public gmListDoubleNode<BigMemNode>
-	{ 
-    // NOTE: IMPORTANT size is NOT stored in m_size but (int*)Data()[-1]
-    //       This allows SmallMemNode and BigMemNode to both check the same memory offset to determine size
-    //       We must allocate AT LEAST enough memory for the size to be stored.
-    private: int m_size_reserved;                         ///< Allocation size (WARNING: Do not directly access)
-    public: char* Data() {return (char*)(this + 1);}      ///< Get ptr after this structure
+	{
+	// NOTE: IMPORTANT size is NOT stored in m_size but (int *)Data()[-1]
+	//	This allows SmallMemNode and BigMemNode to both check the same memory offset to determine size
+	//	We must allocate AT LEAST enough memory for the size to be determined
+		private: int m_size_reserved;				///< Allocation size
+		public: char* Data() {return (char*)(this + 1);}	///< Get ptr after this structure
 	};
 
 	void FreeBigAllocs();                           ///< Free the big allocations
@@ -90,13 +90,13 @@ protected:
 	inline int GetDataAllocationSize(void* a_ptr) const
 	{
 		int* ptrToSize = (int*)a_ptr;
-		return ptrToSize[-1]; 
+		return ptrToSize[-1];
 	}
 	// NOTE: Pass in the DATA ptr, NOT the Node ptr
 	inline void SetDataAllocationSize(void* a_ptr, int a_size)
 	{
 		int* ptrToSize = (int*)a_ptr;
-		ptrToSize[-1] = a_size; 
+		ptrToSize[-1] = a_size;
 	}
 	inline void SetNodeDataSize(SmallMemNode* a_ptr, int a_size)
 	{

@@ -305,7 +305,7 @@ gmDebuggerSession &gmDebuggerSession::Pack(const char * a_val)
 {
 	if(a_val)
 	{
-		int len = strlen(a_val) + 1;
+		int len = (int)strlen(a_val) + 1;
 		Need(len);
 		memcpy((char *) m_out + m_outCursor, a_val, len);
 		m_outCursor += len;
@@ -342,7 +342,7 @@ gmDebuggerSession &gmDebuggerSession::Unpack(int &a_val)
 gmDebuggerSession &gmDebuggerSession::Unpack(const char * &a_val)
 {
 	a_val = (const char *) m_in + m_inCursor;
-	m_inCursor += strlen(a_val) + 1;
+	m_inCursor += (int)strlen(a_val) + 1;
 	return *this;
 }
 

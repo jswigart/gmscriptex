@@ -20,9 +20,9 @@ gmCall::gmCall()
 	: m_machine(0)
 	, m_thread(0)
 	, m_returnVar(gmVariable::s_null)
-	, m_paramCount(0)
-	, m_delayExecuteFlag(false)
+	, m_paramCount(0) 
 	, m_threadId(GM_INVALID_THREAD)
+	, m_delayExecuteFlag(false)
 #ifdef GM_DEBUG_BUILD
 	, m_locked(false)
 #endif //GM_DEBUG_BUILD
