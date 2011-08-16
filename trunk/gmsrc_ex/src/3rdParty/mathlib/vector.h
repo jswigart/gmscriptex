@@ -58,8 +58,9 @@
 
 
 
-
+#ifdef _WIN32
 #pragma warning(disable:4786)
+#endif
 
 #include <math.h>
 #include <float.h>

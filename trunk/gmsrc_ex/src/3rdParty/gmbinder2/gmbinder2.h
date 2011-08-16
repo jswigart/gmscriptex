@@ -44,7 +44,7 @@ namespace gmBind2
 		gmTableObject	*m_Table;		
 		bool IsNative() const { return m_Native; }
 		void SetNative(bool _b) { m_Native = _b; }
-		BoundObject(ClassT *o) : m_NativeObj(o), m_Native(false), m_Table(0) {}
+		BoundObject(ClassT *o) : m_NativeObj(o), m_Table(0), m_Native(false)  {}
 	private:
 		bool		m_Native;
 	};
@@ -677,7 +677,7 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<>
-		inline int Get<gmTableObject*>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		inline int Get<gmTableObject*>(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			gmTableObject **var = a_static ? (gmTableObject**)a_offset : (gmTableObject**)((char*)p + a_offset);
 			if(*var)
@@ -707,7 +707,7 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<typename T>
-		inline int Set(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		inline int Set(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
 			a_operands[1].Get(a_thread->GetMachine(),*var);
@@ -744,7 +744,7 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<>
-		inline void TraceProperty<gmTableObject*>(void *p, gmMachine *a_machine, gmGarbageCollector*a_gc, size_t a_offset, bool a_static) 
+		inline void TraceProperty<gmTableObject*>(void *p, gmMachine *a_machine, gmGarbageCollector*a_gc, size_t a_offset, bool a_static)
 		{
 			gmTableObject **var = a_static ? (gmTableObject**)a_offset : (gmTableObject**)((char*)p + a_offset);
 			if(*var)
@@ -857,8 +857,8 @@ namespace gmBind2
 		}
 		Global(gmMachine *a_machine, const char *_tablename = 0) 
 			: m_Machine(a_machine)
-			, m_TableName(_tablename)
 			, m_Table(0)
+			, m_TableName(_tablename)
 		{
 			if(m_TableName)
 			{
@@ -916,14 +916,14 @@ namespace gmBind2
 		{
 			_Call(true);
 		}
-		
+
 	//private:
-		gmVariable			m_This;
-		gmVariable			m_ReturnVal;
 		gmMachine			*m_Machine;
 		gmFunctionObject	*m_Function;
 		gmThread			*m_Thread;
 		int					m_ParamCount;
+		gmVariable			m_This;
+		gmVariable			m_ReturnVal;
 		int					m_ThreadId;
 	private:
 		gmVariable _Call(bool _async = false)

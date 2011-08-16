@@ -172,7 +172,7 @@ public:
 
 	static inline gmuint Hash(const void * a_key) 
 	{
-		return (gmuint) (((gmuint) a_key) / sizeof(double));
+		return (gmuint) (((gmptr) a_key) / sizeof(double));
 	}
 
 	static inline int Compare(const void * a_keyA, const void * a_keyB)

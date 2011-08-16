@@ -985,12 +985,14 @@ inline gmUserObject * gmThread::ThisUserObject()
 	return GM_EXCEPTION; \
 }
 //////////////////////////////////////////////////////////////////////////
-//#define GM_USER_PARAM(OBJECT, VAR, PARAM) \
-//	OBJECT VAR; \
-//	if( GM_NUM_PARAMS > (PARAM) && !GM_THREAD_ARG->ParamUser((PARAM), (void*&)(VAR)) )  \
-//{ \
-//	return GM_EXCEPTION; \
-//}
+/*
+#define GM_USER_PARAM(OBJECT, VAR, PARAM) \
+	OBJECT VAR; \
+	if( GM_NUM_PARAMS > (PARAM) && !GM_THREAD_ARG->ParamUser((PARAM), (void*&)(VAR)) )  \
+	{ \
+	return GM_EXCEPTION; \
+	}
+*/
 //////////////////////////////////////////////////////////////////////////
 #if(GM_USE_VECTOR3_STACK)
 #define GM_VECTOR_PARAM(VAR, PARAM, DEFX, DEFY, DEFZ) \

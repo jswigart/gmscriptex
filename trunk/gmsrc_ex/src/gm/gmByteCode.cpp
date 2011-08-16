@@ -120,9 +120,9 @@ void gmByteCodePrint(FILE * a_fp, const void * a_byteCode, int a_byteCodeLength)
 		}
 		if(opi32)
 		{
-			gmint32 ival = *((gmint32 *) instruction);
+			gmint32 ival = *((gmint32 *)instruction);
 			instruction += sizeof(gmint32);
-			fprintf(a_fp, "  %04d %s %d"GM_NL, addr, cp, ival);
+			fprintf(a_fp, " %04d %s %d"GM_NL, addr, cp, ival);
 		}
 		else if (opiptr)
 		{

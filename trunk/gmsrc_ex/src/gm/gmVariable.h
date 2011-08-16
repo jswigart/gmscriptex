@@ -97,7 +97,7 @@ struct gmVariable
 		gmVec3Data m_vec3;
 #endif
 #if(GM_USE_ENTITY_STACK)
-		int m_enthndl;
+		gmint m_enthndl;
 #endif
 #if(GM_USE_ENUM_SUPPORT)
 		gmEnumData m_enum;

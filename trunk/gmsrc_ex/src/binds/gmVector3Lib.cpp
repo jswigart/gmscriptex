@@ -756,7 +756,7 @@ struct gmVector3Obj
 	{
 		GM_ASSERT(a_operands[0].m_type == GM_VECTOR3);
 		gmVector3* thisVec = (gmVector3*) ((gmUserObject*)GM_OBJECT(a_operands[0].m_value.m_ref))->m_user;
-		if (thisVec->m_x != 0 || thisVec->m_y != 0 && thisVec->m_z != 0)
+		if ((thisVec->m_x != 0 || thisVec->m_y != 0) && thisVec->m_z != 0)
 		{
 			a_operands[0] = gmVariable(1);
 		}
@@ -772,7 +772,7 @@ struct gmVector3Obj
 	{
 		GM_ASSERT(a_operands[0].m_type == GM_VECTOR3);
 		gmVector3* thisVec = (gmVector3*) ((gmUserObject*)GM_OBJECT(a_operands[0].m_value.m_ref))->m_user;
-		if (thisVec->m_x != 0 || thisVec->m_y != 0 && thisVec->m_z != 0)
+		if ((thisVec->m_x != 0 || thisVec->m_y != 0) && thisVec->m_z != 0)
 		{
 			a_operands[0] = gmVariable(0);
 		}

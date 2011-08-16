@@ -211,7 +211,7 @@ inline void QUAL::RemoveLast(void)
 TMPL
 inline T &QUAL::operator[](gmuint a_index)
 {
-	GM_ASSERT(a_index >= 0 && a_index < m_count);
+	GM_ASSERT(/*a_index >= 0 &&*/ a_index < m_count); // cs: unsigned always >= 0
 	return m_elem[a_index];
 }
 
@@ -219,7 +219,7 @@ inline T &QUAL::operator[](gmuint a_index)
 TMPL
 inline const T &QUAL::operator[](gmuint a_index) const
 {
-	GM_ASSERT(a_index >= 0 && a_index < m_count);
+	GM_ASSERT(/*a_index >= 0 &&*/ a_index < m_count); // cs: unsigned always >= 0
 	return m_elem[a_index];
 }
 

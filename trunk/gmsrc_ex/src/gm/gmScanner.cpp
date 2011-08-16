@@ -661,7 +661,7 @@ YY_MALLOC_DECL
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
  * is returned in "result".
  */
-/* 
+/*
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
 	if ( yy_current_buffer->yy_is_interactive ) \
@@ -688,7 +688,7 @@ YY_MALLOC_DECL
 		{ \
 		int c = '*', n; \
 		for ( n = 0; n < max_size && \
-			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
+		     	     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
 		if ( c == '\n' ) \
 			buf[n++] = (char) c; \
@@ -696,7 +696,7 @@ YY_MALLOC_DECL
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
 		result = n; \
 		} \
-	else if ( ((result = (int)fread( buf, 1, max_size, yyin )) == 0) \
+	else if ( ((result = (int)fread( buf, 1, max_size, yyin )) == 0 ) \
 		  && ferror( yyin ) ) \
 		YY_FATAL_ERROR( "input in flex scanner failed" );
 #endif
@@ -1264,7 +1264,7 @@ YY_RULE_SETUP
 #line 132 "gmScanner.l"
 ECHO;
 	YY_BREAK
-#line 1247 "gmScanner.cpp"
+#line 1268 "gmScanner.cpp"
 			case YY_STATE_EOF(INITIAL):
 				yyterminate();
 

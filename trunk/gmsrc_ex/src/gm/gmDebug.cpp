@@ -460,7 +460,7 @@ gmDebugSession &gmDebugSession::Pack(gmint64 a_val)
 	m_out << a_val;
 	return *this;
 }
-#endif //GM_PTR_SIZE_64
+#endif // GM_PTR_SIZE_64
 
 gmDebugSession &gmDebugSession::Pack(const char * a_val)
 {

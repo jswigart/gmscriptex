@@ -465,10 +465,12 @@ namespace gmBind2
 				DisableGCInScope gcEn(a_machine);
 
 				BoundObject<ClassT> *bo = new BoundObject<ClassT>(a_instance);
+
+				// cs: re-ordered init for gcc warning.
+				bo->SetNative(a_native);
 				if(ClassBase<ClassT>::IsExtensible())
 					bo->m_Table = a_machine->AllocTableObject();
 
-				bo->SetNative(a_native);
 				return gmGCRoot<gmUserObject>(
 					a_machine->AllocUserObject(bo, ClassBase<ClassT>::ClassType()),a_machine);
 			}
@@ -743,11 +745,11 @@ namespace gmBind2
 			int			m_Arguments;
 			gmOperator	m_Op;
 
-			gmDoc(const char *_name, const char *_type, const char *_comment)
-				: m_DocType(Prop)
-				, m_Name(_name)
+			gmDoc(const char *_name, const char *_type, const char *_comment) 
+				: m_Name(_name)
 				, m_Type(_type)
 				, m_Comment(_comment)
+				, m_DocType(Prop)
 				, m_Arguments(0)
 				, m_Op(O_MAXOPERATORS)
 			{

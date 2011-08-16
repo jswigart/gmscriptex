@@ -926,7 +926,7 @@ yynewstate:
 #endif
 
       /* Get the current used size of the three stacks, in elements.  */
-      int size = (int)(yyssp - yyss + 1); // _GD_ cast for 64bit build
+      int size =(int)( yyssp - yyss + 1); // _GD_ cast for 64bit build
 
 #ifdef yyoverflow
       /* Each stack pointer address is followed by the size of
@@ -1179,13 +1179,13 @@ case 10:
     break;}
 case 11:
 {
-      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (int) yyvsp[-2]);
+      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (gmuptr) yyvsp[-2]);
       yyval->SetChild(0, yyvsp[-1]);
     ;
     break;}
 case 12:
 {
-      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (int) yyvsp[-4]);
+      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (gmuptr) yyvsp[-4]);
       yyval->SetChild(0, yyvsp[-3]);
       ATTACH(yyval, yyval, CreateOperation(CTNOT_ASSIGN, yyvsp[-3], yyvsp[-1]));
     ;

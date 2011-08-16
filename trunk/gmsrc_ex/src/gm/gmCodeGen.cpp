@@ -19,7 +19,7 @@ See Copyright Notice in gmMachine.h
 //static const char * s_tempVarName0 = "__t0"; // Currently not used
 static const char * s_tempVarName1 = "__t1";
 
-#define SIZEOF_BC_BRA   (sizeof(gmuint32)+sizeof(gmptr)) // instruction + address
+#define SIZEOF_BC_BRA   (sizeof(gmuint32)+sizeof(gmptr)) //instruction + address
 
 /// \brief gmSortDebugLines will sort debug line information
 static void gmSortDebugLines(gmArraySimple<gmLineInfo> &a_lineInfo)
@@ -641,15 +641,19 @@ bool gmCodeGenPrivate::GenExprTable(const gmCodeTreeNode * a_node, gmByteCodeGen
 			if(!Generate(fields->m_children[1], a_byteCode)) return false;
 			a_byteCode->EmitPtr(BC_SETDOT, m_hooks->GetSymbolId(fields->m_children[0]->m_data.m_string));
 		}
-	else if(fields->m_type == CTNT_EXPRESSION && fields->m_subType == CTNET_OPERATION && fields->m_subTypeType == CTNOT_ASSIGN_INDEX)
-    {
-	  a_byteCode->EmitPtr(BC_PUSHINT, fields->m_children[0]->m_data.m_iValue);
-      if(!Generate(fields->m_children[1], a_byteCode)) return false;
-      a_byteCode->Emit(BC_SETIND);
-	}
+		else if(fields->m_type == CTNT_EXPRESSION && fields->m_subType == CTNET_OPERATION && fields->m_subTypeType == CTNOT_ASSIGN_INDEX)
+		{
+#if 1 // 32bit integers
+			a_byteCode->Emit(BC_PUSHINT, fields->m_children[0]->m_data.m_iValue);
+#else
+			a_byteCode->EmitPtr(BC_PUSHINT, fields->m_children[0]->m_data.m_iValue);
+#endif
+			if(!Generate(fields->m_children[1], a_byteCode)) return false;
+			a_byteCode->Emit(BC_SETIND);
+		}
 		else
 		{
-#if 1 // 32bit Integers
+#if 1 // 32bit integers
 			a_byteCode->Emit(BC_PUSHINT, index++);
 #else
 			a_byteCode->EmitPtr(BC_PUSHINT, index++);
@@ -1398,7 +1402,7 @@ bool gmCodeGenPrivate::GenExprConstant(const gmCodeTreeNode * a_node, gmByteCode
 			}
 			else
 			{
-#if 1 // 32bit Integers
+#if 1 // 32bit integers
 				a_byteCode->Emit(BC_PUSHINT, *((gmint *) &a_node->m_data.m_iValue));
 #else
 				a_byteCode->EmitPtr(BC_PUSHINT, *((gmptr *) &a_node->m_data.m_iValue));
