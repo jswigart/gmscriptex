@@ -140,7 +140,7 @@ namespace gmBind2
 				if(ClassBase<ClassT>::m_AsStringCallback)
 					ClassBase<ClassT>::m_AsStringCallback(bo->m_NativeObj, a_buffer, a_bufferSize);
 				else
-					_gmsnprintf(a_buffer, a_bufferSize, "%X", bo->m_NativeObj);
+					_gmsnprintf(a_buffer, a_bufferSize, "%p", bo->m_NativeObj);
 			}
 		}
 		/*static void gmfDebugChildInfoCallback(gmUserObject *a_object, gmMachine *a_machine, gmChildInfoCallback a_infoCallback)

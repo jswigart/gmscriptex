@@ -220,7 +220,11 @@ namespace gmBind2
 	// and so forth for all the types you want to handle
 	//////////////////////////////////////////////////////////////////////////
 	template<typename T>
-	inline gmVariable ToGmVar(T&) { /* COMPILER ERROR! */ }
+#ifdef _WIN32
+	__declspec(noreturn) inline gmVariable ToGmVar(T&) { /* COMPILER ERROR! */ }
+#else
+	inline gmVariable ToGmVar(T&) __attribute__((noreturn)) {}
+#endif
 	template <>
 	inline gmVariable ToGmVar<bool>(bool &a_var)
 	{
