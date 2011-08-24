@@ -543,7 +543,7 @@ namespace gmBind2
 			BoundObject<ClassT> *boFrom = GetBoundObject(a_userObj);
 			BoundObject<ClassT> *boTo = GetBoundObject(a_cloneTo);
 			GM_ASSERT(boFrom && boTo);
-			if(boFrom && boTo)
+			if(boFrom != NULL && boTo != NULL)
 			{
 				if(boFrom->m_Table)
 				{
@@ -913,7 +913,7 @@ namespace gmBind2
 			GM_ASSERT(a_object->m_userType == ClassBase<ClassT>::ClassType());
 
 			BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(a_object->m_user);
-			if(bo && bo->m_Table)
+			if(bo != NULL && bo->m_Table)
 				a_gc->GetNextObject(bo->m_Table);
 
 			// attempt to trace all properties.
@@ -922,7 +922,7 @@ namespace gmBind2
 			for(; it != itEnd; ++it)
 			{
 				gmPropertyFunctionPair &propfuncs = (*it).second;
-				if(propfuncs.m_TraceObject)
+				if(propfuncs.m_TraceObject && bo != NULL && bo->m_NativeObj)
 				{
 					propfuncs.m_TraceObject(
 						bo->m_NativeObj,
@@ -933,7 +933,7 @@ namespace gmBind2
 				}
 			}
 
-			if(bo && bo->m_NativeObj)
+			if(bo != NULL && bo->m_NativeObj)
 			{
 				if(ClassBase<ClassT>::m_TraceCallback)
 					ClassBase<ClassT>::m_TraceCallback(bo->m_NativeObj, a_machine, a_gc, a_workLeftToGo, a_workDone);
