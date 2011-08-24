@@ -223,7 +223,7 @@ namespace gmBind2
 #ifdef _WIN32
 	__declspec(noreturn) inline gmVariable ToGmVar(T&) { /* COMPILER ERROR! */ }
 #else
-	inline gmVariable ToGmVar(T&) __attribute__((noreturn)) {}
+	__attribute__((noreturn)) inline gmVariable ToGmVar(T&) {}
 #endif
 	template <>
 	inline gmVariable ToGmVar<bool>(bool &a_var)
