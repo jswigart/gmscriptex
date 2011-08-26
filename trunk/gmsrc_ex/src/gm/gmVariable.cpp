@@ -71,7 +71,11 @@ const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_
 		}
 		else
 		{
+#ifdef GM_PTR_SIZE_64
+			_gmsnprintf(a_buffer, a_len, "%s:0x%lld", a_machine->GetTypeName(m_type), m_value.m_ref);
+#else
 			_gmsnprintf(a_buffer, a_len, "%s:0x%x", a_machine->GetTypeName(m_type), m_value.m_ref);
+#endif
 		}
 		break;
 	}

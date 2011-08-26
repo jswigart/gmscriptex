@@ -2009,7 +2009,7 @@ gmVariable gmMachine::Lookup(const char *a_string, gmTableObject *a_tbl)
 {
 	static const int BUF_SZ = 2048;
 	char buffer[BUF_SZ] = {};
-	GM_ASSERT(strlen(a_string) < BUF_SZ);
+	GM_ASSERT((int)strlen(a_string) < BUF_SZ);
 	strncpy(buffer, a_string, BUF_SZ);
 
 	gmTableObject *pCurrentTable = a_tbl ? a_tbl : GetGlobals();
@@ -2062,7 +2062,7 @@ gmVariable gmMachine::Lookup(const char *a_string, gmTableObject *a_tbl)
 						pCurrentTable = var.GetTableObjectSafe();
 					else
 					{
-						if(*pStart==NULL)
+						if(*pStart==0)
 							return var;
 					}
 
@@ -2091,7 +2091,7 @@ const char *gmMachine::ReverseLookup(const char *a_string, const gmVariable &_va
 {
 	static const int BUF_SZ = 2048;
 	char buffer[BUF_SZ] = {0};
-	GM_ASSERT(strlen(a_string) < BUF_SZ);
+	GM_ASSERT((int)strlen(a_string) < BUF_SZ);
 	strncpy(buffer, a_string, BUF_SZ);
 
 	gmTableObject *pCurrentTable = GetGlobals();
