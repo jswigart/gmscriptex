@@ -80,7 +80,7 @@ gmDebuggerSession::gmDebuggerSession()
 	m_out = (void*) new char[m_outSize];
 	m_outCursor = 0;
 	m_in = NULL;
-	m_inCursor = m_inSize = NULL;
+	m_inCursor = m_inSize = 0; //NULL;
 }
 
 

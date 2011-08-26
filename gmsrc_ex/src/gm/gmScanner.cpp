@@ -2095,7 +2095,7 @@ yy_size_t size;
    return (void *) GM_NEW( char [size] );
    }
 
-#ifdef YY_USE_PROTOS
+/*#ifdef YY_USE_PROTOS
 static void *yy_flex_realloc( void *ptr, yy_size_t size )
 #else
 static void *yy_flex_realloc( ptr, size )
@@ -2103,16 +2103,16 @@ void *ptr;
 yy_size_t size;
 #endif
    {
-   /* The cast to (char *) in the following accommodates both
+    * The cast to (char *) in the following accommodates both
     * implementations that use char* generic pointers, and those
     * that use void* generic pointers.  It works with the latter
     * because both ANSI C and C++ allow castless assignment from
     * any pointer type to void*, and deal with argument conversions
     * as though doing an assignment.
-    */
+    *
    //_GD_ return (void *) realloc( (char *) ptr, size );
    }
-
+*/
 #ifdef YY_USE_PROTOS
 static void yy_flex_free( void *ptr )
 #else

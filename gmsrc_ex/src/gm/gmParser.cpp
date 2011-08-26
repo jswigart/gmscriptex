@@ -2063,7 +2063,7 @@ yyerrlab:   /* here on detecting error */
                 {
                   count = 0;
                   for (x = (yyn < 0 ? -yyn : 0);
-                       x < (sizeof(yytname) / sizeof(char *)); x++)
+                       x < (int)(sizeof(yytname) / sizeof(char *)); x++)
                     if (yycheck[x + yyn] == x)
                       {
                         strcat(msg, count == 0 ? ", expecting `" : " or `");
