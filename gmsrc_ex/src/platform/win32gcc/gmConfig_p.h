@@ -102,10 +102,10 @@ typedef int gmint;
 typedef unsigned int gmuint;
 typedef float gmfloat;
 #ifdef GM_PTR_SIZE_64
-  typedef long long gmptr; // machine pointer size as int
-  typedef unsigned long long gmuptr; // machine pointer size as int
-  typedef long long gmint64;
-  typedef unsigned long long gmuint64;
+  typedef long long int gmptr; // machine pointer size as int
+  typedef unsigned long long int gmuptr; // machine pointer size as int
+  typedef long long int gmint64;
+  typedef unsigned long long int gmuint64;
 #else //!GM_PTR_SIZE_64
   typedef int gmptr; // machine pointer size as int
   typedef unsigned int gmuptr; // machine pointer size as int

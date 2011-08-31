@@ -1179,13 +1179,13 @@ case 10:
     break;}
 case 11:
 {
-      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (gmuptr) yyvsp[-2]);
+      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (gmptr) yyvsp[-2]);
       yyval->SetChild(0, yyvsp[-1]);
     ;
     break;}
 case 12:
 {
-      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (gmuptr) yyvsp[-4]);
+      yyval = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (gmptr) yyvsp[-4]);
       yyval->SetChild(0, yyvsp[-3]);
       ATTACH(yyval, yyval, CreateOperation(CTNOT_ASSIGN, yyvsp[-3], yyvsp[-1]));
     ;
