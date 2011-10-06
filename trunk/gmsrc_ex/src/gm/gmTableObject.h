@@ -120,7 +120,7 @@ private:
 
 	void Construct(gmMachine * a_machine);
 
-	
+	// This is a candidate for optimization. May want to specialize hash for variable types and platform.
 	inline gmTableNode * GetAtHashPos(const gmVariable* a_key) const
 	{
 		unsigned int hash = (unsigned int)a_key->m_value.m_ref; // Use lower 32 bits for now (NOTE: Alternate hashing method may improve performance)
