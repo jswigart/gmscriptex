@@ -101,7 +101,38 @@ void gmTableObject::Destruct(gmMachine * a_machine)
 #endif //GM_USE_INCGC
 }
 
+// Helper to minimally compare if two variables are equal, for finding matching keys in table
+// This function is a candidate for platform specific optimization
+inline int VarKeysEqual(const gmVariable& a_varA, const gmVariable& a_varB)
+{
+	// We can't assume unused bits in m_ref are zero.
+	// Some GM variants can't assume sizeof(m_ref) is the largest union component.
+	// We currently CAN assume table keys are either Strings (refs) or Integers (indices).
 
+#if GMMACHINE_NULL_VAR_CTOR
+	if( (a_varA.m_ref == a_varB.m_ref) &&
+		(a_varA.m_type == a_varB.m_type) )
+	{
+		return true;
+	}
+#else //GMMACHINE_NULL_VAR_CTOR
+	if( a_varA.m_type == a_varB.m_type )
+	{
+		if( a_varA.m_type == GM_INT)
+		{
+			if( a_varA.m_value.m_int == a_varB.m_value.m_int )
+			{
+				return true;
+			}
+		}
+		else if( a_varA.m_value.m_ref == a_varB.m_value.m_ref )
+		{
+			return true;
+		}
+	}
+#endif  
+	return false;
+}
 
 gmVariable gmTableObject::Get(const gmVariable &a_key) const
 {
@@ -113,8 +144,7 @@ gmVariable gmTableObject::Get(const gmVariable &a_key) const
 
 		do
 		{
-			if(a_key.m_value.m_ref == foundNode->m_key.m_value.m_ref &&
-				a_key.m_type == foundNode->m_key.m_type)
+			if( VarKeysEqual(a_key, foundNode->m_key) )
 			{
 				return foundNode->m_value;
 			}
@@ -135,8 +165,7 @@ gmTableNode * gmTableObject::GetTableNode(const gmVariable &a_key) const
 
 		do
 		{
-			if(a_key.m_value.m_ref == foundNode->m_key.m_value.m_ref &&
-				a_key.m_type == foundNode->m_key.m_type)
+			if( VarKeysEqual(a_key, foundNode->m_key) )
 			{
 				return foundNode;
 			}
@@ -180,8 +209,7 @@ void gmTableObject::Set(gmMachine * a_machine, const gmVariable &a_key, const gm
 	// find key, if it exists
 	do
 	{
-		if( (a_key.m_value.m_ref == foundNode->m_key.m_value.m_ref) &&
-			(a_key.m_type == foundNode->m_key.m_type))
+		if( VarKeysEqual(a_key, foundNode->m_key) )
 		{
 			//If found and value is null, remove it
 			if(GM_NULL == a_value.m_type)
