@@ -105,7 +105,7 @@ void gmThread::GCScanRoots(gmMachine* a_machine, gmGarbageCollector* a_gc)
 		if(m_stack[i].IsReference())
 		{
 			gmObject * object = GM_MOBJECT(m_machine, m_stack[i].m_value.m_ref);
-			a_gc->GetNextRootObject(object);
+			a_gc->GetNextObject(object);
 		}
 	}
 
@@ -116,7 +116,7 @@ void gmThread::GCScanRoots(gmMachine* a_machine, gmGarbageCollector* a_gc)
 		if(signal->m_signal.IsReference())
 		{
 			gmObject * object = GM_MOBJECT(m_machine, signal->m_signal.m_value.m_ref);
-			a_gc->GetNextRootObject(object);
+			a_gc->GetNextObject(object);
 		}
 		signal = signal->m_nextSignal;
 	}
@@ -128,7 +128,7 @@ void gmThread::GCScanRoots(gmMachine* a_machine, gmGarbageCollector* a_gc)
 		if(block->m_block.IsReference())
 		{
 			gmObject * object = GM_MOBJECT(m_machine, block->m_block.m_value.m_ref);
-			a_gc->GetNextRootObject(object);
+			a_gc->GetNextObject(object);
 		}
 		block = block->m_nextBlock;
 	}
