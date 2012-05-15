@@ -835,7 +835,8 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				GM_ASSERT( newthr );
 
 				// make sure there is enough room
-				newthr->Touch( m_size - m_base + 2 );
+				// http://www.gmscript.com/gamemonkey/forum/viewtopic.php?f=6&t=603
+				newthr->Touch( m_size - m_base + 2 - GMTHREAD_SLACKSPACE);
 				// copy stack and vars
 				memcpy( newthr->m_stack, &m_stack[ m_base - 2 ], sizeof( gmVariable ) * (m_top - m_base + 2 ) );
 
