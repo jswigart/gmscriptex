@@ -31,8 +31,10 @@
 #if defined(_M_X64)
 #define _USE_64BIT_TIME_T
 #else
+#ifndef _USE_32BIT_TIME_T
 #define _USE_32BIT_TIME_T // So system binds can use int for timestamps
 #endif
+#endif //_M_X64
 
 #include <malloc.h> // alloca
 #include <new>
