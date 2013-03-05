@@ -29,9 +29,6 @@ See Copyright Notice in gmMachine.h
 #include <sys/types.h>
 #include <sys/stat.h>
 
-
-#undef GetObject
-
 //
 //
 // system functions

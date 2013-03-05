@@ -58,8 +58,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "gmArraySimple.h"
 #include "gmIncGC.h"
 
-#undef GetObject //Argh Windows defines this in WINGDI.H
-
 #define GM_VERSION "1.26"
 
 // fwd decls
@@ -487,7 +485,7 @@ public:
 
 	/// \brief GetObject() will convert a gmptr (machine pointer size int) into an object pointer.  use this whenever
 	///        converting from a gmVariable m_value.m_ref to an object.
-	inline gmObject * GetObject(gmptr a_ref);
+	inline gmObject * GetGMObject(gmptr a_ref);
 
 	/// \brief AllocStringObject() will create a constant string object from the unique string pool.
 	/// \param a_length is the string length not including '\0' terminator, (-1) if unknown
@@ -717,7 +715,7 @@ inline void gmMachine::SetAutoMemoryUsage(bool a_enableAutoAdjust)
 }
 
 
-inline gmObject * gmMachine::GetObject(gmptr a_ref)
+inline gmObject * gmMachine::GetGMObject(gmptr a_ref)
 {
 #if GMMACHINE_SUPERPARANOIDGC
 	return CheckReference(a_ref);
@@ -747,7 +745,7 @@ inline gmOperatorFunction gmMachine::GetTypeNativeOperator(gmType a_type, gmOper
 
 inline gmFunctionObject * gmMachine::GetTypeOperator(gmType a_type, gmOperator a_operator)
 {
-	return (gmFunctionObject *) GetObject(m_types[a_type].m_operators[a_operator]);
+	return (gmFunctionObject *) GetGMObject(m_types[a_type].m_operators[a_operator]);
 }
 
 

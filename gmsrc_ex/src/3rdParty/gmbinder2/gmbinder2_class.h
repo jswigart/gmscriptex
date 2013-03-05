@@ -483,9 +483,12 @@ namespace gmBind2
 				GM_ASSERT(a_userObj->GetType() == ClassBase<ClassT>::ClassType());
 				BoundObject<ClassT> *bo = static_cast<BoundObject<ClassT>*>(((gmUserObject*)a_userObj)->m_user);
 				GM_ASSERT(bo && bo->IsNative());
-				if(!bo->IsNative())
-					delete bo->m_NativeObj;
-				bo->m_NativeObj = NULL;
+				if ( bo != NULL )
+				{
+					if(!bo->IsNative())
+						delete bo->m_NativeObj;
+					bo->m_NativeObj = NULL;
+				}
 			}
 		}
 		static ClassT*GetNativeObject(gmGCRoot<gmUserObject> a_userObj)

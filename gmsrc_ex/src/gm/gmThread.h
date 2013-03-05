@@ -361,7 +361,7 @@ inline const gmFunctionObject * gmThread::GetFunctionObject() const
 {
 	const gmVariable * fnVar = GetFunction();
 	GM_ASSERT(fnVar->m_type == GM_FUNCTION);
-	return (gmFunctionObject *) m_machine->GetObject(fnVar->m_value.m_ref);
+	return (gmFunctionObject *) m_machine->GetGMObject(fnVar->m_value.m_ref);
 }
 
 //
@@ -540,7 +540,7 @@ const char * gmThread::ParamString(int a_param, const char * a_default) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if(var->m_type == GM_STRING)
 	{
-		return (const char *) *((gmStringObject *) m_machine->GetObject(var->m_value.m_ref));
+		return (const char *) *((gmStringObject *) m_machine->GetGMObject(var->m_value.m_ref));
 	}
 	return a_default;
 }
@@ -557,7 +557,7 @@ bool gmThread::ParamString(int a_param, const char *& a_value, const char * a_de
 	gmVariable * var = m_stack + m_base + a_param;
 	if( var->m_type == GM_STRING )
 	{
-		a_value = (const char *) *((gmStringObject *) m_machine->GetObject(var->m_value.m_ref));
+		a_value = (const char *) *((gmStringObject *) m_machine->GetGMObject(var->m_value.m_ref));
 		return true;
 	}
 	// Invalid
@@ -572,7 +572,7 @@ gmStringObject * gmThread::ParamStringObject(int a_param) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if(var->m_type == GM_STRING)
 	{
-		return (gmStringObject *) m_machine->GetObject(var->m_value.m_ref);
+		return (gmStringObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	}
 	return NULL;
 }
@@ -589,7 +589,7 @@ bool gmThread::ParamStringObject(int a_param, gmStringObject *& a_value) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if(var->m_type == GM_STRING)
 	{
-		a_value = (gmStringObject *) m_machine->GetObject(var->m_value.m_ref);
+		a_value = (gmStringObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		return true;
 	}
 	// Invalid
@@ -603,7 +603,7 @@ gmTableObject * gmThread::ParamTable(int a_param) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if(var->m_type == GM_TABLE)
 	{
-		return (gmTableObject *) m_machine->GetObject(var->m_value.m_ref);
+		return (gmTableObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	}
 	return NULL;
 }
@@ -620,7 +620,7 @@ bool gmThread::ParamTable(int a_param, gmTableObject *& a_value ) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if( var->m_type == GM_TABLE )
 	{
-		a_value = (gmTableObject *) m_machine->GetObject(var->m_value.m_ref);
+		a_value = (gmTableObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		return true;
 	}
 	// Invalid
@@ -635,7 +635,7 @@ gmFunctionObject * gmThread::ParamFunction(int a_param) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if(var->m_type == GM_FUNCTION)
 	{
-		return (gmFunctionObject *) m_machine->GetObject(var->m_value.m_ref);
+		return (gmFunctionObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	}
 	return NULL;
 }
@@ -653,7 +653,7 @@ bool gmThread::ParamFunction(int a_param, gmFunctionObject *& a_value) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if( var->m_type == GM_FUNCTION )
 	{
-		a_value = (gmFunctionObject *) m_machine->GetObject(var->m_value.m_ref);
+		a_value = (gmFunctionObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		return true;
 	}
 	// Invalid
@@ -667,7 +667,7 @@ void * gmThread::ParamUser(int a_param, int * a_userType) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if(var->m_type >= GM_USER)
 	{
-		gmUserObject * user = (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		gmUserObject * user = (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		GM_ASSERT(var->m_type == user->m_userType);
 		if(a_userType) 
 		{
@@ -690,7 +690,7 @@ bool gmThread::ParamUser(int a_param, void *& a_value, int * a_userType) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if( var->m_type >= GM_USER )
 	{
-		gmUserObject * user = (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		gmUserObject * user = (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		GM_ASSERT( var->m_type == user->m_userType );
 		if( a_userType ) 
 		{
@@ -711,7 +711,7 @@ void * gmThread::ParamUserCheckType(int a_param, int a_userType) const
 	if(a_userType == var->m_type) 
 	{
 		GM_ASSERT(var->m_type >= GM_USER);
-		gmUserObject * user = (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		gmUserObject * user = (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		GM_ASSERT(var->m_type == user->m_userType);
 		return user->m_user;
 	}
@@ -724,7 +724,7 @@ void * gmThread::ParamUser_NoCheckTypeOrParam(int a_param) const
 	GM_ASSERT(a_param < m_numParameters);
 	gmVariable * var = m_stack + m_base + a_param;
 	GM_ASSERT(var->m_type >= GM_USER);
-	gmUserObject * user = (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+	gmUserObject * user = (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	return user->m_user;
 }
 
@@ -735,7 +735,7 @@ gmUserObject * gmThread::ParamUserObject(int a_param) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if(var->m_type >= GM_USER)
 	{
-		return (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		return (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	}
 	return NULL;
 }
@@ -753,7 +753,7 @@ bool gmThread::ParamUserObject(int a_param, gmUserObject *& a_value) const
 	gmVariable * var = m_stack + m_base + a_param;
 	if( var->m_type >= GM_USER )
 	{
-		a_value = (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		a_value = (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		return true;
 	}
 	// Invalid
@@ -822,7 +822,7 @@ inline const char * gmThread::ThisString(const char * a_default)
 	const gmVariable * var = GetThis();
 	if(var->m_type == GM_STRING)
 	{
-		return (const char *) *((gmStringObject *) m_machine->GetObject(var->m_value.m_ref));
+		return (const char *) *((gmStringObject *) m_machine->GetGMObject(var->m_value.m_ref));
 	}
 	return a_default;
 }
@@ -833,7 +833,7 @@ inline gmTableObject * gmThread::ThisTable()
 	const gmVariable * var = GetThis();
 	if(var->m_type == GM_TABLE)
 	{
-		return (gmTableObject *) m_machine->GetObject(var->m_value.m_ref);
+		return (gmTableObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	}
 	return NULL;
 }
@@ -844,7 +844,7 @@ inline gmFunctionObject * gmThread::ThisFunction()
 	const gmVariable * var = GetThis();
 	if(var->m_type == GM_FUNCTION)
 	{
-		return (gmFunctionObject *) m_machine->GetObject(var->m_value.m_ref);
+		return (gmFunctionObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	}
 	return NULL;
 }
@@ -855,7 +855,7 @@ inline void * gmThread::ThisUser(int * a_userType)
 	const gmVariable * var = GetThis();
 	if(var->m_type >= GM_USER)
 	{
-		gmUserObject * user = (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		gmUserObject * user = (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		if(a_userType) *a_userType = user->m_userType;
 		return user->m_user;
 	}
@@ -868,7 +868,7 @@ inline void * gmThread::ThisUserCheckType(int a_userType)
 	const gmVariable * var = GetThis();
 	if(var->m_type >= GM_USER)
 	{
-		gmUserObject * user = (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		gmUserObject * user = (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 		if(a_userType != user->m_userType) 
 		{
 			return NULL;
@@ -881,7 +881,7 @@ inline void * gmThread::ThisUserCheckType(int a_userType)
 
 inline void * gmThread::ThisUser_NoChecks()
 {
-	return ((gmUserObject*)m_machine->GetObject(GetThis()->m_value.m_ref))->m_user;
+	return ((gmUserObject*)m_machine->GetGMObject(GetThis()->m_value.m_ref))->m_user;
 }
 
 
@@ -890,7 +890,7 @@ inline gmUserObject * gmThread::ThisUserObject()
 	const gmVariable * var = GetThis();
 	if(var->m_type >= GM_USER)
 	{
-		return (gmUserObject *) m_machine->GetObject(var->m_value.m_ref);
+		return (gmUserObject *) m_machine->GetGMObject(var->m_value.m_ref);
 	}
 	return NULL;
 }
@@ -904,12 +904,12 @@ inline gmUserObject * gmThread::ThisUserObject()
 #define GM_THREAD_ARG a_thread
 
 #ifdef GM_DEBUG_BUILD
-#define GM_OBJECT(A) GM_THREAD_ARG->GetMachine()->GetObject((A))
-#define GM_MOBJECT(M, A) (M)->GetObject((A))
+#define GM_OBJECT(A) GM_THREAD_ARG->GetMachine()->GetGMObject((A))
+#define GM_MOBJECT(M, A) (M)->GetGMObject((A))
 #else //GM_DEBUG_BUILD
 #if GMMACHINE_SUPERPARANOIDGC
-#define GM_OBJECT(A) GM_THREAD_ARG->GetMachine()->GetObject((A))
-#define GM_MOBJECT(M, A) (M)->GetObject((A))
+#define GM_OBJECT(A) GM_THREAD_ARG->GetMachine()->GetGMObject((A))
+#define GM_MOBJECT(M, A) (M)->GetGMObject((A))
 #else //GMMACHINE_SUPERPARANOIDGC
 #define GM_OBJECT(A) (gmObject *) (A)
 #define GM_MOBJECT(M, A) (gmObject *) (A)

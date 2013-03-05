@@ -14,8 +14,6 @@ See Copyright Notice in gmMachine.h
 #include "gmThread.h"
 #include "gmMachine.h"
 
-#undef GetObject //Fix for Win32 where GetObject is #defined
-
 gmCall::gmCall()
 	: m_machine(0)
 	, m_thread(0)
@@ -367,7 +365,7 @@ bool gmCall::GetReturnedString(const char *& a_value)
 {
 	if(DidReturnVariable() && (m_returnVar.m_type == GM_STRING))
 	{
-		a_value = ((gmStringObject *)m_machine->GetObject(m_returnVar.m_value.m_ref))->GetString();
+		a_value = ((gmStringObject *)m_machine->GetGMObject(m_returnVar.m_value.m_ref))->GetString();
 		return true;
 	}
 	return false;
