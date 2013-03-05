@@ -20,8 +20,6 @@ See Copyright Notice in gmMachine.h
 #include "vector.h"
 #endif
 
-#undef GetObject //Fix for Win32 where GetObject is #defined
-
 /// \class gmCall
 /// \brief A helper class to call script functions from C
 /// Warning: Do not store any of the reference type return variables (eg. GM_SRING).  

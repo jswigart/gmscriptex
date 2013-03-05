@@ -79,7 +79,7 @@ bool gmFunctionObject::Trace(gmMachine * a_machine, gmGarbageCollector* a_gc, co
 	int i;
 	for(i = 0; i < m_numReferences; ++i)
 	{
-		gmObject * object = a_machine->GetObject(m_references[i]);
+		gmObject * object = a_machine->GetGMObject(m_references[i]);
 		a_gc->GetNextObject(object);
 		++a_workDone;
 	}
@@ -96,7 +96,7 @@ void gmFunctionObject::Mark(gmMachine * a_machine, gmuint32 a_mark)
 	int i;
 	for(i = 0; i < m_numReferences; ++i)
 	{
-		gmObject * object = a_machine->GetObject(m_references[i]);
+		gmObject * object = a_machine->GetGMObject(m_references[i]);
 		if(object->NeedsMark(a_mark)) object->Mark(a_machine, a_mark);
 	}
 }
