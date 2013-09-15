@@ -164,7 +164,7 @@ void GM_CDECL gmMachine::ScanRootsCallBack(gmMachine* a_machine, gmGarbageCollec
 	for(tit = a_machine->m_runningThreads.GetFirst(); a_machine->m_runningThreads.IsValid(tit); tit = a_machine->m_runningThreads.GetNext(tit)) tit->GCScanRoots(a_machine, a_gc);
 	for(tit = a_machine->m_blockedThreads.GetFirst(); a_machine->m_blockedThreads.IsValid(tit); tit = a_machine->m_blockedThreads.GetNext(tit)) tit->GCScanRoots(a_machine, a_gc);
 	for(tit = a_machine->m_sleepingThreads.GetFirst(); a_machine->m_sleepingThreads.IsValid(tit); tit = a_machine->m_sleepingThreads.GetNext(tit)) tit->GCScanRoots(a_machine, a_gc);
-	for(tit = a_machine->m_exceptionThreads.GetFirst(); a_machine->m_exceptionThreads.IsValid(tit); tit = a_machine->m_sleepingThreads.GetNext(tit)) tit->GCScanRoots(a_machine, a_gc);
+	for(tit = a_machine->m_exceptionThreads.GetFirst(); a_machine->m_exceptionThreads.IsValid(tit); tit = a_machine->m_exceptionThreads.GetNext(tit)) tit->GCScanRoots(a_machine, a_gc);
 
 	// iterate over global variables and mark
 	if(a_machine->m_global)
@@ -310,6 +310,7 @@ void gmMachine::ResetAndFreeMemory()
 	m_sleepingThreads.RemoveAll();
 	m_exceptionThreads.RemoveAll();
 	m_killedThreads.RemoveAndDeleteAll();
+	m_deletedThreads.RemoveAndDeleteAll();
 	m_threads.RemoveAndDeleteAll();
 	m_threadId = 0;
 	m_time = 0;
