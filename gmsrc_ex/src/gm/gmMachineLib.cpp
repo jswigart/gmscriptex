@@ -905,9 +905,9 @@ static int GM_CDECL gmTableSort(gmThread * a_thread)
 
 	typedef std::vector<gmVariable> Vars;
 
-	if(!_gmstricmp(sortby,"value") && !_gmstricmp(sortby,"key"))
+	if(_gmstricmp(sortby,"value") && _gmstricmp(sortby,"key"))
 	{
-		GM_EXCEPTION_MSG("expected 'key' or 'value' or function as param 1");
+		GM_EXCEPTION_MSG("expected 'key' or 'value' as param 1");
 		return GM_EXCEPTION;
 	}
 
