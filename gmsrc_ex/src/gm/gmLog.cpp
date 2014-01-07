@@ -59,7 +59,7 @@ void GM_CDECL gmLog::LogEntry(const char * a_format, ...)
 	va_start(ap, a_format);
 	_gmvsnprintf(buffer, GMLOG_CHAINSIZE, a_format, ap);
 	va_end(ap);
-	strcat(buffer, GM_NL);
+	//strcat(buffer, GM_NL);
 
 	if( (m_memApproxLimit > 0) && (m_mem.GetSystemMemUsed() > (unsigned int)m_memApproxLimit) )
 	{
