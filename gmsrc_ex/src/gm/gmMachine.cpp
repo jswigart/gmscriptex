@@ -598,6 +598,7 @@ int gmMachine::ExecuteString(const char * a_string, int * a_threadId, bool a_now
 	int errors = gmCodeTree::Get().Lock(a_string, &m_log);
 	if(errors > 0) 
 	{
+		if(a_filename) GetLog().LogEntry("Could not parse file %s", a_filename);
 		gmCodeTree::Get().Unlock();
 		return errors;
 	}
