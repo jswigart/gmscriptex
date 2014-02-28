@@ -6,7 +6,7 @@
 
 
 // Init statics and constants
-gmGCRootManager* gmGCRootManager::s_staticInstance;
+gmGCRootManager* gmGCRootManager::s_staticInstance = NULL;
 
 
 gmGCRootManager::gmGCRootManager()

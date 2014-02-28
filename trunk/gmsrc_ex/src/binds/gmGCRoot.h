@@ -216,7 +216,10 @@ class gmGCRoot
 public:
 
   /// Empty Constructor.  Equals NULL.
-  gmGCRoot()                                      { m_ptrToHolder = NULL; }
+  gmGCRoot()                                     
+  {
+	  m_ptrToHolder = NULL; 
+  }
   
   // NOTE: Currently not very safe since holder and controller are not typed.
   /// Construct from holder
