@@ -551,7 +551,11 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 #if GM_BOOL_OP
 				operand = top - 1;
 				--top;
-				if (operand->m_type > GM_USER)
+				if (operand->m_type > GM_USER
+#if(GM_USE_VECTOR3_STACK)
+					|| operand->m_type == GM_VEC3
+#endif
+ 					)
 				{
 					// Look for overridden operator.
 					gmOperatorFunction op = OPERATOR(operand->m_type, O_BOOL);
@@ -604,7 +608,11 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 #if GM_BOOL_OP
 				operand = top - 1;
 				--top;
-				if (operand->m_type > GM_USER)
+				if(operand->m_type > GM_USER
+#if(GM_USE_VECTOR3_STACK)
+					|| operand->m_type == GM_VEC3
+#endif
+					)
 				{
 					// Look for overridden operator.
 					gmOperatorFunction op = OPERATOR(operand->m_type, O_BOOL);
@@ -656,7 +664,11 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 			{
 #if GM_BOOL_OP
 				operand = top - 1;
-				if (operand->m_type > GM_USER)
+				if(operand->m_type > GM_USER
+#if(GM_USE_VECTOR3_STACK)
+					|| operand->m_type == GM_VEC3
+#endif
+					)
 				{
 					// Look for overridden operator.
 					gmOperatorFunction op = OPERATOR(operand->m_type, O_BOOL);
@@ -707,7 +719,11 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 			{
 #if GM_BOOL_OP
 				operand = top - 1;
-				if (operand->m_type > GM_USER)
+				if(operand->m_type > GM_USER
+#if(GM_USE_VECTOR3_STACK)
+					|| operand->m_type == GM_VEC3
+#endif
+					)
 				{
 					// Look for overridden operator.
 					gmOperatorFunction op = OPERATOR(operand->m_type, O_BOOL);
