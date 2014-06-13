@@ -1464,7 +1464,9 @@ void gmThread::LogCallStack()
 		if(fnVar->m_type == GM_FUNCTION)
 		{
 			gmFunctionObject * fn = (gmFunctionObject *) GM_MOBJECT(m_machine, fnVar->m_value.m_ref);
-			m_machine->GetLog().LogEntry("%3d: %s", fn->GetLine(ip), fn->GetDebugName());
+			const char * source, *filename = "";
+			m_machine->GetSourceCode(fn->GetSourceId(), source, filename);
+			m_machine->GetLog().LogEntry("%s(%d): %s", filename, fn->GetLine(ip), fn->GetDebugName());
 		}
 		base = frame->m_returnBase;
 		ip = frame->m_returnAddress;
