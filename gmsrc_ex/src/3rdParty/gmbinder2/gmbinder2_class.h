@@ -563,8 +563,6 @@ namespace gmBind2
 				if(!bo || !bo->m_NativeObj)
 					return false;
 
-				bool bGood = true;
-
 				gmTableIterator tIt;
 				gmTableNode *pNode = a_table->GetFirst(tIt);
 				while(pNode)
@@ -588,7 +586,6 @@ namespace gmBind2
 									propfuncs.m_PropertyOffset, 
 									propfuncs.m_BitfieldOffset,
 									propfuncs.m_Static);
-								return;
 							}
 						}
 						else
@@ -602,6 +599,7 @@ namespace gmBind2
 
 					pNode = a_table->GetNext(tIt);
 				}
+				return true;
 			}
 			return false;
 		}

@@ -993,7 +993,7 @@ bool gmCodeGenPrivate::GenStmtSwitch(const gmCodeTreeNode * a_node, gmByteCodeGe
 				}
 				// Remove all old locs
 				casejumpfromlocs.ResetAndFreeMemory();
-				gmuint end_of_stmt = a_byteCode->Tell();
+				//gmuint end_of_stmt = a_byteCode->Tell();
 				a_byteCode->Seek(casefailloc);
 				a_byteCode->Emit(BC_BRA, jumpfromstmtloc + SIZEOF_BC_BRA);
 				// Jump back to where we were ready for next statement
@@ -1005,7 +1005,7 @@ bool gmCodeGenPrivate::GenStmtSwitch(const gmCodeTreeNode * a_node, gmByteCodeGe
 		// Move to next sibling
 		casenode = casenode->m_sibling;
 	}
-	gmuint default_loc = a_byteCode->Tell();
+	//gmuint default_loc = a_byteCode->Tell();
 	if(defaultstmt)
 	{
 		if(!Generate(defaultstmt, a_byteCode)) return false;
