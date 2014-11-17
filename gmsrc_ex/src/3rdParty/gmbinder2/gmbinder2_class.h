@@ -691,6 +691,8 @@ namespace gmBind2
 		{
 			GM_ASSERT(ClassBase<ClassT>::ClassType()!=GM_NULL);
 
+			m_Properties.clear();
+
 			_machine->RegisterUserCallbacks(ClassBase<ClassT>::ClassType(), 
 				gmfTraceObject, 
 				ClassBase<ClassT>::gmfGarbageCollect, 
