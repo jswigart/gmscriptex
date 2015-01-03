@@ -244,15 +244,18 @@ namespace gmBind2
 		}
 
 		template<typename VarType>
+		size_t get_offset(VarType ClassT::*_var)
+		{
+			return reinterpret_cast<char*>(&(((ClassT*)NULL)->*_var))-reinterpret_cast<char*>(NULL);
+		}
+
+		template<typename VarType>
 		Class &var(VarType ClassT::* _var, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{
-			struct CV { VarType ClassT::* var; } cv; // Cast Variable helper.
-			cv.var = _var;
-
 			gmPropertyFunctionPair pr;
 			pr.m_Getter = GMProperty::Get<VarType>;
 			pr.m_Setter = GMProperty::Set<VarType>;
-			pr.m_PropertyOffset = (size_t)(*(VarType**)&cv);
+			pr.m_PropertyOffset = get_offset(_var);
 			pr.m_TraceObject = GMProperty::TraceProperty<VarType>;
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
@@ -287,13 +290,10 @@ namespace gmBind2
 		template<typename VarType>
 		Class &var_readonly(VarType ClassT::* _var, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{
-			struct CV { VarType ClassT::* var; } cv; // Cast Variable helper.
-			cv.var = _var;
-
 			gmPropertyFunctionPair pr;
 			pr.m_Getter = GMProperty::Get<VarType>;
 			//pr.m_Setter = GMProperty::Get<VarType>;
-			pr.m_PropertyOffset = (size_t)(*(VarType**)&cv);
+			pr.m_PropertyOffset = get_offset(_var);
 			pr.m_TraceObject = GMProperty::TraceProperty<VarType>;
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
@@ -326,13 +326,10 @@ namespace gmBind2
 		template<typename VarType>
 		Class &var_bitfield(VarType ClassT::* _var, int _bit, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{
-			struct CV { VarType ClassT::* var; } cv; // Cast Variable helper.
-			cv.var = _var;
-
 			gmPropertyFunctionPair pr;
 			pr.m_Getter = GMProperty::GetBitField<VarType>;
 			pr.m_Setter = GMProperty::SetBitField<VarType>;
-			pr.m_PropertyOffset = (size_t)(*(int**)&cv);
+			pr.m_PropertyOffset = get_offset(_var);
 			pr.m_BitfieldOffset = _bit;
 			pr.m_Static = false;
 			GM_ASSERT(m_Properties.find(_name)==m_Properties.end());
