@@ -52,13 +52,15 @@ namespace gmBind2
 
 		ClassBase(const char *a_classname, gmMachine *a_machine, bool _extensible)
 		{
+#ifdef WIN32
+			//static data are not cleared on Linux because dlclose does not work
 			GM_ASSERT(!m_ClassName && !m_ClassType);
-			{
-				m_Machine = a_machine;
-				m_ClassName = a_classname;
-				m_ClassType = a_machine->CreateUserType(a_classname);
-				m_Extensible = _extensible;
-			}
+#endif
+
+			m_Machine = a_machine;
+			m_ClassName = a_classname;
+			m_ClassType = a_machine->CreateUserType(a_classname);
+			m_Extensible = _extensible;
 		}
 	protected:
 		static gmType		m_ClassType;
