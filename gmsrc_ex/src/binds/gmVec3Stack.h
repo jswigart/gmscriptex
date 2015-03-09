@@ -3,7 +3,7 @@
 
 #if(GM_USE_VECTOR3_STACK)
 
-#include "../mathlib/vector.h"
+#include "mathlib/vector.h"
 
 struct gmVec3Data
 {

@@ -8,7 +8,7 @@
 
 extern "C" 
 {
-	#include "sqlite3.h"
+	#include "sqlite/sqlite3.h"
 };
 
 //#include <ctype.h>

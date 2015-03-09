@@ -17,7 +17,7 @@ See Copyright Notice in gmMachine.h
 #include "gmMachine.h"
 
 #if(GM_USE_VECTOR3_STACK)
-#include "vector.h"
+#include "mathlib/vector.h"
 #endif
 
 /// \class gmCall
