@@ -6,7 +6,7 @@
 #include "gmThread.h"
 #include "gmHelpers.h"
 
-#include "matrix.h"
+#include "mathlib/matrix.h"
 
 gmVec3Data ZERO_VEC3 = {};
 
