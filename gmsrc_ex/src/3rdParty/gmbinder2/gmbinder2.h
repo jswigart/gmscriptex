@@ -221,7 +221,7 @@ namespace gmBind2
 	//////////////////////////////////////////////////////////////////////////
 	template<typename T>
 #ifdef _WIN32
-	__declspec(noreturn) inline gmVariable ToGmVar(T&) { /* COMPILER ERROR! */ }
+	__declspec( noreturn ) inline gmVariable ToGmVar( T& ); /* LINKER ERROR! */
 #else
 	__attribute__((noreturn)) inline gmVariable ToGmVar(T&) {}
 #endif
@@ -231,9 +231,24 @@ namespace gmBind2
 		return gmVariable(a_var?1:0);
 	}
 	template <>
+	inline gmVariable ToGmVar<short>( short &a_var )
+	{
+		return gmVariable( (int)a_var );
+	}
+	template <>
+	inline gmVariable ToGmVar<unsigned short>( unsigned short &a_var )
+	{
+		return gmVariable( (int)a_var );
+	}
+	template <>
 	inline gmVariable ToGmVar<int>(int &a_var)
 	{
 		return gmVariable(a_var);
+	}
+	template <>
+	inline gmVariable ToGmVar<unsigned int>( unsigned int &a_var )
+	{
+		return gmVariable( (int)a_var );
 	}
 	template <>
 	inline gmVariable ToGmVar<float>(float &a_var)
