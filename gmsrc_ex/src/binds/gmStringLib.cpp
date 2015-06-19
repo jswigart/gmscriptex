@@ -1151,7 +1151,14 @@ static int GM_CDECL gmfIsEntity(gmThread * a_thread)
 	return GM_OK;
 }
 #endif
-static gmFunctionEntry s_stringLib[] = 
+static int GM_CDECL gmfIsNull(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	a_thread->PushInt(a_thread->ParamType(0)==GM_NULL ? 1 : 0);
+	return GM_OK;
+}
+
+static gmFunctionEntry s_stringLib[] =
 { 
 	/*gm
 	\lib string
@@ -1412,6 +1419,7 @@ static gmFunctionEntry s_conversionLib[] =
 #if(GM_USE_ENTITY_STACK)
 	{"IsEntity", gmfIsEntity},
 #endif
+	{"IsNull", gmfIsNull},
 };
 
 void gmBindStringLib(gmMachine * a_machine)
