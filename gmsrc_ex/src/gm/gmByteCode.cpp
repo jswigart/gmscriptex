@@ -116,27 +116,27 @@ void gmByteCodePrint(FILE * a_fp, const void * a_byteCode, int a_byteCodeLength)
 		{
 			float fval = *((float *) instruction);
 			instruction += sizeof(gmint32);
-			fprintf(a_fp, "  %04d %s %f"GM_NL, addr, cp, fval);
+			fprintf(a_fp, "  %04d %s %f" GM_NL, addr, cp, fval);
 		}
 		if(opi32)
 		{
 			gmint32 ival = *((gmint32 *)instruction);
 			instruction += sizeof(gmint32);
-			fprintf(a_fp, " %04d %s %d"GM_NL, addr, cp, ival);
+			fprintf(a_fp, " %04d %s %d" GM_NL, addr, cp, ival);
 		}
 		else if (opiptr)
 		{
 			gmptr ival = *((gmptr *) instruction);
 			instruction += sizeof(gmptr);
 #if defined(GM_PTR_SIZE_64)
-			fprintf(a_fp, "  %04d %s %lld"GM_NL, addr, cp, ival);
+			fprintf(a_fp, "  %04d %s %lld" GM_NL, addr, cp, ival);
 #else
-			fprintf(a_fp, "  %04d %s %d"GM_NL, addr, cp, ival);
+			fprintf(a_fp, "  %04d %s %d" GM_NL, addr, cp, ival);
 #endif
 		}
 		else
 		{
-			fprintf(a_fp, "  %04d %s"GM_NL, addr, cp);
+			fprintf(a_fp, "  %04d %s" GM_NL, addr, cp);
 		}
 	}
 }

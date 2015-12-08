@@ -130,7 +130,7 @@ public:
 //
 void gmDefaultPrintCallback(gmMachine * a_machine, const char * a_string)
 {
-	GM_PRINTF("%s"GM_NL, a_string);
+	GM_PRINTF("%s" GM_NL, a_string);
 }
 
 //
@@ -1411,7 +1411,7 @@ bool gmMachine::CollectGarbage(bool a_forceFullCollect)
 	// do we need to garbage collect?
 	if(m_gcEnabled  && (a_forceFullCollect || (GetCurrentMemoryUsage() > m_desiredByteMemoryUsageHard)) )
 	{
-		//printf("************* COLLECTING GARBAGE ****************"GM_NL);
+		//printf("************* COLLECTING GARBAGE ****************" GM_NL);
 
 		if(++m_mark == GM_MARK_PERSIST) m_mark = GM_MARK_START + 1;
 

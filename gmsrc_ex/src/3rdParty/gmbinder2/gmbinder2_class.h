@@ -270,6 +270,7 @@ namespace gmBind2
 			//////////////////////////////////////////////////////////////////////////
 			return *this;
 		}
+
 		template<typename VarType>
 		Class &var(VarType * _var, const char *_name, const char *_type = 0, const char *_comment = 0)
 		{

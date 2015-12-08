@@ -167,9 +167,9 @@ static void PrintRecursive(const gmCodeTreeNode * a_node, FILE * a_fp, bool a_fi
 				//
 				switch(a_node->m_subType)
 				{
-				case CTNDT_PARAMETER : fprintf(a_fp, "CTNDT_PARAMETER:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNDT_VARIABLE : fprintf(a_fp, "CTNDT_VARIABLE:%04d, type %d"GM_NL, a_node->m_lineNumber, a_node->m_subTypeType); break;
-				default : fprintf(a_fp, "UNKNOWN DECLARATION:"GM_NL); break;
+				case CTNDT_PARAMETER : fprintf(a_fp, "CTNDT_PARAMETER:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNDT_VARIABLE : fprintf(a_fp, "CTNDT_VARIABLE:%04d, type %d" GM_NL, a_node->m_lineNumber, a_node->m_subTypeType); break;
+				default : fprintf(a_fp, "UNKNOWN DECLARATION:" GM_NL); break;
 				}
 			}
 			else if(a_node->m_type == CTNT_STATEMENT)
@@ -179,24 +179,24 @@ static void PrintRecursive(const gmCodeTreeNode * a_node, FILE * a_fp, bool a_fi
 				//
 				switch(a_node->m_subType)
 				{
-				case CTNST_RETURN : fprintf(a_fp, "CTNST_RETURN:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_BREAK : fprintf(a_fp, "CTNST_BREAK:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_CONTINUE : fprintf(a_fp, "CTNST_CONTINUE:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_FOR : fprintf(a_fp, "CTNST_FOR:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_FOREACH : fprintf(a_fp, "CTNST_FOREACH:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_WHILE : fprintf(a_fp, "CTNST_WHILE:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_DOWHILE : fprintf(a_fp, "CTNST_DOWHILE:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_IF : fprintf(a_fp, "CTNST_IF:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNST_COMPOUND : fprintf(a_fp, "CTNST_COMPOUND:%04d"GM_NL, a_node->m_lineNumber); break;
+				case CTNST_RETURN : fprintf(a_fp, "CTNST_RETURN:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_BREAK : fprintf(a_fp, "CTNST_BREAK:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_CONTINUE : fprintf(a_fp, "CTNST_CONTINUE:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_FOR : fprintf(a_fp, "CTNST_FOR:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_FOREACH : fprintf(a_fp, "CTNST_FOREACH:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_WHILE : fprintf(a_fp, "CTNST_WHILE:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_DOWHILE : fprintf(a_fp, "CTNST_DOWHILE:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_IF : fprintf(a_fp, "CTNST_IF:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNST_COMPOUND : fprintf(a_fp, "CTNST_COMPOUND:%04d" GM_NL, a_node->m_lineNumber); break;
 #if GM_USE_FORK
-				case CTNST_FORK : fprintf(a_fp, "CTNST_FORK:%04d"GM_NL, a_node->m_lineNumber); break;
+				case CTNST_FORK : fprintf(a_fp, "CTNST_FORK:%04d" GM_NL, a_node->m_lineNumber); break;
 #endif //GM_USE_FORK
 #if GM_USE_SWITCH
-		  case CTNST_SWITCH : fprintf(a_fp, "CTNST_SWITCH:%04d"GM_NL, a_node->m_lineNumber); break;
-		  case CTNST_CASE : fprintf(a_fp, "CTNST_CASE:%04d"GM_NL, a_node->m_lineNumber); break;
-		  case CTNST_DEFAULT : fprintf(a_fp, "CTNST_DEFAULT:%04d"GM_NL, a_node->m_lineNumber); break;
+		  case CTNST_SWITCH : fprintf(a_fp, "CTNST_SWITCH:%04d" GM_NL, a_node->m_lineNumber); break;
+		  case CTNST_CASE : fprintf(a_fp, "CTNST_CASE:%04d" GM_NL, a_node->m_lineNumber); break;
+		  case CTNST_DEFAULT : fprintf(a_fp, "CTNST_DEFAULT:%04d" GM_NL, a_node->m_lineNumber); break;
 #endif //GM_USE_SWITCH
-				default : fprintf(a_fp, "UNKNOWN STATEMENT:"GM_NL); break;
+				default : fprintf(a_fp, "UNKNOWN STATEMENT:" GM_NL); break;
 				}
 			}
 			else if(a_node->m_type == CTNT_EXPRESSION)
@@ -210,11 +210,11 @@ static void PrintRecursive(const gmCodeTreeNode * a_node, FILE * a_fp, bool a_fi
 					{
 						if(a_node->m_subTypeType < CTNOT_MAX)
 						{
-							fprintf(a_fp, "CTNET_OPERATION:%04d : %s"GM_NL, a_node->m_lineNumber, gmGetOperatorTypeName((gmCodeTreeNodeOperationType) a_node->m_subTypeType));
+							fprintf(a_fp, "CTNET_OPERATION:%04d : %s" GM_NL, a_node->m_lineNumber, gmGetOperatorTypeName((gmCodeTreeNodeOperationType) a_node->m_subTypeType));
 						}
 						else
 						{ 
-							fprintf(a_fp, "UNKNOWN CTNET_OPERATION"GM_NL);
+							fprintf(a_fp, "UNKNOWN CTNET_OPERATION" GM_NL);
 						}
 						break;
 					}
@@ -223,26 +223,26 @@ static void PrintRecursive(const gmCodeTreeNode * a_node, FILE * a_fp, bool a_fi
 					{
 						switch(a_node->m_subTypeType)
 						{
-						case CTNCT_INT : fprintf(a_fp, "CTNCT_INT:%04d : %d"GM_NL, a_node->m_lineNumber, a_node->m_data.m_iValue); break;
-						case CTNCT_FLOAT : fprintf(a_fp, "CTNCT_FLOAT:%04d : %f"GM_NL, a_node->m_lineNumber, a_node->m_data.m_fValue); break;
-						case CTNCT_STRING : fprintf(a_fp, "CTNCT_STRING:%04d : %s"GM_NL, a_node->m_lineNumber, a_node->m_data.m_string); break;
-						case CTNCT_NULL : fprintf(a_fp, "CTNCT_NULL:%04d"GM_NL, a_node->m_lineNumber); break;
-						default: fprintf(a_fp, "UNKNOWN CTNET_CONSTANT"GM_NL);
+						case CTNCT_INT : fprintf(a_fp, "CTNCT_INT:%04d : %d" GM_NL, a_node->m_lineNumber, a_node->m_data.m_iValue); break;
+						case CTNCT_FLOAT : fprintf(a_fp, "CTNCT_FLOAT:%04d : %f" GM_NL, a_node->m_lineNumber, a_node->m_data.m_fValue); break;
+						case CTNCT_STRING : fprintf(a_fp, "CTNCT_STRING:%04d : %s" GM_NL, a_node->m_lineNumber, a_node->m_data.m_string); break;
+						case CTNCT_NULL : fprintf(a_fp, "CTNCT_NULL:%04d" GM_NL, a_node->m_lineNumber); break;
+						default: fprintf(a_fp, "UNKNOWN CTNET_CONSTANT" GM_NL);
 						}
 						break;
 					}
 
-				case CTNET_IDENTIFIER : fprintf(a_fp, "CTNET_IDENTIFIER:%04d : %s"GM_NL, a_node->m_lineNumber, a_node->m_data.m_string); break;
-				case CTNET_THIS : fprintf(a_fp, "CTNET_THIS:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNET_CALL : fprintf(a_fp, "CTNET_CALL:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNET_FUNCTION : fprintf(a_fp, "CTNET_FUNCTION:%04d"GM_NL, a_node->m_lineNumber); break;
-				case CTNET_TABLE : fprintf(a_fp, "CTNET_TABLE:%04d"GM_NL, a_node->m_lineNumber); break;
-				default : fprintf(a_fp, "UNKNOWN EXPRESSION:"GM_NL); break;
+				case CTNET_IDENTIFIER : fprintf(a_fp, "CTNET_IDENTIFIER:%04d : %s" GM_NL, a_node->m_lineNumber, a_node->m_data.m_string); break;
+				case CTNET_THIS : fprintf(a_fp, "CTNET_THIS:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNET_CALL : fprintf(a_fp, "CTNET_CALL:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNET_FUNCTION : fprintf(a_fp, "CTNET_FUNCTION:%04d" GM_NL, a_node->m_lineNumber); break;
+				case CTNET_TABLE : fprintf(a_fp, "CTNET_TABLE:%04d" GM_NL, a_node->m_lineNumber); break;
+				default : fprintf(a_fp, "UNKNOWN EXPRESSION:" GM_NL); break;
 				}
 			}
 			else
 			{
-				fprintf(a_fp, "UNKNOWN NODE TYPE"GM_NL);
+				fprintf(a_fp, "UNKNOWN NODE TYPE" GM_NL);
 			}
 
 			// print the child nodes

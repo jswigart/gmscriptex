@@ -382,12 +382,12 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 	//////////////////////////////////////////////////////////////////////////
 	if(!a_SchemaEl->Get(a_machine,"floatrange").IsNull())
 	{
-		if(!a_var.IsFloat())
+		float Value;
+		if(!gmGetFloatOrIntParamAsFloat(a_var, Value))
 		{
 			a_errs.VA("'%s': expected float, got %s",a_field,a_machine->GetTypeName(a_var.m_type));
 			return false;
 		}
-		const float Value = a_var.GetFloat();
 
 		gmVariable varMin = a_SchemaEl->Get(a_machine,"range_min");
 		gmVariable varMax = a_SchemaEl->Get(a_machine,"range_max");

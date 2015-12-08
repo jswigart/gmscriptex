@@ -118,16 +118,35 @@ inline int VarKeysEqual(const gmVariable& a_varA, const gmVariable& a_varB)
 #else //GMMACHINE_NULL_VAR_CTOR
 	if( a_varA.m_type == a_varB.m_type )
 	{
-		if( a_varA.m_type == GM_INT)
+		switch(a_varA.m_type)
 		{
-			if( a_varA.m_value.m_int == a_varB.m_value.m_int )
-			{
-				return true;
-			}
-		}
-		else if( a_varA.m_value.m_ref == a_varB.m_value.m_ref )
-		{
-			return true;
+			case GM_STRING:
+				if(a_varA.m_value.m_ref == a_varB.m_value.m_ref)
+					return true;
+				break;
+			case GM_INT:
+				if(a_varA.m_value.m_int == a_varB.m_value.m_int)
+					return true;
+				break;
+#if(GM_USE_ENTITY_STACK)
+			case GM_ENTITY:
+				if(a_varA.m_value.m_enthndl == a_varB.m_value.m_enthndl)
+					return true;
+				break;
+#endif
+#if(GM_USE_VECTOR3_STACK)
+			case GM_VEC3:
+				if(a_varA.m_value.m_vec3 == a_varB.m_value.m_vec3)
+					return true;
+				break;
+#endif
+			case GM_FLOAT:
+				if(a_varA.m_value.m_float == a_varB.m_value.m_float)
+					return true;
+				break;
+			default:
+				if(a_varA.m_value.m_ref == a_varB.m_value.m_ref)
+					return true;
 		}
 	}
 #endif  

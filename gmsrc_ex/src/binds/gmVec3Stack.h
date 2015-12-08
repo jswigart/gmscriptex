@@ -8,6 +8,15 @@
 struct gmVec3Data
 {
 	float x, y, z;
+
+	bool operator==(const gmVec3Data &a) const
+	{
+		return a.x == x && a.y == y && a.z == z;
+	};
+	bool operator!=(const gmVec3Data &a) const
+	{
+		return a.x != x || a.y != y || a.z != z;
+	};
 };
 
 inline gmVec3Data ConvertVec3(const Vec3 &v)
