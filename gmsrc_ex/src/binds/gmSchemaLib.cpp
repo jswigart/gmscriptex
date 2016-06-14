@@ -205,7 +205,10 @@ static bool VerifyValue(gmMachine *a_machine, gmTableObject *a_SchemaEl, gmVaria
 			enum { BufferSize=256 };
 			char buffervar[BufferSize] = { " " };
 			const char *VarStr = a_var.AsString(a_machine,buffervar,BufferSize);
-			a_errs.VA("'%s': no match for '%s'",a_field,VarStr);
+			if(a_field)
+				a_errs.VA("'%s': no match for '%s'",a_field,VarStr);
+			else
+				a_errs.VA("no match for '%s'", VarStr);
 			return false;
 		}
 
