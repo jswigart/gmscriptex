@@ -15,6 +15,10 @@ See Copyright Notice in gmMachine.h
 #include "gmMem.h"
 #include "gmUtil.h"
 
+#ifdef SLOW_SWAP
+#include <climits>
+#endif
+
 /// \class gmStream
 /// \brief gmStream is an abstract stream class
 class gmStream
@@ -130,6 +134,26 @@ protected:
 
 private:
 
+#ifdef SLOW_SWAP
+	template <typename T>
+	T SwapEndian(T u)
+	{
+		static_assert (CHAR_BIT == 8, "CHAR_BIT != 8");
+
+		union
+		{
+			T u;
+			unsigned char u8[sizeof(T)];
+		} source, dest;
+
+		source.u = u;
+
+		for (size_t k = 0; k < sizeof(T); k++)
+			dest.u8[k] = source.u8[sizeof(T) - k - 1];
+
+		return dest.u;
+	}
+#else
 	inline void SwapEndian(gmuint8 &a_x) { }
 	inline void SwapEndian(gmint8 &a_x) { }
 	inline void SwapEndian(gmuint16 &a_x) { a_x = (gmuint16)((a_x << 8) | ((a_x >> 8) & 0xff)); }
@@ -140,17 +164,18 @@ private:
 #ifdef GM_PTR_SIZE_64
 	inline void SwapEndian(gmuint64 &a_x)
 	{
-	a_x =     (a_x << 56)
-		    | ((a_x << 40) & 0x00ff000000000000)
-		    | ((a_x << 24) & 0x0000ff0000000000)
-		    | ((a_x << 8 ) & 0x000000ff00000000)
-		    | ((a_x >> 8 ) & 0x00000000ff000000)
-		    | ((a_x >> 24) & 0x0000000000ff0000)
-		    | ((a_x >> 40) & 0x000000000000ff00)
-		    | ((a_x >> 56) & 0x00000000000000ff);
+		a_x =     (a_x << 56)
+				  | ((a_x << 40) & 0x00ff000000000000)
+				  | ((a_x << 24) & 0x0000ff0000000000)
+				  | ((a_x << 8 ) & 0x000000ff00000000)
+				  | ((a_x >> 8 ) & 0x00000000ff000000)
+				  | ((a_x >> 24) & 0x0000000000ff0000)
+				  | ((a_x >> 40) & 0x000000000000ff00)
+				  | ((a_x >> 56) & 0x00000000000000ff);
 	}
 	inline void SwapEndian(gmptr &a_x) { SwapEndian((gmuint64 &) a_x); }
 #endif //!GM_PTR_SIZE_64
+#endif
 };
 
 

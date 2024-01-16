@@ -18,8 +18,8 @@ gmMemChain::gmMemChain(unsigned int a_elementSize, unsigned int a_numElementsInC
 {
 	m_chunkSize = a_numElementsInChunk * a_elementSize;
 	m_elementSize = a_elementSize;
-	m_rootChunk = NULL;
-	m_currentChunk = NULL;
+	m_rootChunk = nullptr;
+	m_currentChunk = nullptr;
 }
 
 
@@ -58,8 +58,8 @@ void gmMemChain::ResetAndFreeMemory()
 	FreeChunks();
 
 	//Clear pointers to chunk chain
-	m_rootChunk = NULL;
-	m_currentChunk = NULL;
+	m_rootChunk = nullptr;
+	m_currentChunk = nullptr;
 }
 
 
@@ -110,7 +110,7 @@ gmMemChain::MemChunk* gmMemChain::NewChunk()
 
 		//Link new chunk to chain
 		newChunk->m_lastChunk = m_currentChunk;
-		newChunk->m_nextChunk = NULL;
+		newChunk->m_nextChunk = nullptr;
 		if(m_currentChunk)
 		{
 			m_currentChunk->m_nextChunk = newChunk;
