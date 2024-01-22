@@ -34,7 +34,7 @@ See Copyright Notice in gmMachine.h
 	#define GM_PTR_SIZE_64 // Ptr size is 64bit
 #else // 32bit target
 	#define GM_DEFAULT_ALLOC_ALIGNMENT 4
-    #define GM_PTR_SIZE_32 // Ptr size is 32bit
+	#define GM_PTR_SIZE_32 // Ptr size is 32bit
 #endif
 
 #define GM_CDECL
@@ -105,18 +105,6 @@ typedef uint32_t gmuint32;
 // typedef intptr_t gmptr; // machine pointer size as int
 // typedef uintptr_t gmuptr; // machine pointer size as int
 
-/*
-#ifdef GM_PTR_SIZE_64
-	typedef long long int gmptr; // machine pointer size as int
-	typedef unsigned long long int gmuptr; // machine pointer size as int
-	typedef long long int gmint64;
-	typedef unsigned long long int gmuint64;
-#else //!GM_PTR_SIZE_64
-	typedef int gmptr; // machine pointer size as int
-	typedef unsigned int gmuptr; // machine pointer size as int
-#endif //!GM_PTR_SIZE_64
-*/
-
 typedef int64_t gmint64;
 typedef uint64_t gmuint64;
 
@@ -129,22 +117,6 @@ typedef int32_t gmptr;
 typedef uint32_t gmuptr;
 #endif
 
-//#define GM_CRT_DEBUG
 #undef GM_CRT_DEBUG
-
-#ifdef GM_CRT_DEBUG
-#include <crtdbg.h>
-#ifdef _DEBUG
-#define DEBUG_CLIENTBLOCK new (_CLIENT_BLOCK, __FILE__, __LINE__)
-
-#define SET_CRT_DEBUG_FIELD(a) _CrtSetDbgFlag( (a) | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) )
-#define CLEAR_CRT_DEBUG_FIELD(a) _CrtSetDbgFlag( ~(a) & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) )
-#define _gmDumpLeaks() SET_CRT_DEBUG_FIELD( _CRTDBG_LEAK_CHECK_DF ) //Flag to dump memory leaks on exit
-#else
-#define DEBUG_CLIENTBLOCK new
-
-#define _gmDumpLeaks() //Do nothing
-#endif
-#endif //GM_CRT_DEBUG
 
 #endif // _GMCONFIG_P_H_
