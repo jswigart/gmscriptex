@@ -29,7 +29,15 @@ See Copyright Notice in gmMachine.h
 #define GM_COMPILER_GCC
 #define GM_X86
 
-#define GM_CDECL              
+#if defined(__LP64__) // 64bit target
+	#define GM_DEFAULT_ALLOC_ALIGNMENT 16
+	#define GM_PTR_SIZE_64 // Ptr size is 64bit
+#else // 32bit target
+	#define GM_DEFAULT_ALLOC_ALIGNMENT 4
+	#define GM_PTR_SIZE_32 // Ptr size is 32bit
+#endif
+
+#define GM_CDECL
 #ifdef _DEBUG
 #define GM_ASSERT(A)        assert(A)
 #else //_DEBUG
@@ -48,8 +56,6 @@ See Copyright Notice in gmMachine.h
 
 #define GM_NEW( alloc_params ) new alloc_params
 #define GM_PLACEMENT_NEW( alloc_params, address ) new(address) alloc_params
-
-#define GM_DEFAULT_ALLOC_ALIGNMENT 4
 
 #define GM_MAKE_ID32( a, b, c, d )  ( ((d)<<24) | ((c)<<16) | ((b)<<8) | (a))
 
@@ -86,34 +92,31 @@ See Copyright Notice in gmMachine.h
 
 // basic types
 typedef const char * LPCTSTR;
-typedef unsigned int gmuint;
-typedef char gmint8;
-typedef unsigned char gmuint8;
-typedef short gmint16;
-typedef unsigned short gmuint16;
-typedef int gmint32;
-typedef unsigned int gmuint32;
+typedef int32_t gmint;
+typedef uint32_t gmuint;
 typedef float gmfloat;
-typedef int gmptr; // machine pointer size as int
-typedef unsigned int gmuptr; // machine pointer size as int
+typedef char gmint8;
+typedef uint8_t gmuint8;
+typedef int16_t gmint16;
+typedef uint16_t gmuint16;
+typedef int32_t gmint32;
+typedef uint32_t gmuint32;
 
+// typedef intptr_t gmptr; // machine pointer size as int
+// typedef uintptr_t gmuptr; // machine pointer size as int
 
-//#define GM_CRT_DEBUG
-#undef GM_CRT_DEBUG
+typedef int64_t gmint64;
+typedef uint64_t gmuint64;
 
-#ifdef GM_CRT_DEBUG
-#include <crtdbg.h>
-#ifdef _DEBUG
-#define DEBUG_CLIENTBLOCK new (_CLIENT_BLOCK, __FILE__, __LINE__)
-
-#define SET_CRT_DEBUG_FIELD(a) _CrtSetDbgFlag( (a) | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) )
-#define CLEAR_CRT_DEBUG_FIELD(a) _CrtSetDbgFlag( ~(a) & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) )
-#define _gmDumpLeaks() SET_CRT_DEBUG_FIELD( _CRTDBG_LEAK_CHECK_DF ) //Flag to dump memory leaks on exit
+// machine pointer size as int
+#if defined(__LP64__)
+typedef int64_t gmptr;
+typedef uint64_t gmuptr;
 #else
-#define DEBUG_CLIENTBLOCK new
-
-#define _gmDumpLeaks() //Do nothing
+typedef int32_t gmptr;
+typedef uint32_t gmuptr;
 #endif
-#endif //GM_CRT_DEBUG
+
+#undef GM_CRT_DEBUG
 
 #endif // _GMCONFIG_P_H_

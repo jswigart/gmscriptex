@@ -5,7 +5,7 @@
 //
 // Features:
 //		Bind classes to script, control whether script can create an instance or not.
-//		Bind class variables to script. 
+//		Bind class variables to script.
 //			Supports bool,int,float,const char *,std::string,gmTableObject,gmFunctionObject,
 //		Bind static functions to script(up to 9 parameters). No glue function needed.
 //		Bind member functions to script(up to 9 parameters). No glue function needed.
@@ -16,7 +16,7 @@
 //			multiple script functions.
 //		Ex: If your class had: void DoSomething(int) and void DoSomething(float)
 //			you could bind both functions, but using different names for each script.
-//		Variable argument functions. To support variable arguments you must use one of the 
+//		Variable argument functions. To support variable arguments you must use one of the
 //			raw binding functions.
 //////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +41,7 @@ namespace gmBind2
 	struct BoundObject
 	{
 		ClassT		*m_NativeObj;
-		gmTableObject	*m_Table;		
+		gmTableObject	*m_Table;
 		bool IsNative() const { return m_Native; }
 		void SetNative(bool _b) { m_Native = _b; }
 		BoundObject(ClassT *o) : m_NativeObj(o), m_Table(0), m_Native(false)  {}
@@ -75,11 +75,11 @@ namespace gmBind2
 	return GM_EXCEPTION;
 	//////////////////////////////////////////////////////////////////////////
 	template<typename T>
-	int GetThisGMType(gmThread *a_thread, T *&a_var) 
+	int GetThisGMType(gmThread *a_thread, T *&a_var)
 	{
 		gmType paramType = ClassBase<T>::ClassType();
-		
-		const gmVariable *pThis = a_thread->GetThis();		
+
+		const gmVariable *pThis = a_thread->GetThis();
 		if(pThis->m_type != ClassBase<T>::ClassType())
 		{
 			gmType parent = a_thread->GetMachine()->GetTypeParent(pThis->m_type);
@@ -126,9 +126,9 @@ namespace gmBind2
 			baseType = m->GetTypeParent(baseType);
 		}
 		//////////////////////////////////////////////////////////////////////////
-		GM_EXCEPTION_MSG("expecting param %d as %s, got %s", 
-			idx, 
-			ClassBase<T>::ClassName(), 
+		GM_EXCEPTION_MSG("expecting param %d as %s, got %s",
+			idx,
+			ClassBase<T>::ClassName(),
 			a_thread->GetMachine()->GetTypeName(a_thread->ParamType(idx)));
 		return GM_EXCEPTION;
 	}
@@ -156,41 +156,41 @@ namespace gmBind2
 			baseType = m->GetTypeParent(baseType);
 		}
 		//////////////////////////////////////////////////////////////////////////
-		GM_EXCEPTION_MSG("expecting param %d as %s, got %s", 
-			idx, 
-			ClassBase<T>::ClassName(), 
+		GM_EXCEPTION_MSG("expecting param %d as %s, got %s",
+			idx,
+			ClassBase<T>::ClassName(),
 			a_thread->GetMachine()->GetTypeName(a_thread->ParamType(idx)));
 		return GM_EXCEPTION;
 	}
-	template<> 
+	template<>
 	inline int GetFromGMType<bool>(gmThread *a_thread, int idx, bool &a_var)
 	{
 		GM_CHECK_INT_PARAM(v,idx);
 		a_var = v!=0;
 		return GM_OK;
 	}
-	template<> 
+	template<>
 	inline int GetFromGMType<int>(gmThread *a_thread, int idx, int &a_var)
 	{
 		GM_CHECK_INT_PARAM(v,idx);
 		a_var = v;
 		return GM_OK;
 	}
-	template<> 
+	template<>
 	inline int GetFromGMType<float>(gmThread *a_thread, int idx, float &a_var)
 	{
 		GM_CHECK_FLOAT_OR_INT_PARAM(v,idx);
 		a_var = v;
 		return GM_OK;
 	}
-	template<> 
+	template<>
 	inline int GetFromGMType<const char*>(gmThread *a_thread, int idx, const char *&a_var)
 	{
 		GM_CHECK_STRING_PARAM(v,idx);
 		a_var = v;
 		return GM_OK;
 	}
-	template<> 
+	template<>
 	inline int GetFromGMType<std::string>(gmThread *a_thread, int idx, std::string &a_var)
 	{
 		GM_CHECK_STRING_PARAM(v,idx);
@@ -198,7 +198,7 @@ namespace gmBind2
 		return GM_OK;
 	}
 #if(GM_USE_VECTOR3_STACK)
-	template<> 
+	template<>
 	inline int GetFromGMType<float*>(gmThread *a_thread, int idx, float *&a_var)
 	{
 		GM_CHECK_VECTOR_PARAM(v,idx);
@@ -207,7 +207,7 @@ namespace gmBind2
 		a_var[2] = v.z;
 		return GM_OK;
 	}
-	template<> 
+	template<>
 	inline int GetFromGMType<Vec3>(gmThread *a_thread, int idx, Vec3 &a_var)
 	{
 		GM_CHECK_VECTOR_PARAM(v,idx);
@@ -222,9 +222,12 @@ namespace gmBind2
 	template<typename T>
 #ifdef _WIN32
 	__declspec( noreturn ) inline gmVariable ToGmVar( T& ); /* LINKER ERROR! */
+#elif defined(__APPLE__)
+	inline gmVariable ToGmVar(T&);
 #else
 	__attribute__((noreturn)) inline gmVariable ToGmVar(T&) {}
 #endif
+
 	template <>
 	inline gmVariable ToGmVar<bool>(bool &a_var)
 	{
@@ -266,7 +269,7 @@ namespace gmBind2
 	//////////////////////////////////////////////////////////////////////////
 	// Return values
 	template<typename T>
-	inline int PushReturnToGM(gmThread *a_thread, T arg) 
+	inline int PushReturnToGM(gmThread *a_thread, T arg)
 	{
 		if(ClassBase<T>::ClassType() != GM_NULL)
 		{
@@ -688,7 +691,7 @@ namespace gmBind2
 	namespace GMProperty
 	{
 		template<typename T>
-		static int Get(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		static int Get(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
 			a_operands[0].Set(a_thread->GetMachine(),*var);
@@ -730,7 +733,7 @@ namespace gmBind2
 		{
 			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
 			a_operands[1].Get(a_thread->GetMachine(),*var);
-			return 1; 
+			return 1;
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<>
@@ -758,7 +761,7 @@ namespace gmBind2
 		}
 		//////////////////////////////////////////////////////////////////////////
 		template<typename T>
-		static void TraceProperty(void *p, gmMachine *a_machine, gmGarbageCollector*a_gc, size_t a_offset, bool a_static) 
+		static void TraceProperty(void *p, gmMachine *a_machine, gmGarbageCollector*a_gc, size_t a_offset, bool a_static)
 		{
 		}
 		//////////////////////////////////////////////////////////////////////////
@@ -772,14 +775,14 @@ namespace gmBind2
 		//////////////////////////////////////////////////////////////////////////
 		// Bitfield stuff.
 		template<typename T>
-		static int GetBitField(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		static int GetBitField(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
 			a_operands[0].SetInt((*var)&(1<<a_bit)?1:0);
 			return 1;
 		}
 		template<typename T>
-		static int SetBitField(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static) 
+		static int SetBitField(void *p, gmThread *a_thread, gmVariable *a_operands, size_t a_offset, size_t a_bit, bool a_static)
 		{
 			T *var = a_static ? (T*)a_offset : (T*)((char*)p + a_offset);
 			const int bitfield = a_operands[1].GetInt();
@@ -787,7 +790,7 @@ namespace gmBind2
 				*var |= (1<<a_bit);
 			else
 				*var &= ~(1<<a_bit);
-			return 1; 
+			return 1;
 		}
 	};
 	//////////////////////////////////////////////////////////////////////////
@@ -799,7 +802,7 @@ namespace gmBind2
 			using namespace Meta;
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			return GMExportStruct<Fn, FunctionTraits<Fn>::Arity>::Call(
-				a_thread, 
+				a_thread,
 				m_Function,
 				BoolToType<IsSame<ret_type, void>::value>(), // void return
 				BoolToType<IsMemberFunction<Fn>::value>()); // member function
@@ -817,7 +820,7 @@ namespace gmBind2
 			using namespace Meta;
 			typedef typename FunctionTraits<Fn>::return_type ret_type;
 			return GMExportOpStruct<Fn, FunctionTraits<Fn>::Arity>::Call(
-				a_thread, 
+				a_thread,
 				m_Function,
 				BoolToType<IsSame<ret_type, void>::value>(), // void return
 				BoolToType<IsMemberFunction<Fn>::value>()); // member function
@@ -874,7 +877,7 @@ namespace gmBind2
 			}
 			return *this;
 		}
-		Global(gmMachine *a_machine, const char *_tablename = 0) 
+		Global(gmMachine *a_machine, const char *_tablename = 0)
 			: m_Machine(a_machine)
 			, m_Table(0)
 			, m_TableName(_tablename)
@@ -921,7 +924,7 @@ namespace gmBind2
 
 			if(m_Function && m_Machine)
 			{
-				m_Thread = m_Machine->CreateThread();   // Create thread for func to run on      
+				m_Thread = m_Machine->CreateThread();   // Create thread for func to run on
 				m_Thread->Push(m_This);					// this
 				m_Thread->PushFunction(m_Function);		// function
 			}
@@ -1094,7 +1097,7 @@ namespace gmBind2
 			if(m_StackTop>0)
 				--m_StackTop;
 		}
-		TableConstructor(gmMachine *a_machine) 
+		TableConstructor(gmMachine *a_machine)
 			: m_Machine(a_machine)
 			, m_StackTop(0)
 		{
@@ -1121,22 +1124,22 @@ namespace gmBind2
 ;------------------------------------------------------------------------------
 ;  gmTableNode
 ;------------------------------------------------------------------------------
-gmTableNode{    
+gmTableNode{
 	preview
-		(	
-#( 
-		"(", 
-		$e.m_key, 
-		",", 
-		$e.m_value , 
+		(
+#(
+		"(",
+		$e.m_key,
+		",",
+		$e.m_value ,
 		")"
 		)
 		)
 		children
 		(
 #(
-Key		: $e.m_key, 
-Value	: $e.m_value, 
+Key		: $e.m_key,
+Value	: $e.m_value,
 		  )
 		  )
 }
@@ -1146,15 +1149,15 @@ Value	: $e.m_value,
 ;------------------------------------------------------------------------------
 gmTableObject{
 	preview
-		(	
+		(
 #(
 		"table[", $c.m_slotsUsed, "]",
 		)
 		)
 		children
-		(		
+		(
 #(
-#array 
+#array
 		(
 expr: $c.m_nodes[$i],
 size: $c.m_tableSize,
@@ -1173,14 +1176,14 @@ size: $e.m_key.m_type != 0
 ;------------------------------------------------------------------------------
 gmFunctionObject{
 	preview
-		(	
+		(
 #if( $c.m_cFunction != 0 )
 		(
-#("function(native) = ", $c.m_cFunction ) 
+#("function(native) = ", $c.m_cFunction )
 		)
 #elif( $c.m_debugInfo != 0 )
 		(
-#("function(script) = ", [ $c.m_debugInfo->m_debugName,s ] ) 
+#("function(script) = ", [ $c.m_debugInfo->m_debugName,s ] )
 		)
 #else
 		(
@@ -1188,7 +1191,7 @@ gmFunctionObject{
 		)
 		)
 		children
-		(		
+		(
 #(
 		[actual members]			: [$e,!]
 	)
@@ -1200,11 +1203,11 @@ gmFunctionObject{
 ;------------------------------------------------------------------------------
 gmStringObject{
 	preview
-		(	
-#("string = ", $c.m_string ) 
+		(
+#("string = ", $c.m_string )
 		)
 		children
-		(		
+		(
 #(
 		[actual members]			: [$e,!]
 	)
@@ -1218,51 +1221,51 @@ gmVariable{
 	preview
 		(
 #switch ($c.m_type)
-#case 0 
+#case 0
 		(
 #("<null>")
 		)
 #case 1
 		(
-#("int = ", $c.m_value.m_int) 
+#("int = ", $c.m_value.m_int)
 		)
 #case 2
 		(
-#("float = ", $c.m_value.m_float) 
+#("float = ", $c.m_value.m_float)
 		)
 #case 3
 		(
 #( "vector = (", $c.m_value.m_vec3.x ,$c.m_value.m_vec3.y ,$c.m_value.m_vec3.z, ")" )
 		)
-#case 4 
+#case 4
 		(
-#("entity = ", $c.m_value.m_hndl) 
+#("entity = ", $c.m_value.m_hndl)
 		)
-#case 5 
+#case 5
 		(
 #( "string = ", [ ((gmStringObject *)$c.m_value.m_ref)->m_string,s ] )
 		)
-#case 6 
+#case 6
 		(
 #( "table[", ((gmTableObject*)$c.m_value.m_ref)->m_slotsUsed, "]" )
 		)
-#case 7 
+#case 7
 		(
 #if( ((gmFunctionObject*)$c.m_value.m_ref)->m_cFunction != 0 )
 		(
-#( "function(native) = ", ((gmFunctionObject*)$c.m_value.m_ref)->m_cFunction ) 
+#( "function(native) = ", ((gmFunctionObject*)$c.m_value.m_ref)->m_cFunction )
 		)
 #elif( ((gmFunctionObject*)$c.m_value.m_ref)->m_debugInfo != 0 )
 		(
-#( "function(script) = ", [ ((gmFunctionObject*)$c.m_value.m_ref)->m_debugInfo->m_debugName,s ] ) 
+#( "function(script) = ", [ ((gmFunctionObject*)$c.m_value.m_ref)->m_debugInfo->m_debugName,s ] )
 		)
 #else
 		(
 #("function = <no debug name, use gmMachine::SetDebugMode(true)>")
 		)
 		)
-#default 
-		( 
+#default
+		(
 #("user = ", $c.m_type )
 		)
 
@@ -1313,21 +1316,21 @@ entity					: $c.m_value.m_hndl
 						  [string]				: [((gmStringObject *)$c.m_value.m_ref)->m_string,s]
 	)
 		)
-#case 6 
+#case 6
 		(
 #(
 		[actual members]		: [$e,!],
 		[table]					: ((gmTableObject *)$c.m_value.m_ref)
 		)
 		)
-#case 7 
+#case 7
 		(
 #(
 		[actual members]		: [$e,!],
 		[function]				: ((gmFunctionObject *)$c.m_value.m_ref)
 		)
 		)
-#default 
+#default
 		(
 #(
 		[actual members]		: [$e,!],
@@ -1342,13 +1345,13 @@ entity					: $c.m_value.m_hndl
 ;------------------------------------------------------------------------------
 gmThread{
 	preview
-		(	
+		(
 #( "this = (", $c.m_stack[$c.m_base - 2], ")" )
 		)
 		children
 		(
 #(
-		[actual members]		: [$e,!], 
+		[actual members]		: [$e,!],
 #array
 		(
 expr :	($c.m_stack)[$c.m_base + $i],
