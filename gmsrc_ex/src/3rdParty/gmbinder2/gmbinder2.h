@@ -792,7 +792,7 @@ namespace gmBind2
 				*var &= ~(1<<a_bit);
 			return 1;
 		}
-	};
+	}
 	//////////////////////////////////////////////////////////////////////////
 	template <typename Fn>
 	struct GMExportFunctor : public gmObjFunctor
@@ -1111,7 +1111,7 @@ namespace gmBind2
 
 		int m_StackTop;
 	};
-};
+}
 
 #include "gmbinder2_class.h"
 

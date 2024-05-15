@@ -756,7 +756,7 @@ namespace DebugChild
 	{
 		gmDebuggerGlobal(Session, a_symbol, a_value, a_valuetype, a_varId);
 	}
-};
+}
 
 void gmMachineGetGlobalInfo(gmDebugSession * a_session, int a_varId)
 {

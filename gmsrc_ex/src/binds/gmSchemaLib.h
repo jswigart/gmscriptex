@@ -28,7 +28,7 @@ namespace gmSchema
 
 	const gmTableObject *GetEnumOptions(gmMachine *a_machine, gmVariable &a_schema, gmVariable a_obj, gmVariable &a_current);
 	bool GetNumRange(gmMachine *a_machine, gmVariable &a_schema, gmVariable a_obj, gmVariable &a_current, float &a_min, float &a_max);
-};
+}
 
 
 

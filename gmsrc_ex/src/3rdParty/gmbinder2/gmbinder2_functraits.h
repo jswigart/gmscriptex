@@ -12,7 +12,7 @@ const char *TypeName()
 namespace gmBind2
 {
 	const char *FuncInfo(const char* _msg, ...);
-};
+}
 //////////////////////////////////////////////////////////////////////////
 // Function Traits
 template<typename Function> struct FunctionTraits;
@@ -631,6 +631,6 @@ namespace Meta
 	template <class T, class R, class P0, class P1, class P2, class P3, class P4					> struct IsMemberFunction <R(T::*)(P0, P1, P2, P3, P4		)	const > { enum { value = true }; };
 	template <class T, class R, class P0, class P1, class P2, class P3, class P4, class P5			> struct IsMemberFunction <R(T::*)(P0, P1, P2, P3, P4, P5	)	const > { enum { value = true }; };
 	template <class T, class R, class P0, class P1, class P2, class P3, class P4, class P5, class P6> struct IsMemberFunction <R(T::*)(P0, P1, P2, P3, P4, P5, P6)	const > { enum { value = true }; };
-};
+}
 
 #endif

@@ -137,7 +137,7 @@ const char * gmGetOperatorTypeName(gmCodeTreeNodeOperationType a_type)
 	default : break;
 	}
 	return "UNKNOWN OPERATOR TYPE";
-};
+}
 
 
 

@@ -537,10 +537,10 @@ static int GM_CDECL gmSetStateOnThread(gmThread * a_thread) // (threadid, fp, pa
 		// call the on state leave if one exists.
 		if(currentState->m_setExitState)
 		{
-			gmThread * thread = a_thread->GetMachine()->CreateThread(thisVar, gmVariable(GM_FUNCTION, currentState->m_setExitState->GetRef()));
-			if(thread)
+			gmThread * thread2 = a_thread->GetMachine()->CreateThread(thisVar, gmVariable(GM_FUNCTION, currentState->m_setExitState->GetRef()));
+			if(thread2)
 			{
-				thread->Sys_Execute();
+				thread2->Sys_Execute();
 			}
 		}
 

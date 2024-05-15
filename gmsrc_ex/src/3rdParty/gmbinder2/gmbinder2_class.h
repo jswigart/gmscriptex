@@ -450,7 +450,7 @@ namespace gmBind2
 			// isn't a real base of ClassT
 			ClassT *ClassPtr = 0;
 			BaseClassT *BaseClassPtr = static_cast<BaseClassT*>(ClassPtr);
-			BaseClassPtr;
+			(void)BaseClassPtr;
 
 			ClassBase<ClassT>::m_Machine->SetBaseForType(
 				ClassBase<ClassT>::ClassType(), 
@@ -955,6 +955,6 @@ namespace gmBind2
 #endif
 
 	//////////////////////////////////////////////////////////////////////////
-};
+}
 
 #endif
