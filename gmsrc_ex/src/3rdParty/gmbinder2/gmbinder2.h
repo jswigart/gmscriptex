@@ -998,6 +998,7 @@ namespace gmBind2
 				++call.m_ParamCount;
 			}
 		}
+		return call;
 	}
 	inline Function& operator<<(Function& call, Null&)
 	{
