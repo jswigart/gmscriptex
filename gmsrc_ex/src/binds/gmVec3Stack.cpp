@@ -199,7 +199,7 @@ static int GM_CDECL gmVector3GetDot( gmThread * a_thread, gmVariable * a_operand
 			a_operands[ 0 ].SetVector( 0.f, 1.f, 0.f );
 			return GM_OK;
 		}
-		else if ( !_gmstricmp( pStr->GetString(), "UNIT_X" ) )
+		else if ( !_gmstricmp( pStr->GetString(), "UNIT_Z" ) )
 		{
 			a_operands[ 0 ].SetVector( 0.f, 0.f, 1.f );
 			return GM_OK;
