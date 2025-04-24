@@ -63,6 +63,13 @@ const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_
 			break;
 		}
 #endif
+#if(GM_USE_ENTITY_STACK)
+	case GM_ENTITY:
+		{
+			_gmsnprintf(a_buffer, a_len, "entity:0x%x (%d)", m_value.m_enthndl, m_value.m_enthndl & 0xffff);
+			break;
+		}
+#endif
 	default:
 		gmAsStringCallback asStringCallback = a_machine->GetUserAsStringCallback(m_type);
 		if(asStringCallback)
