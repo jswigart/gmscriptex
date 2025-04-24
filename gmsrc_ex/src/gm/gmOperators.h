@@ -35,6 +35,8 @@ enum gmOperator
 	O_MUL,              // op1, op2
 	O_DIV,              // op1, op2
 	O_REM,              // op1, op2
+	O_INC,              // op1                       (tos is a_operands + 1)
+	O_DEC,              // op1
 
 	O_BIT_OR,           // op1, op2
 	O_BIT_XOR,          // op1, op2

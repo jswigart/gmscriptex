@@ -45,11 +45,13 @@
 #define	SYMBOL_ASGN_BXOR	299
 #define	SYMBOL_RIGHT_SHIFT	300
 #define	SYMBOL_LEFT_SHIFT	301
-#define	SYMBOL_LTE	302
-#define	SYMBOL_GTE	303
-#define	SYMBOL_EQ	304
-#define	SYMBOL_NEQ	305
-#define	TOKEN_ERROR	306
+#define	SYMBOL_INC	302
+#define	SYMBOL_DEC	303
+#define	SYMBOL_LTE	304
+#define	SYMBOL_GTE	305
+#define	SYMBOL_EQ	306
+#define	SYMBOL_NEQ	307
+#define	TOKEN_ERROR	308
 
 
 extern YYSTYPE gmlval;

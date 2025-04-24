@@ -129,6 +129,8 @@ void gmByteCodeGen::AdjustStack(gmByteCode a_instruction)
 	case BC_OP_MUL : --m_tos; break;
 	case BC_OP_DIV : --m_tos; break;
 	case BC_OP_REM : --m_tos; break;
+	case BC_OP_INC: --m_tos; break;
+	case BC_OP_DEC: --m_tos; break;
 
 	case BC_BIT_OR : --m_tos; break;
 	case BC_BIT_XOR : --m_tos; break;

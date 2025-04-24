@@ -113,6 +113,8 @@ gmCodeTreeNode * CreateAsignExpression(int a_subTypeType, gmCodeTreeNode * a_lef
 %token SYMBOL_ASGN_BXOR
 %token SYMBOL_RIGHT_SHIFT
 %token SYMBOL_LEFT_SHIFT
+%token SYMBOL_INC
+%token SYMBOL_DEC
 %token SYMBOL_LTE
 %token SYMBOL_GTE
 %token SYMBOL_EQ
@@ -178,12 +180,12 @@ compound_statement
 var_statement
   : var_type identifier ';'
     {
-      $$ = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (int) $1);
+      $$ = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (int)(gmptr) $1);
       $$->SetChild(0, $2);
     }
   | var_type identifier '=' constant_expression ';'
     {
-      $$ = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (int) $1);
+      $$ = gmCodeTreeNode::Create(CTNT_DECLARATION, CTNDT_VARIABLE, gmlineno, (int)(gmptr) $1);
       $$->SetChild(0, $2);
       ATTACH($$, $$, CreateOperation(CTNOT_ASSIGN, $2, $4));
     }
@@ -618,6 +620,14 @@ unary_expression
   : postfix_expression
     {
       $$ = $1;
+    }
+  | SYMBOL_INC unary_expression
+    {
+      $$ = CreateOperation(CTNOT_PRE_INC, $2);
+    }
+  | SYMBOL_DEC unary_expression
+    {
+      $$ = CreateOperation(CTNOT_PRE_DEC, $2);
     }
   | unary_operator unary_expression
     {

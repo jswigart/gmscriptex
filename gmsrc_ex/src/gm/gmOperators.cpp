@@ -29,6 +29,8 @@ const char * gmGetOperatorName(gmOperator a_operator)
 	case O_MUL : return "mul";
 	case O_DIV : return "div";
 	case O_REM : return "mod";
+	case O_INC: return "inc";
+	case O_DEC: return "dec";
 	case O_BIT_OR : return "bitor";
 	case O_BIT_XOR : return "bitxor";
 	case O_BIT_AND : return "bitand";
@@ -63,6 +65,8 @@ gmOperator gmGetOperator(const char * a_operatorName)
 	if(_gmstricmp(a_operatorName, "mul") == 0) return O_MUL;
 	if(_gmstricmp(a_operatorName, "div") == 0) return O_DIV;
 	if(_gmstricmp(a_operatorName, "mod") == 0) return O_REM;
+	if(_gmstricmp(a_operatorName, "inc") == 0) return O_INC;
+	if(_gmstricmp(a_operatorName, "dec") == 0) return O_DEC;
 	if(_gmstricmp(a_operatorName, "bitor") == 0) return O_BIT_OR;
 	if(_gmstricmp(a_operatorName, "bitxor") == 0) return O_BIT_XOR;
 	if(_gmstricmp(a_operatorName, "bitand") == 0) return O_BIT_AND;
@@ -143,6 +147,16 @@ int GM_CDECL gmIntOpRem(gmThread * a_thread, gmVariable * a_operands)
 #else // GMMACHINE_GMCHECKDIVBYZERO
 	a_operands[0].m_value.m_int %= a_operands[1].m_value.m_int;
 #endif // GMMACHINE_GMCHECKDIVBYZERO
+	return GM_OK;
+}
+int GM_CDECL gmIntOpInc(gmThread * a_thread, gmVariable * a_operands)
+{
+	++a_operands[0].m_value.m_int;
+	return GM_OK;
+}
+int GM_CDECL gmIntOpDec(gmThread * a_thread, gmVariable * a_operands)
+{
+	--a_operands[0].m_value.m_int;
 	return GM_OK;
 }
 int GM_CDECL gmIntOpBitOr(gmThread * a_thread, gmVariable * a_operands)
@@ -585,6 +599,8 @@ void gmInitBasicType(gmType a_type, gmOperatorFunction * a_operators)
 		a_operators[O_MUL]            = gmIntOpMul;
 		a_operators[O_DIV]            = gmIntOpDiv;
 		a_operators[O_REM]            = gmIntOpRem;
+		a_operators[O_INC]            = gmIntOpInc;
+		a_operators[O_DEC]            = gmIntOpDec;
 		a_operators[O_BIT_OR]         = gmIntOpBitOr;
 		a_operators[O_BIT_XOR]        = gmIntOpBitXor;
 		a_operators[O_BIT_AND]        = gmIntOpBitAnd;
@@ -612,6 +628,8 @@ void gmInitBasicType(gmType a_type, gmOperatorFunction * a_operators)
 		a_operators[O_MUL]    = gmFloatOpMul;
 		a_operators[O_DIV]    = gmFloatOpDiv;
 		a_operators[O_REM]    = gmFloatOpRem;
+		a_operators[O_INC]    = gmFloatOpInc;
+		a_operators[O_DEC]    = gmFloatOpDec;
 		a_operators[O_LT]     = gmFloatOpLT;
 		a_operators[O_GT]     = gmFloatOpGT;
 		a_operators[O_LTE]    = gmFloatOpLTE;

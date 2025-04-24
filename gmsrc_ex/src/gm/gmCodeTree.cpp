@@ -113,6 +113,8 @@ const char * gmGetOperatorTypeName(gmCodeTreeNodeOperationType a_type)
 	case CTNOT_UNARY_MINUS : return "CTNOT_UNARY_MINUS";
 	case CTNOT_UNARY_NOT : return "CTNOT_UNARY_NOT";
 	case CTNOT_UNARY_COMPLEMENT : return "CTNOT_UNARY_COMPLEMENT";
+	case CTNOT_PRE_DEC: return "CTNOT_PRE_DEC";
+	case CTNOT_PRE_INC: return "CTNOT_PRE_INC";
 	case CTNOT_ARRAY_INDEX : return "CTNOT_ARRAY_INDEX";
 	case CTNOT_TIMES : return "CTNOT_TIMES";
 	case CTNOT_DIVIDE : return "CTNOT_DIVIDE";
