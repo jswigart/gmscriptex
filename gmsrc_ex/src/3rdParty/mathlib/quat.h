@@ -473,9 +473,9 @@ inline void Quat::QuatToEuler( float &roll, float &pitch, float &yaw ) const
 	}
 
 	// compute output rotations
-	roll	= atan2( sinv, cosv );
-	pitch	= atan2( sint, cost );
-	yaw		= atan2( sinf, cosf );
+	roll	= atan2f( sinv, cosv );
+	pitch	= atan2f( sint, cost );
+	yaw		= atan2f( sinf, cosf );
 }
 
 class QuatPos

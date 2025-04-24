@@ -93,6 +93,7 @@ struct gmVariable
 		gmint m_int;
 		gmfloat m_float;
 		gmptr m_ref;
+		int m_debug_ref;
 #if(GM_USE_VECTOR3_STACK)
 		gmVec3Data m_vec3;
 #endif

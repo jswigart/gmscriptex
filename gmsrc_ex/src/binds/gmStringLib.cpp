@@ -215,6 +215,11 @@ static int GM_CDECL gmfStringCompareNoCase(gmThread * a_thread)
 }
 
 
+static char toLower(char c)
+{
+	return (char)tolower(c);
+}
+
 static int GM_CDECL gmfStringLower(gmThread * a_thread)
 {
 	const gmVariable * var = a_thread->GetThis();
@@ -225,12 +230,16 @@ static int GM_CDECL gmfStringLower(gmThread * a_thread)
 	const char * str = (const char *) *strObj;
 
 	std::string s(str);
-	std::transform(s.begin(),s.end(),s.begin(),tolower);
+	std::transform(s.begin(),s.end(),s.begin(),toLower);
 	a_thread->PushNewString(s.c_str(), (int)s.length());
 
 	return GM_OK;
 }
 
+static char toUpper(char c)
+{
+	return (char)toupper(c);
+}
 
 static int GM_CDECL gmfStringUpper(gmThread * a_thread)
 {
@@ -242,7 +251,7 @@ static int GM_CDECL gmfStringUpper(gmThread * a_thread)
 	const char * str = (const char *) *strObj;
 
 	std::string s(str);
-	std::transform(s.begin(),s.end(),s.begin(),toupper);
+	std::transform(s.begin(),s.end(),s.begin(),toUpper);
 	a_thread->PushNewString(s.c_str(), (int)s.length());
 
 	return GM_OK;

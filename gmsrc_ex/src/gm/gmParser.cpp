@@ -895,7 +895,7 @@ yyparse(YYPARSE_PARAM)
 #endif
 #endif
 
-  YYSTYPE yyval;                /*  the variable used to return         */
+  YYSTYPE yyval = 0;                /*  the variable used to return         */
                                 /*  semantic values from the action     */
                                 /*  routines                            */
 

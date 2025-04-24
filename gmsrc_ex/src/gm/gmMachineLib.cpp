@@ -1236,6 +1236,11 @@ static int GM_CDECL gmfLookup(gmThread * a_thread)
 	return GM_OK;
 }
 
+static char toLower(char c)
+{
+	return (char)tolower(c);
+}
+
 pfnExecuteFileImpl gmImportExecuteFile = 0;
 
 static int GM_CDECL gmfImport(gmThread * a_thread)
@@ -1265,7 +1270,7 @@ static int GM_CDECL gmfImport(gmThread * a_thread)
 	}
 
 	std::string slower = var;
-	std::transform(slower.begin(),slower.end(),slower.begin(),tolower);
+	std::transform(slower.begin(),slower.end(),slower.begin(),toLower);
 
 	// return it if it exists
 	gmTableObject *Module = ModulesTable->Get(pM,slower.c_str()).GetTableObjectSafe();

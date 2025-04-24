@@ -180,7 +180,7 @@ static void CallEndCallback(gmThread * a_thread, const gmVariable & retVal)
 		const char * retValue = retVal.AsString(a_thread->GetMachine(),valueBuffer,BufferSize);
 		const char * retType = a_thread->GetMachine()->GetTypeName(retVal.m_type);
 		const int varId = 
-			retVal.IsReference() && !retVal.IsFunction() ? retVal.m_value.m_ref : 0;
+			retVal.IsReference() && !retVal.IsFunction() ? retVal.m_value.m_debug_ref : 0;
 		gmDebuggerReturnVal(session,retValue,retType,varId);
 	}
 }
@@ -644,7 +644,7 @@ void gmMachineGetContext(gmDebugSession * a_session, int a_threadId, int a_callf
 						"this", 
 						buff, 
 						thisType, 
-						(base[-2].IsReference()) ? base[-2].m_value.m_ref : 0);
+						(base[-2].IsReference()) ? base[-2].m_value.m_debug_ref : 0);
 
 					if(numFrames == a_callframe)
 					{
@@ -654,7 +654,7 @@ void gmMachineGetContext(gmDebugSession * a_session, int a_threadId, int a_callf
 						{
 							const char * typeName = thread->GetMachine()->GetTypeName(base[i].m_type);
 							base[i].AsString(thread->GetMachine(), buff, buffSize);
-							gmDebuggerContextVariable(a_session, fn->GetSymbol(i), buff, typeName, (base[i].IsReference()) ? base[i].m_value.m_ref : 0);
+							gmDebuggerContextVariable(a_session, fn->GetSymbol(i), buff, typeName, (base[i].IsReference()) ? base[i].m_value.m_debug_ref : 0);
 						}
 					}
 				}
@@ -662,7 +662,7 @@ void gmMachineGetContext(gmDebugSession * a_session, int a_threadId, int a_callf
 				{
 					const char * typeName = thread->GetMachine()->GetTypeName(base[-2].m_type);
 					base[-2].AsString(thread->GetMachine(), buff, buffSize);
-					gmDebuggerContextCallFrame(a_session, numFrames, "unknown", 0, 0, "this", buff, typeName, (base[-2].IsReference()) ? base[-2].m_value.m_ref : 0);
+					gmDebuggerContextCallFrame(a_session, numFrames, "unknown", 0, 0, "this", buff, typeName, (base[-2].IsReference()) ? base[-2].m_value.m_debug_ref : 0);
 				}
 
 				// next call frame
@@ -754,7 +754,7 @@ namespace DebugChild
 	gmDebugSession *Session = 0;
 	void _gmChildInfoCallback(const char * a_symbol, const char * a_value, const char * a_valuetype, gmptr a_varId)
 	{
-		gmDebuggerGlobal(Session, a_symbol, a_value, a_valuetype, a_varId);
+		gmDebuggerGlobal(Session, a_symbol, a_value, a_valuetype, (int)a_varId);
 	}
 }
 

@@ -78,7 +78,7 @@ const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_
 		}
 		else
 		{
-			_gmsnprintf(a_buffer, a_len, "%s:0x%x", a_machine->GetTypeName(m_type), m_value.m_ref);
+			_gmsnprintf(a_buffer, a_len, "%s:0x%x", a_machine->GetTypeName(m_type), (unsigned int)m_value.m_ref);
 		}
 		break;
 	}
@@ -115,7 +115,7 @@ void gmVariable::DebugInfo(gmMachine * a_machine, gmChildInfoCallback a_cb) cons
 
 				const int varId = 
 					pNode->m_value.IsReference() && !pNode->m_value.IsFunction() ? 
-					pNode->m_value.m_value.m_ref : 
+					pNode->m_value.m_value.m_debug_ref : 
 				0;
 				
 				a_cb(

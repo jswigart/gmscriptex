@@ -276,7 +276,7 @@ public:
 	}
 	float Magnitude() const
 	{
-		return sqrt(x * x + y * y + z * z);
+		return sqrtf(x * x + y * y + z * z);
 	}
 	void Lerp(const Vec3& from,const Vec3& to,float slerp)
 	{
