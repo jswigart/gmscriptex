@@ -338,14 +338,14 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 				register gmType t0 = operand[0].m_type;
 				register gmType t1 = operand[1].m_type;
 
-				if(operand->m_type > t1) t1 = operand->m_type; 
+				if(t0 > t1) std::swap(t0, t1); 
 				gmOperatorFunction op = OPERATOR(t1, (gmOperator) instruction32[-1]); 
 				if(op) 
 				{ 
 					const int res = op(this, operand); 
 					if(res==GM_EXCEPTION)
 					{
-						GMTHREAD_LOG("operator %s bad operand %s for %s", 
+						GMTHREAD_LOG("operator %s bad operands %s and %s", 
 							gmGetOperatorName((gmOperator) instruction32[-1]), 
 							m_machine->GetTypeName(t1),
 							m_machine->GetTypeName(t0));

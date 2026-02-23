@@ -534,23 +534,25 @@ bool gmCodeGenPrivate::GenExprFunction(const gmCodeTreeNode * a_node, gmByteCode
 		(a_node->m_parent->m_subTypeType == CTNOT_ASSIGN || a_node->m_parent->m_subTypeType == CTNOT_ASSIGN_FIELD) && a_node->m_parent->m_children[1] == a_node)
 	{
 		const gmCodeTreeNode * debugName = a_node->m_parent->m_children[0];
-		if(debugName && debugName->m_type == CTNT_EXPRESSION && debugName->m_subType == CTNET_IDENTIFIER)
-		{
-		}
-		else if(debugName->m_type == CTNT_EXPRESSION && debugName->m_subType == CTNET_OPERATION && 
-			debugName->m_subTypeType == CTNOT_DOT)
-		{
-			debugName = debugName->m_children[1];
-		}
-		else
-		{
-			debugName = NULL;
-		}
-
 		if(debugName)
 		{
-			GM_ASSERT(debugName->m_type == CTNT_EXPRESSION && debugName->m_subType == CTNET_IDENTIFIER);
-			m_currentFunction->m_debugName = debugName->m_data.m_string;
+			if(debugName->m_type == CTNT_EXPRESSION && debugName->m_subType == CTNET_IDENTIFIER)
+			{
+			}
+			else if(debugName->m_type == CTNT_EXPRESSION && debugName->m_subType == CTNET_OPERATION && debugName->m_subTypeType == CTNOT_DOT)
+			{
+				debugName = debugName->m_children[1];
+			}
+			else
+			{
+				debugName = NULL;
+			}
+
+			if(debugName)
+			{
+				GM_ASSERT(debugName->m_type == CTNT_EXPRESSION && debugName->m_subType == CTNET_IDENTIFIER);
+				m_currentFunction->m_debugName = debugName->m_data.m_string;
+			}
 		}
 	}
 

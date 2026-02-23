@@ -82,6 +82,7 @@ const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_
 		}
 		break;
 	}
+	a_buffer[a_len - 1] = 0; // Ensure null termination
 	return a_buffer;
 }
 
@@ -145,6 +146,7 @@ const char * gmVariable::AsStringWithType(gmMachine * a_machine, char * a_buffer
 {
 	// Copy the type first
 	_gmsnprintf(a_buffer, a_len, "%s: ", a_machine->GetTypeName(m_type));
+	a_buffer[a_len - 1] = 0;
 
 	// Update for used portion
 	int usedLen = (int)strlen(a_buffer);

@@ -1086,8 +1086,8 @@ namespace gmBind2
 		}
 		void Push(const char *_tablename)
 		{
-			GM_ASSERT(m_StackTop < TableStackSize);
-			if ( m_StackTop < TableStackSize ) {
+			GM_ASSERT(m_StackTop < TableStackSize-1);
+			if ( m_StackTop < TableStackSize-1 ) {
 				m_StackTop++;
 				m_TableStack[m_StackTop].Set(m_Machine->AllocTableObject(),m_Machine);
 				m_TableStack[m_StackTop-1]->Set(m_Machine,_tablename,gmVariable(m_TableStack[m_StackTop]));

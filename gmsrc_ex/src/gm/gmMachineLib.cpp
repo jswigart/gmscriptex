@@ -877,8 +877,8 @@ public:
 		else
 		{
 			enum { BufferSize = 256 };
-			char buffer1[BufferSize] = {};
-			char buffer2[BufferSize] = {};
+			char buffer1[BufferSize];
+			char buffer2[BufferSize];
 
 			const char *buf1 = _var1.AsString(m_Machine,buffer1,BufferSize);
 			const char *buf2 = _var2.AsString(m_Machine,buffer2,BufferSize);
@@ -1009,7 +1009,7 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 	int param = 1;
 	int len = 0, size = 0;
 	const int bufferSize = 1024;
-	char * str = NULL, buffer[bufferSize] = {};
+	char * str = NULL, buffer[bufferSize];
 
 	while(*format)
 	{
@@ -1076,7 +1076,7 @@ static int GM_CDECL gmfFormat(gmThread * a_thread) // string, params ...
 						GM_EXCEPTION_MSG("expected int as param %d",param);
 						return GM_EXCEPTION;
 					}
-					sprintf(buffer, "%u", a_thread->Param(param).GetInt());
+					sprintf(buffer, "%u", (unsigned)a_thread->Param(param).GetInt());
 					gmConcat(a_thread->GetMachine(), str, len, size, buffer, 64);
 					++param;
 					break;

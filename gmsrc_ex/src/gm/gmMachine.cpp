@@ -2010,9 +2010,10 @@ void gmMachine::SetBaseForType(gmType a_type, gmType a_base)
 gmVariable gmMachine::Lookup(const char *a_string, gmTableObject *a_tbl)
 {
 	static const int BUF_SZ = 2048;
-	char buffer[BUF_SZ] = {};
+	char buffer[BUF_SZ];
 	GM_ASSERT((int)strlen(a_string) < BUF_SZ);
-	strncpy(buffer, a_string, BUF_SZ);
+	_gmsnprintf(buffer, BUF_SZ, "%s", a_string);
+	buffer[BUF_SZ - 1] = 0;
 
 	gmTableObject *pCurrentTable = a_tbl ? a_tbl : GetGlobals();
 
@@ -2092,9 +2093,10 @@ gmVariable gmMachine::Lookup(const char *a_string, gmTableObject *a_tbl)
 const char *gmMachine::ReverseLookup(const char *a_string, const gmVariable &_value)
 {
 	static const int BUF_SZ = 2048;
-	char buffer[BUF_SZ] = {0};
+	char buffer[BUF_SZ];
 	GM_ASSERT((int)strlen(a_string) < BUF_SZ);
-	strncpy(buffer, a_string, BUF_SZ);
+	_gmsnprintf(buffer, BUF_SZ, "%s", a_string);
+	buffer[BUF_SZ - 1] = 0;
 
 	gmTableObject *pCurrentTable = GetGlobals();
 

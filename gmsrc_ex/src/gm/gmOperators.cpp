@@ -211,8 +211,8 @@ int GM_CDECL gmIntOpGTE(gmThread * a_thread, gmVariable * a_operands)
 }
 int GM_CDECL gmIntOpEQ(gmThread * a_thread, gmVariable * a_operands)
 {
-	a_operands[0].m_value.m_int = (a_operands[0].m_value.m_int == a_operands[1].m_value.m_int);
-	return GM_OK;
+		a_operands[0].m_value.m_int = (a_operands[0].m_value.m_int == a_operands[1].m_value.m_int);
+    return GM_OK;
 }
 int GM_CDECL gmIntOpNEQ(gmThread * a_thread, gmVariable * a_operands)
 {

@@ -21,14 +21,11 @@ class SchemaErrors
 public:
 	void VA(const char* _msg, ...)
 	{
-		char buffer[8192] = {0};
+		char buffer[8192];
 		va_list list;
 		va_start(list, _msg);
-#ifdef WIN32
-		_vsnprintf(buffer, 8192, _msg, list);	
-#else
 		vsnprintf(buffer, 8192, _msg, list);
-#endif
+		buffer[8191] = 0;
 		va_end(list);
 		m_Errors->Set(m_Machine,gmVariable(m_NumErrors++),buffer);
 	}
@@ -110,7 +107,7 @@ static bool CheckIfVarsAreEqual(const gmVariable &a, const gmVariable &b)
 static bool VerifyAgainstTable(gmMachine *a_machine, gmTableObject *a_SchemaEl, const gmVariable &a_var, SchemaErrors &a_errs, const char *a_field)
 {
 	enum { BuffSize=256 };
-	char buffer[BuffSize] = {};
+	char buffer[BuffSize];
 
 	gmTableObject *CheckKeyTable = a_SchemaEl->Get(a_machine,"checkkey").GetTableObjectSafe();
 	if(CheckKeyTable)

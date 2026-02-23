@@ -193,10 +193,10 @@ struct gmVariable
 
 	inline void SetInt(int a_value) { m_type = GM_INT; m_value.m_int = a_value; }
 	inline void SetFloat(float a_value) { m_type = GM_FLOAT; m_value.m_float = a_value; }
-	inline void SetString(gmStringObject * a_string);
+	inline void SetString(const gmStringObject *a_string);
 	void SetString(gmMachine * a_machine, const char * a_cString);
-	inline void SetTable(gmTableObject * a_table);
-	inline void SetFunction(gmFunctionObject * a_function);
+	inline void SetTable(const gmTableObject *a_table);
+	inline void SetFunction(const gmFunctionObject * a_function);
 	void SetUser(gmUserObject * a_object);
 	void SetUser(gmMachine * a_machine, void * a_userPtr, int a_userType);
 
@@ -277,9 +277,9 @@ struct gmVariable
 	void Set(gmMachine *a_machine, bool a_value) { SetInt(a_value?1:0); }
 	void Set(gmMachine *a_machine, int a_value) { SetInt(a_value); }
 	void Set(gmMachine *a_machine, float a_value) { SetFloat(a_value); }
-	void Set(gmMachine *a_machine, gmStringObject *a_value) { SetString(a_value); }
-	void Set(gmMachine *a_machine, gmTableObject *a_value) { SetTable(a_value); }
-	void Set(gmMachine *a_machine, gmFunctionObject *a_value) { SetFunction(a_value); }
+	void Set(gmMachine *a_machine, const gmStringObject *a_value) { SetString(a_value); }
+	void Set(gmMachine *a_machine, const gmTableObject *a_value) { SetTable(a_value); }
+	void Set(gmMachine *a_machine, const gmFunctionObject *a_value) { SetFunction(a_value); }
 	void Set(gmMachine *a_machine, gmUserObject *a_value) { SetUser(a_value); }
 	void Set(gmMachine *a_machine, gmGCRoot<gmFunctionObject> &a_value);
 	void Set(gmMachine *a_machine, gmGCRoot<gmTableObject> &a_value);
@@ -376,19 +376,19 @@ protected:
 //
 
 
-inline void gmVariable::SetString(gmStringObject * a_string)
+inline void gmVariable::SetString(const gmStringObject *a_string)
 {
 	m_type = GM_STRING;
 	m_value.m_ref = ((gmObject *) a_string)->GetRef();
 }
 
-inline void gmVariable::SetTable(gmTableObject * a_table)
+inline void gmVariable::SetTable(const gmTableObject *a_table)
 {
 	m_type = GM_TABLE;
 	m_value.m_ref = ((gmObject *) a_table)->GetRef();
 }
 
-inline void gmVariable::SetFunction(gmFunctionObject * a_function)
+inline void gmVariable::SetFunction(const gmFunctionObject * a_function)
 {
 	m_type = GM_FUNCTION;
 	m_value.m_ref = ((gmObject *) a_function)->GetRef();

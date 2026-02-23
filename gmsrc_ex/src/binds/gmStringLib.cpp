@@ -319,11 +319,7 @@ static int GM_CDECL gmfStringSpanExcluding(gmThread * a_thread)
 // a_endWithSlash is optional, default is false, removing trailing slashes.
 static int GM_CDECL gmfStringAppendPath(gmThread * a_thread)
 {
-	//Need at least 1 parameter
-	if(a_thread->GetNumParams() < 1)
-	{
-		return GM_EXCEPTION;
-	}
+	GM_CHECK_NUM_PARAMS(1);
 
 	//Optional trailing slash flag
 	int PutTrailingSlash = a_thread->ParamInt(1, false);
@@ -341,22 +337,19 @@ static int GM_CDECL gmfStringAppendPath(gmThread * a_thread)
 		int lenA = strObjA->GetLength();
 		int lenB = strObjB->GetLength();
 
-		int curLength = lenA;
-		int appLength = lenB;
-
 		//Alloc buffer on stack is fine, path strings cannot be long
-		char * buffer = (char *) alloca(curLength + appLength + 2);
+		int newLength = lenA + lenB;
+		char *buffer = (char *)alloca(newLength + 2);
 
 		if(lenA > 0)
 		{
 			memcpy(buffer, cStrA, lenA);
 
-
 			//Make sure first part has a slash
-			if(buffer[curLength-1] != '\\' && buffer[curLength-1] != '/')
+			if(buffer[lenA - 1] != '\\' && buffer[lenA - 1] != '/')
 			{
-				buffer[curLength] = '\\';
-				curLength += 1;
+				buffer[lenA++] = '\\';
+				newLength++;
 			}
 		}
 
@@ -366,31 +359,33 @@ static int GM_CDECL gmfStringAppendPath(gmThread * a_thread)
 			const char* startOfAppend = cStrB;
 			if((startOfAppend[0] == '\\') || (startOfAppend[0] == '/'))
 			{
-				startOfAppend += 1;
-				appLength -= 1;
+				startOfAppend++;
+				lenB--;
+				newLength--;
 			}
 
 			//Append the string
-			memcpy(&buffer[curLength], startOfAppend, appLength);
+			memcpy(&buffer[lenA], startOfAppend, lenB);
 		}
 
-		int newLength = curLength + appLength;
-
-		if(PutTrailingSlash && (newLength > 0)) //Only add slash if string is not empty
+		if(newLength > 0) //Only add slash if string is not empty
 		{
-			//Make sure path ends with slash
-			if(buffer[newLength-1] != '\\' && buffer[newLength-1] != '/')
+			char lastChar = buffer[newLength - 1];
+			if(PutTrailingSlash)
 			{
-				buffer[newLength] = '\\';
-				newLength += 1;
+				//Make sure path ends with slash
+				if(lastChar != '\\' && lastChar != '/')
+				{
+					buffer[newLength++] = '\\';
+				}
 			}
-		}
-		else
-		{
-			//Make sure path does not end with slash
-			if(buffer[newLength-1] == '\\' || buffer[newLength-1] == '/')
+			else
 			{
-				newLength -= 1;
+				//Make sure path does not end with slash
+				if(lastChar == '\\' || lastChar == '/')
+				{
+					newLength--;
+				}
 			}
 		}
 
@@ -1092,7 +1087,7 @@ static int GM_CDECL gmfToString(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 
-	char buffer[256] = {};
+	char buffer[256];
 	const char * str = a_thread->Param(0).AsString(a_thread->GetMachine(),buffer,256);
 	a_thread->PushNewString(str);
 	return GM_OK;
@@ -1102,7 +1097,7 @@ static int GM_CDECL gmfToStringWithType(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 
-	char buffer[256] = {};
+	char buffer[256];
 	const char * str = a_thread->Param(0).AsStringWithType(a_thread->GetMachine(),buffer,256);
 	a_thread->PushNewString(str);
 	return GM_OK;

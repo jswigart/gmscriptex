@@ -176,7 +176,7 @@ static void CallEndCallback(gmThread * a_thread, const gmVariable & retVal)
 	if(a_thread->m_debugFlags & TF_STEPOVER)
 	{
 		enum { BufferSize = 256 };
-		char valueBuffer[BufferSize] = {};
+		char valueBuffer[BufferSize];
 		const char * retValue = retVal.AsString(a_thread->GetMachine(),valueBuffer,BufferSize);
 		const char * retType = a_thread->GetMachine()->GetTypeName(retVal.m_type);
 		const int varId = 

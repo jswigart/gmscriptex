@@ -133,7 +133,7 @@ bool gmFunctionObject::Init(gmMachine * a_machine, bool a_debug, gmFunctionInfo 
 		// find the objects this function references by iterating over the byte code and collecting them.
 		// we could perform this step in the compilation phase if we don't want to iterate over the byte code.
 
-		gmptr * references = (gmptr *) GM_NEW( char[a_info.m_byteCodeLength] );
+		gmptr * references = (gmptr *) GM_NEW( char[a_info.m_byteCodeLength + 16] );
 
 		union
 		{

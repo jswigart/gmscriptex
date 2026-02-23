@@ -59,7 +59,7 @@
 
 
 #ifdef _WIN32
-#pragma warning(disable:4786)
+//#pragma warning(disable:4786)
 #endif
 
 #include <math.h>
@@ -876,7 +876,6 @@ public:
 	{
 		return (float)sqrtf(x * x + y * y);
 	}	
-	void Reflection(const Vec2 &a,const Vec2 &b);
 	float Length() const
 	{
 		return float(sqrtf( x*x + y*y ));
